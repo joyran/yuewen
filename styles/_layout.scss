@@ -1,0 +1,21 @@
+// layout 布局
+
+@import "variable";
+
+.ant-layout {
+  background: $background-color;
+}
+
+.ant-layout-header {
+  background: $background-color;
+}
+
+.ant-layout-content {
+  width: $layout-width;
+  margin: 0 auto;
+  color: $grey-dark;
+}
+
+body {
+  font-family: $font-family;
+}

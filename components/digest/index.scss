@@ -1,0 +1,101 @@
+@import "././styles/variable";
+
+.digest-list {
+  width: 100%;
+}
+
+.digest {
+  position: relative;
+  border-bottom: 1px solid $grey-lighter;
+  padding: 15px 0;
+}
+
+.digest-footer {
+  font-size: 12px;
+  color: $grey-light;
+  margin-right: 24px;
+}
+
+.digest-date {
+  font-size: 12px;
+  color: $grey-light;
+  margin-right: 16px;
+}
+
+.avatar {
+  font-size: 12px;
+  margin-right: 16px;
+}
+
+.avatar-img {
+  width: 32px;
+  height: 32px;
+  vertical-align: middle;
+  border-radius: 50%;
+  margin-right: 16px;
+}
+
+.digest-title {
+  display: inline-block;
+  width: 100%;
+  font-size: 20px;
+  font-weight: 400;
+  color: $grey-darker;
+  line-height: 1.5;
+  vertical-align: middle;
+  text-overflow: ellipsis;
+  margin: 8px 0;
+  font-weight: 700;
+}
+
+.digest-title:hover {
+  text-decoration: underline;
+}
+
+.digest-content {
+  font-size: 14px;
+  margin: 0 0 12px;
+  max-height: 50px;
+  color: $grey-dark;
+  line-height: 28px;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.empty-label {
+  font-size: 14px;
+  margin-top: 20px;
+  color: $grey;
+}
+
+.loading {
+  text-align: center;
+  padding-top: 200px;
+  height: 1000px;
+}
+
+.loading-more {
+  width: 100%;
+  text-align: center;
+  padding-top: 20px;
+}
+
+.loading-more-button {
+  width: 100%;
+}
+
+.digest-tag {
+  height: 20px;
+  border: none;
+  &:hover {
+    opacity: .85;
+  }
+}
+
+.digest-tag a {
+  color: #108ee9;
+  &:hover {
+    color: #108ee9;
+  }
+}

@@ -1,0 +1,79 @@
+@import "././styles/variable";
+@import "././styles/atom-one-dark";     // highlight atom-one-dark主题风格
+@import "article-preview";
+
+// 文章头部，包括标题，作者和创作时间
+.article-header {
+  .title {
+    margin: 32px 0;
+    font-size: 32px;
+    color: $grey-darker;
+    font-weight: 700;
+  }
+
+  .author-info {
+    margin: 30px 0;
+    font-size: 12px;
+  }
+
+  .avatar {
+    display: inline-block;
+    color: inherit;
+
+    img {
+      width: 40px;
+      height: 40px;
+      vertical-align: middle;
+      border-radius: 50%;
+      margin-right: 12px;
+    }
+  }
+
+  .split {
+    margin: 0 8px;
+  }
+}
+
+
+// 文章点赞
+.article-like {
+  margin-top: 40px;
+
+  .like-button {
+    padding: 6px 20px;
+    border: 1px solid $link-color;
+    color: $link-color;
+    display: inline-block;
+    border-radius: 3px;
+    font-size: 16px;
+    cursor: pointer;
+
+    .anticon {
+      font-size: 18px;
+      margin-right: 12px;
+      color: inherit;
+    }
+
+    &.active{
+      background: $link-color;
+      color: #fff;
+    }
+  }
+
+  .likers {
+    margin-top: 30px;
+
+    li {
+      float: left;
+      width: 32px;
+      height: 32px;
+      margin-right: 5px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+@import "././styles/variable";
+
+.nav {
+  font-size: 14px;
+  position: fixed;
+  z-index: 10;
+  left: 0;
+  right: 0;
+  top: 0;
+  width: 100%;
+  background: #fff;
+  box-shadow: 0px 0px 4px 0px $grey-light;
+
+  .nav-menu {
+    width: $layout-width;
+    margin: 0 auto;
+    border-bottom: none;
+    line-height: 60px;
+  }
+
+  .nav-avatar {
+    float: right;
+  }
+
+  .nav-avatar-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    vertical-align: middle;
+  }
+
+  .nav-notification {
+    float: right;
+
+    .anticon {
+      font-size: 20px;
+      vertical-align: middle;
+    }
+  }
+}

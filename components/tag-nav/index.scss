@@ -1,0 +1,35 @@
+@import "././styles/variable";
+
+.tag-nav {
+  height: 48px;
+  line-height: 48px;
+  border-bottom: 1px solid $grey-lighter;
+
+  ul {
+    height: 46px;
+    line-height: 46px;
+  }
+
+  li {
+    display: inline-block;
+    margin-right: 16px;
+    font-size: 14px;
+
+    a {
+      color: $grey-dark;
+
+      &:hover {
+        color: $link-color;
+      }
+    }
+  }
+
+  .active-tag {
+    border-bottom: 2px solid $link-color;
+
+    a {
+      font-weight: 700;
+      color: $link-color;
+    }
+  }
+}

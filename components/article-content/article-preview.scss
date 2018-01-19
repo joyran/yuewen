@@ -1,0 +1,127 @@
+// 文章内容显示
+.article-preview {
+  font-size: 14px;
+  line-height: 2;
+  color: $grey-darker;
+
+  h1 {
+    font-size: 30px;
+    line-height: 40px;
+    font-weight: 700;
+    padding-bottom: 8px;
+    margin: 16px 0;
+    color: $grey-darker;
+    border-bottom: 1px solid $grey-lighter;
+  }
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 30px;
+    padding-bottom: 8px;
+    margin: 16px 0;
+    color: $grey-darker;
+    border-bottom: 1px solid $grey-lighter;
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 26px;
+    margin: 12px 0;
+    color: $grey-darker;
+  }
+
+  h4, h5, h6 {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 26px;
+    margin: 10px 0;
+    color: $grey-darker;
+  }
+
+  p {
+    margin-bottom: 16px;
+  }
+
+  ol {
+    list-style-type: decimal;
+    padding-left: 24px;
+    margin-bottom: 16px;
+  }
+
+  ul {
+    list-style-type: disc;
+    padding-left: 24px;
+    margin-bottom: 16px;
+  }
+
+  img {
+    margin: 40px auto;
+    display: block;
+    max-width: 100%;
+  }
+
+  code {
+    margin: 0 5px;
+    padding: 0 5px;
+    color: #c7254e;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+  }
+
+  pre {
+    background: #282c34;
+    margin-bottom: 16px;
+    padding: 16px;
+    overflow: auto;
+    line-height: 1.5;
+    border-radius: 4px;
+    max-height: 800px;
+
+    code {
+      display: block;
+      color: #abb2bf;
+      background: #282c34;
+      font-family: Consolas, $font-family;
+    }
+  }
+
+  table {
+    display: table;
+    overflow: auto;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 24px auto;
+    max-width: 100%;
+
+    td, th {
+      word-break: break-all;
+      padding: 8px 12px;
+      border: 1px solid $grey-lighter;
+    }
+
+    th {
+      font-weight: bold;
+    }
+  }
+
+  hr {
+    margin: 24px 0;
+    color: $grey-lighter;
+  }
+
+  a {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  blockquote {
+    border-left: 4px solid $grey-light;
+    padding-left: 20px;
+    margin-left: 0;
+    font-style: italic;
+    color: $grey;
+  }
+}
