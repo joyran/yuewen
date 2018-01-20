@@ -39,25 +39,10 @@
 .article-like {
   margin-top: 40px;
 
-  .like-button {
-    padding: 6px 20px;
-    border: 1px solid $link-color;
-    color: $link-color;
-    display: inline-block;
-    border-radius: 3px;
-    font-size: 16px;
-    cursor: pointer;
-
-    .anticon {
-      font-size: 18px;
-      margin-right: 12px;
-      color: inherit;
-    }
-
-    &.active{
-      background: $link-color;
-      color: #fff;
-    }
+  .like-button .anticon {
+    font-size: 18px;
+    margin-right: 12px;
+    color: inherit;
   }
 
   .likers {
@@ -76,4 +61,13 @@
       }
     }
   }
+}
+
+.article-star {
+  position: relative;
+  left: 24px;
+  font-size: 32px;
+  cursor: pointer;
+  top: 4px;
+  color: $link-color;
 }

@@ -174,7 +174,7 @@ const MarkdownToolbar = (props) => {
             <li onClick={() => { props.dispatch(toggleAddLinkModal()); }}><Icon type="link" /></li>
           </Tooltip>
           <Tooltip placement="bottom" title="表格">
-            <li onClick={() => { props.dispatch(toggleAddTableModal()); }}><Icon type="calendar" /></li>
+            <li onClick={() => { props.dispatch(toggleAddTableModal()); }}><Icon type="table" /></li>
           </Tooltip>
           <li className="release">
             <Button

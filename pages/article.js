@@ -28,7 +28,8 @@ const initialState = {
     authorId: null,
     authorAvatar: null,
     createAt: null,
-    comments: null
+    comments: null,
+    isStar: null,
   },
   session: {
     uid: null,
@@ -74,8 +75,8 @@ Article.getInitialProps = async ({ store, req, query }) => {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  res = await res.json();
-  store.dispatch(readArticleSuccess(res.article));
+  const article = await res.json();
+  store.dispatch(readArticleSuccess(article));
 
   // ----- 读取文章点赞人列表和点赞人数
   res = await fetch(`http://${req.headers.host}/api/v1/article/like?aid=${aid}`, {

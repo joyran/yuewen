@@ -2,10 +2,10 @@
  * 文章内容展示
  */
 
-import { Tooltip, Icon } from 'antd';
+import { Tooltip, Icon, Button } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { updateArticleLikes } from '../../reducers/article';
+import { updateArticleLikes, updateArticleStar } from '../../reducers/article';
 import stylesheet from './index.scss';
 
 // 时间汉化
@@ -39,12 +39,23 @@ const ArticleContent = (props) => {
       {/* 点赞 div */}
       <div className="article-like">
         {/* 点赞按钮，已点赞实心，未点赞空心 */}
-        <div
-          className={props.article.isLiked ? 'like-button active' : 'like-button'}
+        <Button
+          className="like-button"
+          type={props.article.isLiked ? 'primary' : 'default'}
+          size="large"
+          icon="like"
           onClick={() => { props.dispatch(updateArticleLikes(props.article.aid)); }}
         >
-          <Icon type="like" />{props.article.likerCount}
-        </div>
+          {props.article.likerCount}
+        </Button>
+        {/* 收藏按钮 */}
+        <Tooltip title={props.article.isStar ? '取消收藏' : '收藏文章'}>
+          <Icon
+            onClick={() => { props.dispatch(updateArticleStar(props.article.aid)); }}
+            className="article-star"
+            type={props.article.isStar ? 'star' : 'star-o'}
+          />
+        </Tooltip>
         {/* 点赞人列表 */}
         <ol className="likers">
           {props.article.likers.map((liker) => {

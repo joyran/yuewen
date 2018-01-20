@@ -7,6 +7,8 @@ import { Input, Button } from 'antd';
 import { connect } from 'react-redux';
 import { createArticleReply } from '../../reducers/article';
 
+const { TextArea } = Input;
+
 class ReplyEditor extends Component {
   constructor(props) {
     super(props);
@@ -48,15 +50,14 @@ class ReplyEditor extends Component {
   render() {
     return (
       <div className="comment-reply-input-textarea clearfix hidden">
-        <Input
-          type="textarea"
-          autosize={{ minRows: 1 }}
+        <TextArea
+          autosize={{ minRows: 2 }}
           placeholder="写下你的回复..."
           onChange={this.onChangeValue}
           value={this.state.reply}
+          onPressEnter={this.onClickButton}
         />
         <Button
-          size="large"
           type="primary"
           disabled={this.state.disabled}
           onClick={this.onClickButton}

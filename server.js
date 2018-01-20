@@ -16,7 +16,8 @@ const comment = require('./server/routers/comment');
 const like = require('./server/routers/like');
 const auth = require('./server/routers/auth');
 
-const port = parseInt(process.env.PORT, 10) || 3000;
+// 端口号
+const port = parseInt(process.env.PORT, 10) || 527;
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
@@ -84,8 +85,14 @@ app.prepare().then(() => {
   })
 
   // 写文章路由
-  router.get('/markdown', async ctx => {
+  router.get('/markdown/:aid', async ctx => {
     await app.render(ctx.req, ctx.res, '/markdown', ctx.params);
+    ctx.respond = false;
+  })
+
+  // 文章管理路由
+  router.get('/manage', async ctx => {
+    await app.render(ctx.req, ctx.res, '/manage', ctx.params);
     ctx.respond = false;
   })
 

@@ -4,16 +4,28 @@
 
 .ant-layout {
   background: $background-color;
+
+  // 调整部分全局样式
+  ul, ol {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
 }
 
 .ant-layout-header {
   background: $background-color;
+  padding: 0;
 }
 
 .ant-layout-content {
   width: $layout-width;
   margin: 0 auto;
   color: $grey-dark;
+}
+
+.ant-layout-footer {
+  margin-top: 48px;
 }
 
 body {

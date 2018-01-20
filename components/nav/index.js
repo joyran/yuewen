@@ -2,12 +2,12 @@
  * 顶部导航
  */
 
-import { Menu, Icon, Input, Badge } from 'antd';
+import { Menu, Icon, Badge } from 'antd';
 import { connect } from 'react-redux';
 import stylesheet from './index.scss';
 
 const SubMenu = Menu.SubMenu;
-const Search = Input.Search;
+// const Search = Input.Search;
 
 const Nav = (props) => {
   return (
@@ -51,12 +51,6 @@ const Nav = (props) => {
             <a href="/notice"><Icon type="notification" /></a>
           </Badge>
         </Menu.Item>
-        <Search
-          placeholder="搜索你感兴趣的内容..."
-          size="large"
-          style={{ width: 200, float: 'right', marginRight: 30 }}
-          onSearch={(value) => { top.location = `/search/${value}`; }}
-        />
       </Menu>
     </div>
   );

@@ -32,7 +32,7 @@ const Digest = (props) => {
                   {digest.authorName}
                 </a>
                 <span className="digest-date">
-                  发表于 {moment(digest.createAt, 'X').fromNow()}
+                  {moment(digest.createAt, 'X').fromNow()}
                 </span>
                 {/* digest.createAt !== digest.updateAt ?
                   <span className="digest-date">更新于 {moment(digest.updateAt, 'X').fromNow()}</span> : '' */}
@@ -63,7 +63,6 @@ const Digest = (props) => {
       {props.digest.digests.length > 0 ?
         <div className="loading-more">
           <Button
-            size="large"
             type="primary"
             className="loading-more-button"
             disabled={props.digest.loadBtnDisableState}

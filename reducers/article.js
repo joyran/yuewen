@@ -13,19 +13,27 @@ export const {
   readArticleSuccess,
   readArticleLikesSuccess,
   updateArticleLikesSuccess,
-  readArticleCommentsSuccess
+  readArticleCommentsSuccess,
+  updateArticleStarSuccess
 } = createActions(
   'READ_ARTICLE_SUCCESS',
   'READ_ARTICLE_LIKES_SUCCESS',
   'UPDATE_ARTICLE_LIKES_SUCCESS',
-  'READ_ARTICLE_COMMENTS_SUCCESS'
+  'READ_ARTICLE_COMMENTS_SUCCESS',
+  'UPDATE_ARTICLE_STAR_SUCCESS'
 );
 
 /**
  * 更新文章点赞用户及用户总数
  * @param aid 文章索引 id
  */
-export const updateArticleLikes = aid => (dispatch) => {
+export const updateArticleLikes = aid => (dispatch, getState) => {
+  const { isLiked } = getState().article;
+  if (isLiked) {
+    message.warn('你已经点过赞');
+    return false;
+  }
+
   return fetch('/api/v1/article/like', {
     credentials: 'include',
     method: 'post',
@@ -38,6 +46,35 @@ export const updateArticleLikes = aid => (dispatch) => {
     .then((res) => {
       if (res.status === 200) {
         dispatch(updateArticleLikesSuccess(res.likers));
+        message.success('点赞成功');
+      }
+    })
+    .catch((err) => {
+      console.error(err.message);
+      message.error(networkErrorMsg, 5);
+    });
+};
+
+
+/**
+ * 收藏和取消收藏文章
+ */
+export const updateArticleStar = aid => (dispatch) => {
+  return fetch('/api/v1/article/star', {
+    credentials: 'include',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ aid })
+  })
+    .then(res => res.json())
+    .then((res) => {
+      dispatch(updateArticleStarSuccess());
+      if (res.isStar) {
+        message.success('收藏文章成功');
+      } else {
+        message.success('取消收藏文章成功');
       }
     })
     .catch((err) => {
@@ -117,6 +154,7 @@ export const article = handleActions({
     authorId: action.payload.authorId,
     authorAvatar: action.payload.authorAvatar,
     createAt: action.payload.createAt,
+    isStar: action.payload.isStar
   }),
 
   READ_ARTICLE_LIKES_SUCCESS: (state, action) => ({
@@ -136,6 +174,11 @@ export const article = handleActions({
   READ_ARTICLE_COMMENTS_SUCCESS: (state, action) => ({
     ...state,
     comments: action.payload
+  }),
+
+  UPDATE_ARTICLE_STAR_SUCCESS: state => ({
+    ...state,
+    isStar: !state.isStar
   })
 }, {});
 

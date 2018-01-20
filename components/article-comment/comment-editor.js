@@ -8,6 +8,8 @@ import { connect } from 'react-redux';
 import { Picker } from 'emoji-mart';
 import { createArticleComment } from '../../reducers/article';
 
+const { TextArea } = Input;
+
 // emoji-mart 中文汉化
 const i18n = {
   search: '搜索',
@@ -70,12 +72,12 @@ class CommentEditor extends Component {
   render() {
     return (
       <div className="comment-input-textarea clearfix">
-        <Input
-          type="textarea"
+        <TextArea
           autosize={{ minRows: 2 }}
           placeholder="写下你的评论..."
           onChange={this.onChangeValue}
           value={this.state.comment}
+          onPressEnter={this.onClickButton}
         />
         <Picker
           onClick={this.addEmoji}
@@ -87,7 +89,6 @@ class CommentEditor extends Component {
           style={{ width: '310px', display: 'none', position: 'absolute', zIndex: 10000, right: '124px', top: '76px' }}
         />
         <Button
-          size="large"
           type="primary"
           disabled={this.state.disabled}
           onClick={this.onClickButton}
