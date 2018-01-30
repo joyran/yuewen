@@ -6,6 +6,8 @@ var Router = require('koa-router');
 var router = new Router();
 var Article = require('../models/article');
 var Like = require('../models/like');
+var Notice = require('../models/notice');
+var User = require('../models/user');
 
 
 /**
@@ -54,12 +56,11 @@ router.post('/api/v1/article/like', async ctx => {
   const { aid } = ctx.request.body;
   const userObjectId = ctx.session.objectId;
 
-  // 根据 aid 查找 _id
-  const article = await Article.findOne({ '_id': aid }).lean();
-  // const articleObjectId = article._id;
+  const article = await Article.findOne({ _id: aid }).lean();
+  const user = await User.findOne({ _id: userObjectId }).lean();
 
   // 查找该篇文章是否被当前登录用户点过赞
-  var ret = await Like.findOne({ 'article': aid, 'user': userObjectId });
+  var ret = await Like.findOne({ article: aid, user: userObjectId });
 
   // 如果已经点过赞则取消点赞，反之添加点赞记录
   if (ret) {
@@ -67,14 +68,26 @@ router.post('/api/v1/article/like', async ctx => {
     await Like.findByIdAndRemove(ret._id).exec();
 
     // 文章点赞数减 1
-    await Article.findByIdAndUpdate({ '_id': aid }, {'likes': article.likes - 1}).exec();
+    await Article.findByIdAndUpdate({ _id: aid }, { likes: article.likes - 1 }).exec();
   } else {
     // 添加点赞记录
     var createAt = parseInt(Date.now()/1000);
-    await Like.create({ 'article': aid, 'user': userObjectId, createAt });
+    await Like.create({ article: aid, user: userObjectId, createAt });
 
     // 文章点赞数加 1
-    await Article.findByIdAndUpdate({ '_id': aid }, {'likes': article.likes + 1}).exec();
+    await Article.findByIdAndUpdate({ _id: aid }, { likes: article.likes + 1 }).exec();
+
+    // 生成点赞通知消息
+    await Notice.create({
+      at: article.author,
+      content: '',
+      link: `/article/${aid}`,
+      title: `${user.username} 点赞了文章 ${article.title}`,
+      initiator: userObjectId,
+      hasView: false,
+      type: 'like',
+      createAt
+    });
   }
 
   // 获取更新后的点赞人列表

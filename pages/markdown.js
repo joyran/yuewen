@@ -7,8 +7,9 @@ import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunkMiddleware from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
-import { Layout } from 'antd';
+import { Layout, LocaleProvider } from 'antd';
 import Head from 'next/head';
+import zhCN from 'antd/lib/locale-provider/zh_CN';
 import MarkdownToolbar from '../components/markdown/markdown-toolbar';
 import MarkdownEditor from '../components/markdown/markdown-editor';
 import reducers from '../reducers/markdown';
@@ -40,15 +41,17 @@ const initStore = (state = initialState) => {
 
 const Markdown = () => {
   return (
-    <Layout>
-      <Head>
-        <title>悦文 · 写新文章</title>
-        <link rel="stylesheet" href="/css/antd.min.css" />
-        <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
-      </Head>
-      <MarkdownToolbar />
-      <MarkdownEditor />
-    </Layout>
+    <LocaleProvider locale={zhCN}>
+      <Layout>
+        <Head>
+          <title>悦文 · 写新文章</title>
+          <link rel="stylesheet" href="/css/antd.min.css" />
+          <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
+        </Head>
+        <MarkdownToolbar />
+        <MarkdownEditor />
+      </Layout>
+    </LocaleProvider>
   );
 };
 

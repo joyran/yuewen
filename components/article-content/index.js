@@ -2,7 +2,7 @@
  * 文章内容展示
  */
 
-import { Tooltip, Icon, Button } from 'antd';
+import { Tooltip, Icon, Button, Avatar } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { updateArticleLikes, updateArticleStar } from '../../reducers/article';
@@ -23,7 +23,7 @@ const ArticleContent = (props) => {
             href={`/user/${props.article.authorId}`}
             className="avatar"
           >
-            <img alt={props.article.author} src={props.article.authorAvatar} />
+            <Avatar src={props.article.authorAvatar} />
             {props.article.author}
           </a>
           <span className="split"> · </span>

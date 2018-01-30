@@ -7,10 +7,11 @@ import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunkMiddleware from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
-import { Layout } from 'antd';
+import { Layout, BackTop } from 'antd';
 import Head from 'next/head';
 import { reducers, readArticleSuccess, readArticleCommentsSuccess, readArticleLikesSuccess } from '../reducers/article';
 import { readSessionSuccess } from '../reducers/session';
+import { readUnviewNoticeSuccess } from '../reducers/notice';
 import ArticleContent from '../components/article-content/index';
 import ArticleComment from '../components/article-comment/index';
 import Nav from '../components/nav/index';
@@ -35,7 +36,16 @@ const initialState = {
     uid: null,
     username: null,
     avatar: null,
-    notifications: 5
+    followedTags: []
+  },
+  notice: {
+    comments: [],
+    likes: [],
+    unviewComments: [],
+    unviewLikes: [],
+    unviewCommentsCount: 5,
+    unviewLikesCount: 5,
+    unviewAllCount: 10
   }
 };
 
@@ -59,6 +69,7 @@ const Article = () => {
         <ArticleComment />
       </Content>
       <Footer />
+      <BackTop />
     </Layout>
   );
 };
@@ -102,6 +113,14 @@ Article.getInitialProps = async ({ store, req, query }) => {
   });
   res = await res.json();
   store.dispatch(readSessionSuccess(res.user));
+
+  // ----- 读取当前登录用户未读消息
+  res = await fetch(`http://${req.headers.host}/api/v1/notice?state=unview`, {
+    method: 'get',
+    headers: { Cookie: req.headers.cookie }
+  });
+  const notice = await res.json();
+  store.dispatch(readUnviewNoticeSuccess(notice));
 };
 
 

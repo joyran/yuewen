@@ -14,6 +14,7 @@ const digest = require('./server/routers/digest');
 const article = require('./server/routers/article');
 const comment = require('./server/routers/comment');
 const like = require('./server/routers/like');
+const notice = require('./server/routers/notice');
 const auth = require('./server/routers/auth');
 
 // 端口号
@@ -108,6 +109,7 @@ app.prepare().then(() => {
   koa.use(article.routes()).use(article.allowedMethods());
   koa.use(comment.routes()).use(comment.allowedMethods());
   koa.use(like.routes()).use(like.allowedMethods());
+  koa.use(notice.routes()).use(notice.allowedMethods());
 
   // 特定路由放在通用路由 * 之前
   router.get('*', async ctx => {

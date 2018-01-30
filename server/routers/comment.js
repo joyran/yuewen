@@ -6,6 +6,8 @@ var Router = require('koa-router');
 var router = new Router();
 var Comment = require('../models/comment');
 var Article = require('../models/article');
+var User = require('../models/user');
+var Notice = require('../models/notice');
 
 /**
  * 根据 rid 和 aid 读取该评论的所有回复
@@ -38,7 +40,7 @@ const readArticleComments = async (aid) => {
   // mongoose find 查询返回的结果默认不可以修改，除非用 .lean() 查询。
   // 或者用.toObject()转换成 objcet对象
   // rid 为 "000000000000000000000000" 表示原始评论，否则为评论的回复
-  var comments = await Comment.find({ article: aid, rid: "000000000000000000000000" })
+  var comments = await Comment.find({ article: aid, rid: '000000000000000000000000' })
                               .sort({ createAt: -1 }).populate('author').populate('atuser').lean();
 
   comments.map(async (comment) => {
@@ -92,15 +94,29 @@ router.post('/api/v1/article/comment', async ctx => {
   var article = await Article.findOne({ _id: aid }).lean();
   var atuser = article.author;
 
+  var user = await User.findOne({ _id: author }).lean();
+
   // 直接评论文章 rid 为 000000000000000000000000
   const rid = '000000000000000000000000';
   const createAt = parseInt(Date.now()/1000);
 
   // 写入评论
-  await Comment.create({ author, atuser, rid, article: aid, comment, createAt });
+  var newComment = await Comment.create({ author, atuser, rid, article: aid, comment, createAt });
 
   // 评论写入成功后更新文章评论数量 comments
-  await Article.findByIdAndUpdate({ '_id': aid }, {'comments': article.comments + 1}).exec();
+  await Article.findByIdAndUpdate({ _id: aid }, {comments: article.comments + 1}).exec();
+
+  // 生成新的评论通知消息
+  await Notice.create({
+    at: atuser,
+    content: comment,
+    link: `/article/${aid}#comment-${newComment._id}`,
+    title: `${user.username} 评论了你的文章 ${article.title}`,
+    initiator: author,
+    hasView: false,
+    type: 'comment',
+    createAt
+  });
 
   // 写入成功后重新读取所有的评论并返回给前端显示
   var comments = await readArticleComments(aid);
@@ -122,14 +138,27 @@ router.post('/api/v1/article/reply', async ctx => {
 
   // 评论作者
   const author = ctx.session.objectId;
+  var user = await User.findOne({ _id: author }).lean();
   var article = await Article.findOne({ _id: aid }).lean();
   const createAt = parseInt(Date.now()/1000);
 
   // 写入评论
-  await Comment.create({ author, atuser, rid, article: aid, comment: reply, createAt });
+  var newComment = await Comment.create({ author, atuser, rid, article: aid, comment: reply, createAt });
 
   // 评论写入成功后更新文章评论数量 comments
-  await Article.findByIdAndUpdate({ '_id': aid }, {'comments': article.comments + 1}).exec();
+  await Article.findByIdAndUpdate({ _id: aid }, {comments: article.comments + 1}).exec();
+
+  // 生成新的评论回复通知消息
+  await Notice.create({
+    at: atuser,
+    content: reply,
+    link: `/article/${aid}#comment-${newComment._id}`,
+    title: `${user.username} 回复了你在文章 ${article.title} 中的评论`,
+    initiator: author,
+    hasView: false,
+    type: 'comment',
+    createAt
+  });
 
   // 写入成功后重新读取所有的评论并返回给前端显示
   var comments = await readArticleComments(aid);

@@ -7,7 +7,7 @@ var router = new Router();
 var User = require('../models/user');
 
 /**
- * 退出登录，删除 uid和koa:sess cookie，删除所有session
+ * 退出登录，删除 uid和 koa:sess cookie，删除所有session
  */
 router.del('/api/v1/session', async ctx => {
   // 清空 session
@@ -22,6 +22,7 @@ router.del('/api/v1/session', async ctx => {
   });
 
   ctx.status = 204;
+  ctx.body = {};
 })
 
 

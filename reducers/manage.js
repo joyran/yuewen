@@ -5,6 +5,7 @@ import { createActions, handleActions } from 'redux-actions';
 import { combineReducers } from 'redux';
 import { message } from 'antd';
 import { session } from './session';
+import { notice } from './notice';
 
 const networkErrorMsg = '网络连接失败，请刷新重试！';
 
@@ -47,4 +48,4 @@ export const manage = handleActions({
   })
 }, {});
 
-export const reducers = combineReducers({ manage, session });
+export const reducers = combineReducers({ manage, session, notice });
