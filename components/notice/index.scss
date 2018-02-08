@@ -1,0 +1,48 @@
+.notices {
+  margin-top: 24px;
+
+  .ant-list-item {
+    position: relative;
+    padding: 16px 24px;
+    cursor: pointer;
+    align-items: flex-start;
+    flex-direction: column;
+
+    &:hover {
+      background: #e6f7ff;
+    }
+  }
+
+  .ant-list-item-content {
+    position: absolute;
+    left: 8px;
+    top: 20px;
+  }
+
+  .unview {
+    // background: #e6f7ff;
+  }
+
+  .viewed {
+    // background: rgba(0, 0, 0, 0.2);
+    opacity: 0.7;
+  }
+
+  .ant-list-item-meta-title {
+    margin-bottom: 8px;
+    color: #333;
+  }
+
+  .ant-list-item-meta-description {
+    color: #666;
+    line-height: 28px;
+  }
+  .ant-list-item-action {
+    margin-left: 48px;
+
+    li {
+      font-size: 12px;
+      margin-top: 8px;
+    }
+  }
+}

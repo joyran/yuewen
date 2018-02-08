@@ -65,7 +65,7 @@ const ArticleManage = (props) => {
         dataSource={props.manage.articles}
         pagination={pagination}
         rowKey="_id"
-        style={{ marginTop: 30 }}
+        style={{ marginTop: 24 }}
       />
     </div>
   );

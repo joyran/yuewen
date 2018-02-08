@@ -1,5 +1,5 @@
 /**
- * 首页
+ * 通知消息页面
  */
 
 import withRedux from 'next-redux-wrapper';
@@ -9,29 +9,16 @@ import thunkMiddleware from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
 import { Layout, BackTop } from 'antd';
 import Head from 'next/head';
-import reducers from '../reducers/index';
-import { readDigestsSuccessByServer, disableLoadButton, activeTag } from '../reducers/digest';
+import { reducers, readAllNoticeSuccess, readUnviewNoticeSuccess } from '../reducers/notice';
 import { readSessionSuccess } from '../reducers/session';
-import { readUnviewNoticeSuccess } from '../reducers/notice';
-import Digest from '../components/digest/index';
 import Nav from '../components/nav/index';
-import TagNav from '../components/tag-nav/index';
+import Notice from '../components/notice/index';
 import stylesheet from '../styles/index.scss';
 
 const { Header, Content, Footer } = Layout;
 
 // 初始默认 state
 const initialState = {
-  digest: {
-    digests: [],
-    loadBtnDisableState: false,
-    loadBtnLoadingState: false,
-    loadBtnLabel: '加载更多',
-    emptyLabel: '还没有一篇文章',
-    skip: 0,
-    limit: 10,
-    activeTag: null
-  },
   session: {
     uid: null,
     username: null,
@@ -39,8 +26,7 @@ const initialState = {
     followedTags: []
   },
   notice: {
-    comments: [],
-    likes: [],
+    notices: [],
     unviewComments: [],
     unviewLikes: [],
     unviewCommentsCount: 5,
@@ -65,8 +51,7 @@ const Index = () => {
         <Nav />
       </Header>
       <Content>
-        <TagNav />
-        <Digest />
+        <Notice />
       </Content>
       <Footer />
       <BackTop />
@@ -74,44 +59,33 @@ const Index = () => {
   );
 };
 
-Index.getInitialProps = async ({ store, req, query }) => {
+Index.getInitialProps = async ({ store, req }) => {
   var res;
-  // ----- 根据标签读取文章摘要列表
-  // limit
-  const limit = store.getState().digest.limit;
-  const tag = typeof query.tag !== 'undefined' ? query.tag : '';
-  // 请求 url 必须为完整路径，不能为绝对路径 /api/v1/digests
-  // isomorphic-fetch 在 node 端不会自动带上 cookie，需要手动添加 headers: { Cookie: req.headers.cookie }
-  res = await fetch(`http://${req.headers.host}/api/v1/digests?tag=${tag}&skip=0&limit=${limit}`, {
-    method: 'get',
-    headers: { Cookie: req.headers.cookie }
-  });
-  const digest = await res.json();
-  store.dispatch(readDigestsSuccessByServer(digest.digests));
-
-  // isEnd = true 表示全部加载完成
-  if (digest.isEnd) {
-    store.dispatch(disableLoadButton());
-  }
-
-  // 更新 activeTag
-  store.dispatch(activeTag(tag));
+  var notice;
 
   // ----- 读取当前登录用户id, 用户名, 头像
   res = await fetch(`http://${req.headers.host}/api/v1/session`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  const session = await res.json();
-  store.dispatch(readSessionSuccess(session.user));
+  res = await res.json();
+  store.dispatch(readSessionSuccess(res.user));
 
   // ----- 读取当前登录用户未读消息
   res = await fetch(`http://${req.headers.host}/api/v1/notice/unview`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  const notice = await res.json();
+  notice = await res.json();
   store.dispatch(readUnviewNoticeSuccess(notice));
+
+  // ----- 读取当前登录用户所有通知消息
+  res = await fetch(`http://${req.headers.host}/api/v1/notice`, {
+    method: 'get',
+    headers: { Cookie: req.headers.cookie }
+  });
+  notice = await res.json();
+  store.dispatch(readAllNoticeSuccess(notice));
 };
 
 

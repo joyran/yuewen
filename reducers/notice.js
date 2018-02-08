@@ -1,6 +1,8 @@
 import { createActions, handleActions } from 'redux-actions';
+import { combineReducers } from 'redux';
 import { message } from 'antd';
 import fetch from 'isomorphic-fetch';
+import { session } from './session';
 
 const networkErrorMsg = '网络连接失败，请刷新重试！';
 
@@ -9,10 +11,12 @@ const networkErrorMsg = '网络连接失败，请刷新重试！';
 // ------------------------
 export const {
   readUnviewNoticeSuccess,
+  readAllNoticeSuccess,
   updateAllCommentNoticeToViewSuccess,
   updateAllLikeNoticeToViewSuccess
 } = createActions(
   'READ_UNVIEW_NOTICE_SUCCESS',
+  'READ_ALL_NOTICE_SUCCESS',
   'UPDATE_ALL_COMMENT_NOTICE_TO_VIEW_SUCCESS',
   'UPDATE_ALL_LIKE_NOTICE_TO_VIEW_SUCCESS'
 );
@@ -21,7 +25,7 @@ export const {
  * 更新所有评论通知消息状态为已读
  */
 export const updateAllCommentNoticeToView = () => (dispatch) => {
-  return fetch('/api/v1/notice/view', {
+  return fetch('/api/v1/notice/toview', {
     credentials: 'include',
     method: 'post',
     headers: {
@@ -45,7 +49,7 @@ export const updateAllCommentNoticeToView = () => (dispatch) => {
  * 更新评论通知消息状态为已读, 然后跳转到文章评论
  */
 export const updateCommentNoticeToView = (nid, link) => () => {
-  return fetch('/api/v1/notice/view', {
+  return fetch('/api/v1/notice/toview', {
     credentials: 'include',
     method: 'post',
     headers: {
@@ -65,7 +69,7 @@ export const updateCommentNoticeToView = (nid, link) => () => {
  * 更新所有点赞通知消息状态为已读
  */
 export const updateAllLikeNoticeToView = () => (dispatch) => {
-  return fetch('/api/v1/notice/view', {
+  return fetch('/api/v1/notice/toview', {
     credentials: 'include',
     method: 'post',
     headers: {
@@ -89,7 +93,7 @@ export const updateAllLikeNoticeToView = () => (dispatch) => {
  * 更新点赞通知消息状态为已读, 然后跳转到文章
  */
 export const updateLikeNoticeToView = (nid, link) => () => {
-  return fetch('/api/v1/notice/view', {
+  return fetch('/api/v1/notice/toview', {
     credentials: 'include',
     method: 'post',
     headers: {
@@ -118,6 +122,11 @@ export const notice = handleActions({
     unviewAllCount: action.payload.unviewAllCount
   }),
 
+  READ_ALL_NOTICE_SUCCESS: (state, action) => ({
+    ...state,
+    notices: action.payload
+  }),
+
   UPDATE_ALL_COMMENT_NOTICE_TO_VIEW_SUCCESS: state => ({
     ...state,
     unviewComments: [],
@@ -132,3 +141,5 @@ export const notice = handleActions({
     unviewAllCount: state.unviewCommentsCount
   })
 }, {});
+
+export const reducers = combineReducers({ session, notice });

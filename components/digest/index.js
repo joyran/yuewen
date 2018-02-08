@@ -34,8 +34,6 @@ const Digest = (props) => {
                 <span className="digest-date">
                   {moment(digest.createAt, 'X').fromNow()}
                 </span>
-                {/* digest.createAt !== digest.updateAt ?
-                  <span className="digest-date">更新于 {moment(digest.updateAt, 'X').fromNow()}</span> : '' */}
               </div>
               <a
                 href={`/article/${digest.aid}`}

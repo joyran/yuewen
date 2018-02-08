@@ -4,6 +4,7 @@
 
 import { Menu, Icon, Badge, Popover, Tabs, List, Avatar } from 'antd';
 import { connect } from 'react-redux';
+import moment from 'moment';
 import { deleteSession } from '../../reducers/session';
 import {
   updateCommentNoticeToView,
@@ -16,6 +17,9 @@ import stylesheet from './index.scss';
 const SubMenu = Menu.SubMenu;
 const TabPane = Tabs.TabPane;
 // const Search = Input.Search;
+
+// 时间汉化
+moment.locale('zh-cn');
 
 const Nav = (props) => {
   // 点赞未读消息为空时显示的内容
@@ -64,7 +68,10 @@ const Nav = (props) => {
               itemLayout="horizontal"
               dataSource={props.notice.unviewComments}
               renderItem={item => (
-                <List.Item>
+                <List.Item
+                  key={item._id}
+                  actions={[moment(item.createAt, 'X').fromNow()]}
+                >
                   <List.Item.Meta
                     onClick={() => { props.dispatch(updateCommentNoticeToView(item._id, item.link)); }}
                     avatar={<Avatar src={item.initiatorAvatar} />}
@@ -154,6 +161,7 @@ const Nav = (props) => {
             content={notice}
             trigger="click"
             placement="bottom"
+            overlayClassName="notification"
           >
             <Badge count={props.notice.unviewAllCount}>
               <Icon type="notification" />

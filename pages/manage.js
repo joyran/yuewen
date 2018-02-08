@@ -86,7 +86,7 @@ Manage.getInitialProps = async ({ store, req }) => {
   store.dispatch(readSessionSuccess(session.user));
 
   // ----- 读取当前登录用户未读消息
-  res = await fetch(`http://${req.headers.host}/api/v1/notice?state=unview`, {
+  res = await fetch(`http://${req.headers.host}/api/v1/notice/unview`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
