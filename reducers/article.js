@@ -15,13 +15,13 @@ export const {
   readArticleLikesSuccess,
   updateArticleLikesSuccess,
   readArticleCommentsSuccess,
-  updateArticleStarSuccess
+  updateArticleCollectionSuccess
 } = createActions(
   'READ_ARTICLE_SUCCESS',
   'READ_ARTICLE_LIKES_SUCCESS',
   'UPDATE_ARTICLE_LIKES_SUCCESS',
   'READ_ARTICLE_COMMENTS_SUCCESS',
-  'UPDATE_ARTICLE_STAR_SUCCESS'
+  'UPDATE_ARTICLE_COLLECTION_SUCCESS'
 );
 
 /**
@@ -60,8 +60,8 @@ export const updateArticleLikes = aid => (dispatch, getState) => {
 /**
  * 收藏和取消收藏文章
  */
-export const updateArticleStar = aid => (dispatch) => {
-  return fetch('/api/v1/article/star', {
+export const updateArticleCollection = aid => (dispatch) => {
+  return fetch('/api/v1/article/collection', {
     credentials: 'include',
     method: 'post',
     headers: {
@@ -71,8 +71,8 @@ export const updateArticleStar = aid => (dispatch) => {
   })
     .then(res => res.json())
     .then((res) => {
-      dispatch(updateArticleStarSuccess());
-      if (res.isStar) {
+      dispatch(updateArticleCollectionSuccess());
+      if (res.hasCollected) {
         message.success('收藏文章成功');
       } else {
         message.success('取消收藏文章成功');
@@ -148,14 +148,12 @@ export const createArticleReply = (aid, reply, atuser, rid) => (dispatch) => {
 export const article = handleActions({
   READ_ARTICLE_SUCCESS: (state, action) => ({
     ...state,
-    aid: action.payload.aid,
+    _id: action.payload._id,
     title: action.payload.title,
     markup: action.payload.markup,
     author: action.payload.author,
-    authorId: action.payload.authorId,
-    authorAvatar: action.payload.authorAvatar,
     createAt: action.payload.createAt,
-    isStar: action.payload.isStar
+    hasCollected: action.payload.hasCollected
   }),
 
   READ_ARTICLE_LIKES_SUCCESS: (state, action) => ({
@@ -177,9 +175,9 @@ export const article = handleActions({
     comments: action.payload
   }),
 
-  UPDATE_ARTICLE_STAR_SUCCESS: state => ({
+  UPDATE_ARTICLE_COLLECTION_SUCCESS: state => ({
     ...state,
-    isStar: !state.isStar
+    hasCollected: !state.hasCollected
   })
 }, {});
 

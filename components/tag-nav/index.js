@@ -2,28 +2,57 @@
  * 标签导航
  */
 
+import { Tabs, Card } from 'antd';
 import { connect } from 'react-redux';
+import InfiniteScroll from 'react-infinite-scroller';
+import ExcerptList from '../excerpt-list/index';
+import { readExcerptsByTag, changeTag } from '../../reducers/excerpt';
 import stylesheet from './index.scss';
 
+const TabPane = Tabs.TabPane;
+
 const TagNav = (props) => {
+  const { followedTags } = props.session;
+  const { loading, hasMore } = props.excerpt;
+
+  const onChangeTag = (key) => {
+    props.dispatch(changeTag(key));
+    props.dispatch(readExcerptsByTag());
+  };
+
+  const handleInfiniteOnLoad = () => {
+    if (!loading) {
+      props.dispatch(readExcerptsByTag());
+    }
+  };
+
   return (
     <div className="tag-nav">
       <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
-      <ul>
-        {props.digest.activeTag ?
-          <li key="new"><a href="/">new</a></li> :
-          <li className="active-tag" key="new"><a href="/">new</a></li>
-        }
+      <Tabs
+        defaultActiveKey="hot"
+        onChange={onChangeTag}
+        animated={false}
+      >
         {
-          props.session.followedTags.map((tag) => {
+          followedTags.map((tag) => {
             return (
-              props.digest.activeTag === tag ?
-                <li className="active-tag" key={tag}><a href={`/tag/${tag}`}>{tag}</a></li> :
-                <li key={tag}><a href={`/tag/${tag}`}>{tag}</a></li>
+              <TabPane tab={tag} key={tag}>
+                <InfiniteScroll
+                  initialLoad={false}
+                  pageStart={0}
+                  loadMore={handleInfiniteOnLoad}
+                  hasMore={!loading && hasMore}
+                  useWindow
+                >
+                  <ExcerptList dataSource={props.excerpt.dataSource} loading={loading} />
+                  { loading && hasMore && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
+                </InfiniteScroll>
+              </TabPane>
             );
           })
         }
-      </ul>
+      </Tabs>
     </div>
   );
 };

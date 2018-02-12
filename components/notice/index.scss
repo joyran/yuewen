@@ -1,3 +1,5 @@
+@import "././styles/variable";
+
 .notices {
   margin-top: 24px;
 
@@ -30,11 +32,11 @@
 
   .ant-list-item-meta-title {
     margin-bottom: 8px;
-    color: #333;
+    color: $grey-darker;
   }
 
   .ant-list-item-meta-description {
-    color: #666;
+    color: $grey-dark;
     line-height: 28px;
   }
   .ant-list-item-action {
@@ -44,5 +46,11 @@
       font-size: 12px;
       margin-top: 8px;
     }
+  }
+
+  .not-found {
+    margin-top: 100px;
+    text-align: center;
+    color: $grey;
   }
 }

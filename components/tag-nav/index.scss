@@ -1,35 +1,38 @@
 @import "././styles/variable";
 
 .tag-nav {
-  height: 48px;
-  line-height: 48px;
-  border-bottom: 1px solid $grey-lighter;
+  // background: #fff;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  // padding-left: 16px;
+  // padding-right: 16px;
 
-  ul {
-    height: 46px;
-    line-height: 46px;
+  .ant-tabs {
+    // overflow: unset;
   }
 
-  li {
-    display: inline-block;
-    margin-right: 16px;
-    font-size: 14px;
-
-    a {
-      color: $grey-dark;
-
-      &:hover {
-        color: $link-color;
-      }
-    }
+  .ant-tabs-nav-wrap {
+    padding: 0 24px;
   }
 
-  .active-tag {
-    border-bottom: 2px solid $link-color;
+  .ant-tabs-nav .ant-tabs-tab {
+    margin: 0;
+  }
 
-    a {
-      font-weight: 700;
-      color: $link-color;
-    }
+  .ant-tabs-ink-bar .ant-tabs-ink-bar-animated {
+    transform: translate3d(0px, 0px, 0px);
+  }
+
+  .ant-tabs-bar {
+    margin-bottom: 0;
+    background: #fff;
+  }
+
+  .ant-tabs-content {
+    background: #f6f6f6;
+  }
+
+  .ant-card-loading-content {
+    padding: 24px 20px;
   }
 }

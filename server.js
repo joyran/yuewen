@@ -10,11 +10,13 @@ const multer = require('koa-multer');
 
 // 导入路由
 const session = require('./server/routers/session');
-const digest = require('./server/routers/digest');
+const excerpt = require('./server/routers/excerpt');
 const article = require('./server/routers/article');
 const comment = require('./server/routers/comment');
 const like = require('./server/routers/like');
 const notice = require('./server/routers/notice');
+const collection = require('./server/routers/collection');
+const profile = require('./server/routers/profile');
 const auth = require('./server/routers/auth');
 
 // 端口号
@@ -97,6 +99,12 @@ app.prepare().then(() => {
     ctx.respond = false;
   })
 
+  // 个人主页
+  router.get('/profile/:uid', async ctx => {
+    await app.render(ctx.req, ctx.res, '/profile', ctx.params);
+    ctx.respond = false;
+  })
+
   // 主页路由
   router.get('/', async ctx => {
     await app.render(ctx.req, ctx.res, '/index', ctx.params);
@@ -104,12 +112,14 @@ app.prepare().then(() => {
   })
 
   // 应用外部路由文件
-  koa.use(digest.routes()).use(digest.allowedMethods());
+  koa.use(excerpt.routes()).use(excerpt.allowedMethods());
   koa.use(session.routes()).use(session.allowedMethods());
   koa.use(article.routes()).use(article.allowedMethods());
   koa.use(comment.routes()).use(comment.allowedMethods());
   koa.use(like.routes()).use(like.allowedMethods());
   koa.use(notice.routes()).use(notice.allowedMethods());
+  koa.use(collection.routes()).use(collection.allowedMethods());
+  koa.use(profile.routes()).use(profile.allowedMethods());
 
   // 特定路由放在通用路由 * 之前
   router.get('*', async ctx => {

@@ -8,6 +8,7 @@ var Article = require('../models/article');
 var Like = require('../models/like');
 var Tag = require('../models/tag');
 var User = require('../models/user');
+var Collection = require('../models/collection');
 
 
 /**
@@ -21,23 +22,15 @@ router.get('/api/v1/article', async ctx => {
   // 或者用.toObject()转换成 objcet对象
   var article = await Article.findOne({ _id: aid }).populate('author').lean();
 
-  // 判断文章是否被用户收藏
-  var user = await User.findOne({ _id: ctx.session.objectId }).lean();
-  var isStar = user.stars.some(function (star) {
-    return star.equals(aid);
-  });
-  article.isStar = isStar;
+  // 判断文章是否已经被用户收藏
+  var collection = await Collection.findOne({ user: ctx.session.objectId, article: aid }).lean();
+  var hasCollected = collection ? true : false;
+  article.hasCollected = hasCollected;
 
-  // 文章作者头像
-  article.authorAvatar = article.author.avatar;
-  // 文章作者 id
-  article.authorId = article.author._id;
-  // 文章作者
-  article.author = article.author.username;
-  // aid 更新为 _id
-  article.aid = article._id;
-  // 删除 user
-  delete article.user;
+  // 删除用户密码
+  delete article.author.password;
+  // 删除 markdown
+  delete article.markdown;
 
   // 输出返回值
   ctx.status = 200;
@@ -99,31 +92,6 @@ router.delete('/api/v1/article', async ctx => {
   ctx.body = articles;
 });
 
-/**
- * 收藏和取消收藏文章
- */
-router.post('/api/v1/article/star', async ctx => {
-  const { aid } = ctx.request.body;
-
-  // 首先获取用户收藏状态
-  var user = await User.findOne({ _id: ctx.session.objectId }).lean();
-  var isStar = user.stars.some(function (star) {
-    return star.equals(aid);
-  });
-
-  if (isStar) {
-    // 已收藏则取消收藏
-    var res = await User.findOneAndUpdate({ _id: ctx.session.objectId }, { $pull: { stars: aid }}).exec();
-    console.log(res);
-  } else {
-    // 未收藏则添加收藏
-    await User.findOneAndUpdate({ _id: ctx.session.objectId }, { $addToSet: { stars: aid }}).exec();
-  }
-
-  // 输出 response
-  ctx.status = 200;
-  ctx.body = { isStar: !isStar };
-});
 
 /**
  * 读取所有标签

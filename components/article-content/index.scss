@@ -4,27 +4,53 @@
 
 // 文章头部，包括标题，作者和创作时间
 .article-header {
-  .title {
-    margin: 32px 0;
-    font-size: 32px;
+
+}
+.article-title {
+  margin: 32px 0;
+  font-size: 28px;
+  color: $grey-darker;
+  font-weight: 700;
+}
+
+.article-author-info {
+  display: flex;
+  margin: 30px 0;
+}
+
+.article-author-info-avatar {
+  width: 40px;
+  height: 40px;
+  vertical-align: middle;
+  border-radius: 50%;
+}
+
+.article-author-info-avatar-link {
+  font-size: 12px;
+  margin-right: 16px;
+}
+
+.article-author-info-content {
+  flex: 1;
+}
+
+.article-author-info-content-username {
+  margin: 0;
+  font-weight: bold;
+  color: $grey-darker;
+
+  &:hover {
     color: $grey-darker;
-    font-weight: 700;
-  }
-
-  .author-info {
-    margin: 30px 0;
-    font-size: 12px;
-  }
-
-  .ant-avatar-image {
-    margin-right: 12px;
-  }
-
-  .split {
-    margin: 0 8px;
   }
 }
 
+.article-author-info-content-bio {
+  margin: 0;
+}
+
+.article-author-info-datetime {
+  float: right;
+}
 
 // 文章点赞
 .article-like {

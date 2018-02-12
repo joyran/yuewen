@@ -55,7 +55,7 @@ router.get('/api/v1/notice/unview', async ctx => {
                                 .sort({'createAt': -1}).populate('initiator').lean();
 
   unviewLikes.map((unviewLike) => {
-    unviewLike.initiatorAvatar = unviewLike.initiator.avatar;initiatorId
+    unviewLike.initiatorAvatar = unviewLike.initiator.avatar;
     unviewLike.initiatorId = unviewLike.initiator._id;
     unviewLike.initiator = unviewLike.initiator.username;
   });
@@ -84,7 +84,7 @@ router.post('/api/v1/notice/toview', async ctx => {
 
   if (nid == 0) {
     // 清空所有通知，修改 hasView 为 true
-    await Notice.update({ at: userObjectId, hasView: false, type }, { hasView: true }).exec();
+    await Notice.update({ at: userObjectId, hasView: false, type }, { hasView: true }, { multi: true }).exec();
   } else {
     // 修改单条通知状态为已读
     await Notice.update({ _id: nid, at: userObjectId, hasView: false, type }, { hasView: true }).exec();

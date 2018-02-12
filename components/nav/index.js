@@ -21,105 +21,90 @@ const TabPane = Tabs.TabPane;
 // 时间汉化
 moment.locale('zh-cn');
 
+// 未读消息为空时显示的内容
+const NotFound = (
+  <div className="not-found">
+    <div className="body">
+      <img src="/imgs/notice.svg" alt="空空而已" />
+      <p>你已读完所有通知</p>
+    </div>
+    <div className="footer">
+      <span>
+        <Icon type="delete" style={{ marginRight: 8 }} />清空通知
+      </span>
+      <a style={{ float: 'right' }} href="/notice" >
+        查看全部通知
+      </a>
+    </div>
+  </div>
+);
+
+const UnviewNoticeTabPane = (props) => {
+  const { type, dataSource, dispatch } = props;
+  const count = dataSource.length;
+
+  const updateNoticeToView = (id, link) => {
+    if (type === '评论') {
+      dispatch(updateCommentNoticeToView(id, link));
+    } else {
+      dispatch(updateLikeNoticeToView(id, link));
+    }
+  };
+
+  const updateAllNoticeToView = () => {
+    if (type === '评论') {
+      dispatch(updateAllCommentNoticeToView());
+    } else {
+      dispatch(updateAllLikeNoticeToView());
+    }
+  };
+
+  return (
+    <div>
+      {
+        count !== 0 ?
+          <List
+            itemLayout="horizontal"
+            dataSource={dataSource}
+            renderItem={item => (
+              <List.Item
+                key={item._id}
+                actions={[moment(item.createAt, 'X').fromNow()]}
+              >
+                <List.Item.Meta
+                  onClick={() => { updateNoticeToView(item._id, item.link); }}
+                  avatar={<Avatar src={item.initiatorAvatar} size="large" shape="square" />}
+                  title={item.title}
+                  description={item.content}
+                />
+              </List.Item>
+            )}
+            footer={
+              <div>
+                <span style={{ cursor: 'pointer' }} onClick={() => { updateAllNoticeToView(); }}>
+                  <Icon type="delete" style={{ marginRight: 8 }} />清空通知
+                </span>
+                <a style={{ float: 'right' }} href="/notice" >查看全部通知</a>
+              </div>
+            }
+          /> :
+          NotFound
+      }
+    </div>
+  );
+};
+
 const Nav = (props) => {
-  // 点赞未读消息为空时显示的内容
-  const NotFoundLikeNotice = (
-    <div className="not-found">
-      <div className="body">
-        <img src="/imgs/notice.svg" alt="空空而已" />
-        <p>你已读完所有点赞通知</p>
-      </div>
-      <div className="footer">
-        <span>
-          <Icon type="delete" style={{ marginRight: 8 }} />清空通知
-        </span>
-        <a style={{ float: 'right' }} href="/notice" >
-          查看全部通知
-        </a>
-      </div>
-    </div>
-  );
-
-  // 评论未读消息为空时显示的内容
-  const NotFoundCommentNotice = (
-    <div className="not-found">
-      <div className="body">
-        <img src="/imgs/notice.svg" alt="空空而已" />
-        <p>你已读完所有评论通知</p>
-      </div>
-      <div className="footer">
-        <span>
-          <Icon type="delete" style={{ marginRight: 8 }} />清空通知
-        </span>
-        <a style={{ float: 'right' }} href="/notice" >
-          查看全部通知
-        </a>
-      </div>
-    </div>
-  );
-
-  // 通知消息弹出卡片内容
+  // 通知消息弹出卡片主体内容
+  const { unviewComments, unviewLikes } = props.notice;
+  const { dispatch } = props;
   const notice = (
     <Tabs defaultActiveKey="1">
-      <TabPane tab={props.notice.unviewCommentsCount === 0 ? '评论' : `评论 (${props.notice.unviewCommentsCount})`} key="1" >
-        {
-          props.notice.unviewCommentsCount !== 0 ?
-            <List
-              itemLayout="horizontal"
-              dataSource={props.notice.unviewComments}
-              renderItem={item => (
-                <List.Item
-                  key={item._id}
-                  actions={[moment(item.createAt, 'X').fromNow()]}
-                >
-                  <List.Item.Meta
-                    onClick={() => { props.dispatch(updateCommentNoticeToView(item._id, item.link)); }}
-                    avatar={<Avatar src={item.initiatorAvatar} />}
-                    title={item.title}
-                    description={item.content}
-                  />
-                </List.Item>
-              )}
-              footer={
-                <div>
-                  <span style={{ cursor: 'pointer' }} onClick={() => { props.dispatch(updateAllCommentNoticeToView()); }}>
-                    <Icon type="delete" style={{ marginRight: 8 }} />清空通知
-                  </span>
-                  <a style={{ float: 'right' }} href="/notice" >
-                    查看全部通知
-                  </a>
-                </div>
-              }
-            /> : NotFoundCommentNotice
-        }
+      <TabPane tab={unviewComments.length === 0 ? '评论' : `评论 (${unviewComments.length})`} key="1">
+        <UnviewNoticeTabPane type="评论" dataSource={unviewComments} dispatch={dispatch} />
       </TabPane>
-      <TabPane tab={props.notice.unviewLikesCount === 0 ? '点赞' : `点赞 (${props.notice.unviewLikesCount})`} key="2" >
-        {
-          props.notice.unviewLikesCount !== 0 ?
-            <List
-              itemLayout="horizontal"
-              dataSource={props.notice.unviewLikes}
-              renderItem={item => (
-                <List.Item>
-                  <List.Item.Meta
-                    onClick={() => { props.dispatch(updateLikeNoticeToView(item._id, item.link)); }}
-                    avatar={<Avatar src={item.initiatorAvatar} />}
-                    title={item.title}
-                  />
-                </List.Item>
-              )}
-              footer={
-                <div>
-                  <span style={{ cursor: 'pointer' }} onClick={() => { props.dispatch(updateAllLikeNoticeToView()); }}>
-                    <Icon type="delete" style={{ marginRight: 8 }} />清空通知
-                  </span>
-                  <a style={{ float: 'right' }} href="/notice" >
-                    查看全部通知
-                  </a>
-                </div>
-              }
-            /> : NotFoundLikeNotice
-        }
+      <TabPane tab={unviewLikes.length === 0 ? '点赞' : `点赞 (${unviewLikes.length})`} key="2">
+        <UnviewNoticeTabPane type="点赞" dataSource={unviewLikes} dispatch={dispatch} />
       </TabPane>
     </Tabs>
   );
@@ -137,8 +122,8 @@ const Nav = (props) => {
         </Menu.Item>
         <SubMenu
           title={
-            <a href={`/user/${props.session.uid}`}>
-              <Avatar src={props.session.avatar} />
+            <a href={`/profile/${props.session.uid}`}>
+              <Avatar src={props.session.avatar} size="large" shape="square" />
             </a>
           }
           className="nav-avatar"

@@ -42,6 +42,7 @@
     "react-addons-shallow-compare": "^15.6.2",
     "react-codemirror": "^1.0.0",
     "react-dom": "^15.6.1",
+    "react-infinite-scroller": "^1.1.3",
     "react-lowlight": "^1.1.1",
     "react-markdown": "^3.0.2",
     "react-redux": "^5.0.6",

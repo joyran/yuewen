@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
-import { digest } from './digest';
+import { excerpt } from './excerpt';
 import { session } from './session';
 import { notice } from './notice';
 
 const reducers = combineReducers({
-  digest,
+  excerpt,
   session,
   notice
 });

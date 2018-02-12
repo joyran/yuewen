@@ -19,20 +19,8 @@ const { Header, Content, Footer } = Layout;
 
 // 初始默认 state
 const initialState = {
-  session: {
-    uid: null,
-    username: null,
-    avatar: null,
-    followedTags: []
-  },
-  notice: {
-    notices: [],
-    unviewComments: [],
-    unviewLikes: [],
-    unviewCommentsCount: 5,
-    unviewLikesCount: 5,
-    unviewAllCount: 10
-  }
+  session: {},
+  notice: {}
 };
 
 const initStore = (state = initialState) => {
