@@ -93,12 +93,12 @@ router.get('/api/v1/session', async ctx => {
   var { uid } = ctx.session;
   var result = await User.findOne({ _id: uid });
 
-  // 返回用户名，uid, 头像url, 关注tag
+  // 返回用户名，uid, 头像url, 关注 tag
   var user = {
     username: result.username,
     uid,
     avatar: result.avatar,
-    followedTags: ['hot'].concat(result.followedTags)
+    followedTags: ['new', 'hot'].concat(result.followedTags)
   };
 
   // 输出返回值

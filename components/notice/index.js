@@ -6,7 +6,8 @@ import { List, Avatar, Badge } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import {
-  updateCommentNoticeToView
+  updateCommentNoticeToView,
+  updateLikeNoticeToView
 } from '../../reducers/notice';
 import stylesheet from './index.scss';
 
@@ -14,6 +15,14 @@ import stylesheet from './index.scss';
 moment.locale('zh-cn');
 
 const Notice = (props) => {
+  const updateNoticeToView = (type, id, link) => {
+    if (type === 'comment') {
+      props.dispatch(updateCommentNoticeToView(id, link));
+    } else {
+      props.dispatch(updateLikeNoticeToView(id, link));
+    }
+  }
+
   return (
     <div className="notices">
       <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
@@ -29,7 +38,7 @@ const Notice = (props) => {
             >
               <Badge status={item.hasView ? 'default' : 'processing'} />
               <List.Item.Meta
-                onClick={() => { props.dispatch(updateCommentNoticeToView(item._id, item.link)); }}
+                onClick={() => { updateNoticeToView(item.type, item._id, item.link); }}
                 avatar={<Avatar src={item.initiatorAvatar} shape="square" />}
                 title={item.title}
                 description={item.content}

@@ -88,7 +88,10 @@ router.get('/api/v1/excerpts/user/:uid', async ctx => {
       break;
   }
 
-  // console.log(excerpts);
+  // 用户发布的文章总数量
+  var totalCreated = await Article.find({author: uid}).count({});
+  // 用户收藏的文章总数量
+  var totalCollected = await Collection.find({user: uid}).count({});
 
   excerpts.map((excerpt) => {
     // 删除用户密码
@@ -103,7 +106,7 @@ router.get('/api/v1/excerpts/user/:uid', async ctx => {
   const hasMore = skip + limit >= total ? false : true;
 
   // 输出返回值
-  const body = { total, hasMore, dataSource: excerpts };
+  const body = { total, totalCreated, totalCollected, hasMore, dataSource: excerpts };
   ctx.status = 200;
   ctx.body = body;
 });

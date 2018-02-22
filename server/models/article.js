@@ -5,7 +5,7 @@
 // 从 mongoose.js 中导出 mongoose, Schema 两个变量
 var { mongoose, Schema } = require('../utils/mongoose');
 
-var articleSchema = new Schema({
+var schema = new Schema({
   author: { type: Schema.Types.ObjectId, ref: 'User' },
   title: String,
   tags: Array,
@@ -20,6 +20,6 @@ var articleSchema = new Schema({
   heat: Number
 }, { versionKey: false });
 
-var Article = mongoose.model('Article', articleSchema);
+var Article = mongoose.model('Article', schema);
 
 module.exports = Article;

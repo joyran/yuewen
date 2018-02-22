@@ -18,6 +18,7 @@ const notice = require('./server/routers/notice');
 const collection = require('./server/routers/collection');
 const profile = require('./server/routers/profile');
 const auth = require('./server/routers/auth');
+const search = require('./server/routers/search');
 
 // 端口号
 const port = parseInt(process.env.PORT, 10) || 527;
@@ -120,6 +121,7 @@ app.prepare().then(() => {
   koa.use(notice.routes()).use(notice.allowedMethods());
   koa.use(collection.routes()).use(collection.allowedMethods());
   koa.use(profile.routes()).use(profile.allowedMethods());
+  koa.use(search.routes()).use(search.allowedMethods());
 
   // 特定路由放在通用路由 * 之前
   router.get('*', async ctx => {

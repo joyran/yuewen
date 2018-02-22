@@ -7,10 +7,6 @@
   // padding-left: 16px;
   // padding-right: 16px;
 
-  .ant-tabs {
-    // overflow: unset;
-  }
-
   .ant-tabs-nav-wrap {
     padding: 0 24px;
   }
@@ -30,6 +26,7 @@
 
   .ant-tabs-content {
     background: #f6f6f6;
+    min-height: 600px;
   }
 
   .ant-card-loading-content {

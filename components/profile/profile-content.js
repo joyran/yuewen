@@ -18,7 +18,7 @@ const ProfileContent = (props) => {
 
   const onChangeTag = (key) => {
     props.dispatch(changeTag(key));
-    if (key === 'article') {
+    if (key === 'created') {
       props.dispatch(readExcerptsByUserCreated());
     } else {
       props.dispatch(readExcerptsByUserCollected());
@@ -27,12 +27,12 @@ const ProfileContent = (props) => {
 
   return (
     <div className="profile-content">
-      <Tabs defaultActiveKey="article" onChange={onChangeTag} animated={false}>
-        <TabPane tab="文章" key="article">
+      <Tabs defaultActiveKey="created" onChange={onChangeTag} animated={false}>
+        <TabPane tab={`文章 ${props.excerpt.totalCreated}`} key="created">
           <InfiniteScroll
             initialLoad={false}
             pageStart={0}
-            loadMore={() => { !loading && props.dispatch(readExcerptsByUserCreated()); }}
+            loadMore={() => { !loading && hasMore && props.dispatch(readExcerptsByUserCreated()); }}
             hasMore={!loading && hasMore}
             useWindow
           >
@@ -40,11 +40,11 @@ const ProfileContent = (props) => {
             { loading && hasMore && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
           </InfiniteScroll>
         </TabPane>
-        <TabPane tab="收藏" key="collection">
+        <TabPane tab={`收藏 ${props.excerpt.totalCollected}`} key="collected">
           <InfiniteScroll
             initialLoad={false}
             pageStart={0}
-            loadMore={() => { !loading && props.dispatch(readExcerptsByUserCollected()); }}
+            loadMore={() => { !loading && hasMore && props.dispatch(readExcerptsByUserCollected()); }}
             hasMore={!loading && hasMore}
             useWindow
           >

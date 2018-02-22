@@ -39,6 +39,7 @@ const NotFound = (
   </div>
 );
 
+// 通知卡片内容
 const UnviewNoticeTabPane = (props) => {
   const { type, dataSource, dispatch } = props;
   const count = dataSource.length;
@@ -54,7 +55,7 @@ const UnviewNoticeTabPane = (props) => {
   const updateAllNoticeToView = () => {
     if (type === '评论') {
       dispatch(updateAllCommentNoticeToView());
-    } else {
+    } else if (type === '点赞') {
       dispatch(updateAllLikeNoticeToView());
     }
   };
@@ -135,7 +136,7 @@ const Nav = (props) => {
             <a href="/markdown" target="_blank">写新文章</a>
           </Menu.Item>
           <Menu.Item key="profile">
-            <a href="/profile">个人设置</a>
+            <a href={`/profile/${props.session.uid}`}>个人主页</a>
           </Menu.Item>
           <Menu.Item key="logout">
             <a onClick={() => props.dispatch(deleteSession())}>退出登录</a>

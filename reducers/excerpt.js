@@ -101,14 +101,18 @@ export const excerpt = handleActions({
     skip: state.skip + state.limit,
     dataSource: state.dataSource.concat(action.payload.dataSource),
     loading: false,
-    hasMore: action.payload.hasMore
+    hasMore: action.payload.hasMore,
+    total: action.payload.total
   }),
 
   READ_EXCERPTS_SUCCESS_BY_SERVER: (state, action) => ({
     ...state,
     skip: state.skip + state.limit,
     dataSource: action.payload.dataSource,
-    hasMore: action.payload.hasMore
+    hasMore: action.payload.hasMore,
+    total: action.payload.total,
+    totalCreated: action.payload.totalCreated,
+    totalCollected: action.payload.totalCollected
   }),
 
   // 点击 tag 标签，skip 和 dataSource 重置，loading 置为 true 是想显示 loading card

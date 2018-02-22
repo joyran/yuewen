@@ -20,17 +20,11 @@ const TagNav = (props) => {
     props.dispatch(readExcerptsByTag());
   };
 
-  const handleInfiniteOnLoad = () => {
-    if (!loading) {
-      props.dispatch(readExcerptsByTag());
-    }
-  };
-
   return (
     <div className="tag-nav">
       <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
       <Tabs
-        defaultActiveKey="hot"
+        defaultActiveKey="new"
         onChange={onChangeTag}
         animated={false}
       >
@@ -41,7 +35,7 @@ const TagNav = (props) => {
                 <InfiniteScroll
                   initialLoad={false}
                   pageStart={0}
-                  loadMore={handleInfiniteOnLoad}
+                  loadMore={() => { !loading && hasMore && props.dispatch(readExcerptsByTag()); }}
                   hasMore={!loading && hasMore}
                   useWindow
                 >

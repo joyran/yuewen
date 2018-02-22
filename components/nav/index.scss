@@ -3,7 +3,7 @@
 .nav {
   width: 100%;
   background: #fff;
-  box-shadow: 0px 0px 4px 0px $grey-light;
+  box-shadow: 0px 1px 3px rgba(26,26,26,.1);
 
   .nav-menu {
     width: $layout-width;
@@ -12,12 +12,21 @@
     line-height: 60px;
   }
 
+  .ant-menu-horizontal {
+    border-bottom: none;
+  }
+
   .nav-avatar {
     float: right;
+
+    .ant-menu-submenu-title {
+      padding: 0;
+    }
   }
 
   .nav-notification {
     float: right;
+    margin-right: 24px;
 
     .anticon {
       font-size: 20px;
@@ -71,6 +80,8 @@
   .ant-list-item-meta-title {
     margin-bottom: 8px;
     margin-top: -2px;
+    color: $grey-darker;
+    font-size: 13px;
   }
 
   .ant-spin-nested-loading {
