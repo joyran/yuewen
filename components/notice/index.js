@@ -39,7 +39,7 @@ const Notice = (props) => {
               <Badge status={item.hasView ? 'default' : 'processing'} />
               <List.Item.Meta
                 onClick={() => { updateNoticeToView(item.type, item._id, item.link); }}
-                avatar={<Avatar src={item.initiatorAvatar} shape="square" />}
+                avatar={<Avatar src={item.initiator.smAvatar} shape="square" />}
                 title={item.title}
                 description={item.content}
               />

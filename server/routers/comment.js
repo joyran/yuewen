@@ -31,12 +31,13 @@ const readArticleCommentReplys = async (aid, rid) => {
  * 读取指定文章的所有评论，包括评论的回复
  * @param aid  文章索引 id
  */
-const readArticleComments = async (aid) => {
+const readArticleComments = async (aid, skip, limit) => {
   // mongoose find 查询返回的结果默认不可以修改，除非用 .lean() 查询。
   // 或者用.toObject()转换成 objcet对象
   // rid 为 "000000000000000000000000" 表示原始评论，否则为评论的回复
   var comments = await Comment.find({ article: aid, rid: '000000000000000000000000' })
-                              .sort({ createAt: -1 }).populate('author').populate('atuser').lean();
+                              .sort({ createAt: -1 }).populate('author').populate('atuser')
+                              .lean().skip(skip).limit(limit);
 
   comments.map(async (comment) => {
     // 删除不必要显示的敏感信息
@@ -60,12 +61,16 @@ const readArticleComments = async (aid) => {
  */
 router.get('/api/v1/article/comment', async ctx => {
   const aid = ctx.query.aid;
-  var comments = await readArticleComments(aid);
-  const status = 200;
+  const skip  = ctx.query.skip ? parseInt(ctx.query.skip) : 0;
+  const limit = ctx.query.limit ? parseInt(ctx.query.limit) : 10;
+
+  var comments = await readArticleComments(aid, skip, limit);
+  var total = await Comment.find({ article: aid, rid: '000000000000000000000000' }).count({});
+  var pages = parseInt(total / limit) + 1;
 
   // 输出返回值
-  const body = { status, comments };
-  ctx.status = status;
+  const body = { dataSource: comments, total, pages };
+  ctx.status = 200;
   ctx.body = body;
 });
 
@@ -109,11 +114,11 @@ router.post('/api/v1/article/comment', async ctx => {
 
   // 写入成功后重新读取所有的评论并返回给前端显示
   var comments = await readArticleComments(aid);
-  const status = 200;
+  var total = await Comment.find({ article: aid, rid }).count({});
 
   // 输出返回值
-  const body = { status, comments };
-  ctx.status = status;
+  const body = { dataSource: comments, total };
+  ctx.status = 200;
   ctx.body = body;
 });
 

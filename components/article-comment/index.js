@@ -3,11 +3,12 @@
  */
 
 import React, { Component } from 'react';
-import { Tooltip } from 'antd';
+import { Tooltip, Pagination } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import CommentEditor from './comment-editor';
 import ReplyEditor from './reply-editor';
+import { readArticleComments } from '../../reducers/article';
 import stylesheet from './index.scss';
 
 // 时间汉化
@@ -19,6 +20,15 @@ class ArticleComment extends Component {
     super(props);
     this.state = { visible: false };
     this.toggleCommentReply = this.toggleCommentReply.bind(this);
+    this.onChangePagination = this.onChangePagination.bind(this);
+  }
+
+  // 点击分页按钮切换评论分页
+  onChangePagination = (page) => {
+    const { limit } = this.props.article.comment;
+    const { _id } = this.props.article;
+    const skip = (page - 1) * limit;
+    this.props.dispatch(readArticleComments(_id, skip, limit));
   }
 
   // 切换评论回复框显示状态
@@ -44,9 +54,9 @@ class ArticleComment extends Component {
           {/* 评论输入框 */}
           <CommentEditor />
           {/* 评论列表 */}
-          <ul className="comment-list">
+          <ul className="comment-list" id="comment-list">
             {
-              this.props.article.comments.map((comment) => {
+              this.props.article.comment.dataSource.map((comment) => {
                 return (
                   <li className="comment-item" id={`comment-${comment._id}`} key={comment._id}>
                     {/* 评论人头像 */}
@@ -99,6 +109,16 @@ class ArticleComment extends Component {
               })
             }
           </ul>
+          {/* 评论分页组件，当且仅当页数 pages > 1时才显示分页组件 */}
+          { this.props.article.comment.pages > 1 ?
+            <Pagination
+              defaultCurrent={1}
+              total={this.props.article.comment.total}
+              className="comment-pagination"
+              style={{ marginTop: 24 }}
+              onChange={this.onChangePagination}
+            /> : ''
+          }
         </div>
       </div>
     );

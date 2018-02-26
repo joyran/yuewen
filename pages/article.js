@@ -21,7 +21,12 @@ const { Header, Content, Footer } = Layout;
 
 // 初始默认 state
 const initialState = {
-  article: {},
+  article: {
+    comment: {
+      skip: 0,
+      limit: 10  // comment 评论每次读取的数量
+    }
+  },
   session: {},
   notice: {}
 };
@@ -30,7 +35,7 @@ const initStore = (state = initialState) => {
   return createStore(reducers, state, composeWithDevTools(applyMiddleware(thunkMiddleware)));
 };
 
-const Article = () => {
+const Index = () => {
   return (
     <Layout>
       <Head>
@@ -51,10 +56,11 @@ const Article = () => {
   );
 };
 
-Article.getInitialProps = async ({ store, req, query }) => {
+Index.getInitialProps = async ({ store, req, query }) => {
   var res;
   // 文章索引 aid
   const aid = typeof query.aid !== 'undefined' ? query.aid : '';
+  const { limit } = store.getState().article.comment;
 
   // ----- 读取文章内容，作者等
   // 请求 url 必须为完整路径，不能为绝对路径 /api/v1/digests
@@ -75,12 +81,12 @@ Article.getInitialProps = async ({ store, req, query }) => {
   store.dispatch(readArticleLikesSuccess(res.like));
 
   // ----- 读取文章评论列表
-  res = await fetch(`http://${req.headers.host}/api/v1/article/comment?aid=${aid}`, {
+  res = await fetch(`http://${req.headers.host}/api/v1/article/comment?aid=${aid}&skip=0&limit=${limit}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
   res = await res.json();
-  store.dispatch(readArticleCommentsSuccess(res.comments));
+  store.dispatch(readArticleCommentsSuccess(res));
 
 
   // ----- 读取当前登录用户id, 用户名, 头像
@@ -101,4 +107,4 @@ Article.getInitialProps = async ({ store, req, query }) => {
 };
 
 
-export default withRedux(initStore, null)(Article);
+export default withRedux(initStore, null)(Index);

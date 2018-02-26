@@ -100,10 +100,32 @@ export const createArticleComment = (aid, comment) => (dispatch) => {
   })
     .then(res => res.json())
     .then((res) => {
-      if (res.status === 200) {
-        dispatch(readArticleCommentsSuccess(res.comments));
-        message.success('评论成功');
-      }
+      dispatch(readArticleCommentsSuccess(res));
+      message.success('评论成功');
+    })
+    .catch((err) => {
+      console.error(err.message);
+      message.error(networkErrorMsg, 5);
+    });
+};
+
+/**
+ * 读取文章评论
+ */
+export const readArticleComments = (aid, skip, limit) => (dispatch) => {
+  return fetch(`/api/v1/article/comment?aid=${aid}&skip=${skip}&limit=${limit}`, {
+    credentials: 'include',
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(res => res.json())
+    .then((res) => {
+      dispatch(readArticleCommentsSuccess(res));
+      // 点击分页按钮跳转到评论顶部
+      const offsetTop = document.getElementById('comment-list').offsetTop;
+      window.scrollTo(0, offsetTop);
     })
     .catch((err) => {
       console.error(err.message);
@@ -148,12 +170,7 @@ export const createArticleReply = (aid, reply, atuser, rid) => (dispatch) => {
 export const article = handleActions({
   READ_ARTICLE_SUCCESS: (state, action) => ({
     ...state,
-    _id: action.payload._id,
-    title: action.payload.title,
-    markup: action.payload.markup,
-    author: action.payload.author,
-    createAt: action.payload.createAt,
-    hasCollected: action.payload.hasCollected
+    ...action.payload
   }),
 
   READ_ARTICLE_LIKES_SUCCESS: (state, action) => ({
@@ -172,7 +189,10 @@ export const article = handleActions({
 
   READ_ARTICLE_COMMENTS_SUCCESS: (state, action) => ({
     ...state,
-    comments: action.payload
+    comment: {
+      ...state.comment,
+      ...action.payload
+    }
   }),
 
   UPDATE_ARTICLE_COLLECTION_SUCCESS: state => ({
