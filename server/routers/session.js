@@ -58,15 +58,15 @@ router.post('/api/v1/session', async ctx => {
       var status  = 201;
       var msg = '登录成功';
 
-      // 登录成功则将 uid,username,avator 写入session
-      ctx.session.uid       = user._id;
+      // 登录成功则将 uid, username, avator, smAvatar 写入session
       ctx.session.username  = user.username;
+      ctx.session.uid  = user._id;
       ctx.session.avatar    = user.avatar;
-      ctx.session.objectId  = user._id;
+      ctx.session.smAvatar  = user.smAvatar;
 
-      // 如果勾选“下次自动登录”，将uid写入到cookie中，生存时间1个月
+      // 如果勾选“下次自动登录”，将 uid 写入到cookie中，生存时间1个月
       if (remember) {
-        ctx.cookies.set('uid', user.uid, {
+        ctx.cookies.set('uid', user._id, {
           signed: true,
           maxAge: 1000*3600*24*30,
           httpOnly: true
@@ -98,6 +98,7 @@ router.get('/api/v1/session', async ctx => {
     username: result.username,
     uid,
     avatar: result.avatar,
+    smAvatar: result.smAvatar,
     followedTags: ['new', 'hot'].concat(result.followedTags)
   };
 

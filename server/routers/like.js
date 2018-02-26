@@ -15,31 +15,23 @@ var User = require('../models/user');
  */
 router.get('/api/v1/article/like', async ctx => {
   const aid = ctx.query.aid;
-  const userObjectId = ctx.session.objectId;
+  const uid = ctx.session.uid;
   var like = {};
 
-  // // 根据 aid 查找 _id
-  // var article = await Article.findOne({ _id: aid }).lean();
-
   // 获取更新后的点赞人列表
-  var likers = await Like.find({ 'article': aid }).populate('user').lean();
+  var likers = await Like.find({ article: aid }).populate('user').lean();
 
   likers.map((liker) => {
-    // 点赞人用户名, 头像，id
-    liker.liker = liker.user.username;
-    liker.likerAvatar = liker.user.avatar;
-    liker.likerId = liker.user._id;
-
-    // 删除 user
-    delete liker.user;
-    delete liker._id;
+    // 删除不必要显示的敏感信息
+    delete liker.user.password;
+    delete liker.user.isAdmin;
   })
 
   like.likers = likers;
 
   // 查找该篇文章是否被当前登录用户点过赞，已点赞 isLiked 为 true，反之为 false
-  var ret = await Like.findOne({ 'article': aid, 'user': userObjectId });
-  like.isLiked = ret ? true : false;
+  var ret = await Like.findOne({ article: aid, user: uid });
+  like.hasLike = ret ? true : false;
 
   // 输出返回值
   const status = 200;
@@ -54,13 +46,13 @@ router.get('/api/v1/article/like', async ctx => {
  */
 router.post('/api/v1/article/like', async ctx => {
   const { aid } = ctx.request.body;
-  const userObjectId = ctx.session.objectId;
+  const uid = ctx.session.uid;
 
   const article = await Article.findOne({ _id: aid }).lean();
-  const user = await User.findOne({ _id: userObjectId }).lean();
+  const user = await User.findOne({ _id: uid }).lean();
 
   // 查找该篇文章是否被当前登录用户点过赞
-  var ret = await Like.findOne({ article: aid, user: userObjectId });
+  var ret = await Like.findOne({ article: aid, user: uid });
 
   // 如果已经点过赞则取消点赞，反之添加点赞记录
   if (ret) {
@@ -72,7 +64,7 @@ router.post('/api/v1/article/like', async ctx => {
   } else {
     // 添加点赞记录
     var createAt = parseInt(Date.now()/1000);
-    await Like.create({ article: aid, user: userObjectId, createAt });
+    await Like.create({ article: aid, user: uid, createAt });
 
     // 文章点赞数加 1
     await Article.findByIdAndUpdate({ _id: aid }, { likes: article.likes + 1 }).exec();
@@ -83,7 +75,7 @@ router.post('/api/v1/article/like', async ctx => {
       content: '',
       link: `/article/${aid}`,
       title: `${user.username} 点赞了文章 ${article.title}`,
-      initiator: userObjectId,
+      initiator: uid,
       hasView: false,
       type: 'like',
       createAt
@@ -91,16 +83,11 @@ router.post('/api/v1/article/like', async ctx => {
   }
 
   // 获取更新后的点赞人列表
-  var likers = await Like.find({ 'article': aid }).populate('user').lean();
+  var likers = await Like.find({ article: aid }).populate('user').lean();
   likers.map((liker) => {
-    // 点赞人用户名, 头像，id
-    liker.liker = liker.user.username;
-    liker.likerAvatar = liker.user.avatar;
-    liker.likerId = liker.user._id;
-
-    // 删除 user
-    delete liker.user;
-    delete liker._id;
+    // 删除不必要显示的敏感信息
+    delete liker.user.password;
+    delete liker.user.isAdmin;
   })
 
   const status = 200;

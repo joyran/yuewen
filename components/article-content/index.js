@@ -26,7 +26,7 @@ const ArticleContent = (props) => {
           >
             <img
               alt={article.author.username}
-              src={article.author.avatar}
+              src={article.author.smAvatar}
               className="article-author-info-avatar"
             />
           </a>
@@ -48,7 +48,7 @@ const ArticleContent = (props) => {
         {/* 点赞按钮，已点赞实心，未点赞空心 */}
         <Button
           className="like-button"
-          type={article.isLiked ? 'primary' : 'default'}
+          type={article.hasLike ? 'primary' : 'default'}
           size="large"
           icon="like"
           onClick={() => { props.dispatch(updateArticleLikes(article._id)); }}
@@ -67,10 +67,10 @@ const ArticleContent = (props) => {
         <ol className="likers">
           {article.likers.map((liker) => {
             return (
-              <Tooltip placement="top" title={liker.liker} key={liker.likerId}>
+              <Tooltip placement="top" title={liker.user.username} key={liker.user._id}>
                 <li>
-                  <a href={`/user/${liker.likerId}`}>
-                    <img alt={liker.liker} src={liker.likerAvatar} />
+                  <a href={`/user/${liker.user._id}`}>
+                    <img alt={liker.user.username} src={liker.user.smAvatar} />
                   </a>
                 </li>
               </Tooltip>

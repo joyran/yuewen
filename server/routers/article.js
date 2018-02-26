@@ -23,7 +23,7 @@ router.get('/api/v1/article', async ctx => {
   var article = await Article.findOne({ _id: aid }).populate('author').lean();
 
   // 判断文章是否已经被用户收藏
-  var collection = await Collection.findOne({ user: ctx.session.objectId, article: aid }).lean();
+  var collection = await Collection.findOne({ user: ctx.session.uid, article: aid }).lean();
   var hasCollected = collection ? true : false;
   article.hasCollected = hasCollected;
 
@@ -43,7 +43,7 @@ router.get('/api/v1/article', async ctx => {
  */
 router.get('/api/v1/article/manage', async ctx => {
   // 文章索引 id
-  const uid = ctx.session.objectId;
+  const uid = ctx.session.uid;
 
   // mongoose find 查询返回的结果默认不可以修改，除非用 .lean() 查询。
   // 或者用.toObject()转换成 objcet对象
@@ -62,7 +62,7 @@ router.get('/api/v1/article/manage', async ctx => {
 router.post('/api/v1/article', async ctx => {
   const { title, digest, tags, markdown, markup } = ctx.request.body;
   // 文章作者
-  const author = ctx.session.objectId;
+  const author = ctx.session.uid;
   const updateAt = createAt = parseInt(Date.now()/1000);
   // 写入
   const res = await Article.create({ author, title, tags, digest, views: 0,
@@ -84,7 +84,7 @@ router.delete('/api/v1/article', async ctx => {
   const res = await Article.remove({ _id: aid }).exec();
 
   // 返回删除后用户发表的文章
-  const articles = await Article.find({ author: ctx.session.objectId }, { title: 1, createAt: 1, by: 1 })
+  const articles = await Article.find({ author: ctx.session.uid }, { title: 1, createAt: 1, by: 1 })
                                 .sort({ createAt: -1 });
 
   // 输出返回值

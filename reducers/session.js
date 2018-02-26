@@ -35,9 +35,6 @@ export const deleteSession = () => () => {
 export const session = handleActions({
   READ_SESSION_SUCCESS: (state, action) => ({
     ...state,
-    uid: action.payload.uid,
-    username: action.payload.username,
-    avatar: action.payload.avatar,
-    followedTags: action.payload.followedTags
+    ...action.payload
   })
 }, {});

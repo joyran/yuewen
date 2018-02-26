@@ -6,7 +6,7 @@ const koaSession = require("koa-session2");
 const mongoose = require('./server/utils/mongoose');
 const SessionStore = require("./server/utils/session-store");
 const server = require('koa-static');
-const multer = require('koa-multer');
+// const multer = require('koa-multer');
 
 // 导入路由
 const session = require('./server/routers/session');
@@ -19,6 +19,7 @@ const collection = require('./server/routers/collection');
 const profile = require('./server/routers/profile');
 const auth = require('./server/routers/auth');
 const search = require('./server/routers/search');
+const upload = require('./server/routers/upload');
 
 // 端口号
 const port = parseInt(process.env.PORT, 10) || 527;
@@ -39,36 +40,6 @@ app.prepare().then(() => {
     store: new SessionStore(mongoose)
   }));
   koa.use(bodyParser());
-
-  // 设置文件存储路径和存储文件名
-  const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'server/static/uploads/article')
-    },
-    filename: function (req, file, cb) {
-      const filename = file.originalname;
-
-      // 文件后缀
-      const arr = filename.split('.');
-      const suffix = arr[arr.length - 1];
-      cb(null,  Date.now() + '.' + suffix);
-    }
-  });
-
-  // 设置 storage
-  const upload = multer({ storage: storage });
-
-  router.post('/api/v1/upload', upload.single('file'), async ctx => {
-    const { originalname, filename } = ctx.req.file;
-    console.log(ctx.req.file);
-
-    // 文件相对路径
-    const filepath = `/uploads/article/${filename}`;
-    const status = 200;
-    const body = { status, filepath };
-    ctx.status = status;
-    ctx.body = body;
-  });
 
   // 登录页面路由
   router.get('/login', async ctx => {
@@ -122,6 +93,7 @@ app.prepare().then(() => {
   koa.use(collection.routes()).use(collection.allowedMethods());
   koa.use(profile.routes()).use(profile.allowedMethods());
   koa.use(search.routes()).use(search.allowedMethods());
+  koa.use(upload.routes()).use(upload.allowedMethods());
 
   // 特定路由放在通用路由 * 之前
   router.get('*', async ctx => {

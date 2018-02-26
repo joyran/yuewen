@@ -17,16 +17,11 @@ const readArticleCommentReplys = async (aid, rid) => {
                             .populate('author').populate('atuser').lean();
 
   replys.map((reply) => {
-    reply.authorName = reply.author.username;
-    reply.authorId = reply.author._id;
-    reply.cid = reply._id;
-    reply.atUserId = reply.atuser._id;
-    reply.atUsername = reply.atuser.username;
-
-    // 删除不必要显示的信息
-    delete reply.author;
-    delete reply._id;
-    delete reply.atuser;
+    // 删除不必要显示的敏感信息
+    delete reply.author.password;
+    delete reply.author.isAdmin;
+    delete reply.atuser.password;
+    delete reply.atuser.isAdmin;
   })
 
   return replys;
@@ -44,22 +39,16 @@ const readArticleComments = async (aid) => {
                               .sort({ createAt: -1 }).populate('author').populate('atuser').lean();
 
   comments.map(async (comment) => {
-    comment.authorName = comment.author.username;
-    comment.authorAvatar = comment.author.avatar;
-    comment.authorId = comment.author._id;
-    comment.cid = comment._id;
-    comment.atUserId = comment.atuser._id;
-    comment.atUsername = comment.atuser.username;
-
-    // 删除不必要显示的信息
-    delete comment.author;
-    delete comment._id;
-    delete comment.atuser;
+    // 删除不必要显示的敏感信息
+    delete comment.author.password;
+    delete comment.author.isAdmin;
+    delete comment.atuser.password;
+    delete comment.atuser.isAdmin;
   })
 
   // 不能在 map 中直接操作
   for (var i = 0; i < comments.length; i++) {
-    var replys = await readArticleCommentReplys(aid, comments[i].cid);
+    var replys = await readArticleCommentReplys(aid, comments[i]._id);
     comments[i].replys = replys;
   }
 
@@ -89,7 +78,7 @@ router.post('/api/v1/article/comment', async ctx => {
   const { aid, comment } = ctx.request.body;
 
   // 评论作者
-  const author = ctx.session.objectId;
+  const author = ctx.session.uid;
   // 根据 aid 读取文章作者，也就是被@的用户
   var article = await Article.findOne({ _id: aid }).lean();
   var atuser = article.author;
@@ -104,7 +93,7 @@ router.post('/api/v1/article/comment', async ctx => {
   var newComment = await Comment.create({ author, atuser, rid, article: aid, comment, createAt });
 
   // 评论写入成功后更新文章评论数量 comments
-  await Article.findByIdAndUpdate({ _id: aid }, {comments: article.comments + 1}).exec();
+  await Article.findByIdAndUpdate({ _id: aid }, { comments: article.comments + 1 }).exec();
 
   // 生成新的评论通知消息
   await Notice.create({
@@ -137,7 +126,7 @@ router.post('/api/v1/article/reply', async ctx => {
   const { aid, reply, atuser, rid } = ctx.request.body;
 
   // 评论作者
-  const author = ctx.session.objectId;
+  const author = ctx.session.uid;
   var user = await User.findOne({ _id: author }).lean();
   var article = await Article.findOne({ _id: aid }).lean();
   const createAt = parseInt(Date.now()/1000);

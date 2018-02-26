@@ -29,8 +29,8 @@ export const {
  * @param aid 文章索引 id
  */
 export const updateArticleLikes = aid => (dispatch, getState) => {
-  const { isLiked } = getState().article;
-  if (isLiked) {
+  const { hasLike } = getState().article;
+  if (hasLike) {
     message.warn('你已经点过赞');
     return false;
   }
@@ -158,14 +158,14 @@ export const article = handleActions({
 
   READ_ARTICLE_LIKES_SUCCESS: (state, action) => ({
     ...state,
-    isLiked: action.payload.isLiked,
+    hasLike: action.payload.hasLike,
     likers: action.payload.likers,
     likerCount: action.payload.likers.length
   }),
 
   UPDATE_ARTICLE_LIKES_SUCCESS: (state, action) => ({
     ...state,
-    isLiked: !state.isLiked,
+    hasLike: !state.hasLike,
     likers: action.payload,
     likerCount: action.payload.length
   }),

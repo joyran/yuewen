@@ -41,7 +41,7 @@ const AddImgModal = Form.create()(
         <Dragger
           name="file"
           showUploadList={false}
-          action="/api/v1/upload"
+          action="/api/v1/upload/article"
           onChange={onChange}
           beforeUpload={beforeUpload}
         >

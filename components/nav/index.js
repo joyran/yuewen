@@ -74,7 +74,7 @@ const UnviewNoticeTabPane = (props) => {
               >
                 <List.Item.Meta
                   onClick={() => { updateNoticeToView(item._id, item.link); }}
-                  avatar={<Avatar src={item.initiatorAvatar} size="large" shape="square" />}
+                  avatar={<Avatar src={item.initiator.smAvatar} size="large" shape="square" />}
                   title={item.title}
                   description={item.content}
                 />
@@ -124,7 +124,7 @@ const Nav = (props) => {
         <SubMenu
           title={
             <a href={`/profile/${props.session.uid}`}>
-              <Avatar src={props.session.avatar} size="large" shape="square" />
+              <Avatar src={props.session.smAvatar} size="large" shape="square" />
             </a>
           }
           className="nav-avatar"

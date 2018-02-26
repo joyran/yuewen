@@ -37,7 +37,7 @@ const ExcerptList = (props) => {
                 >
                   <img
                     alt={item.author.username}
-                    src={item.author.avatar}
+                    src={item.author.smAvatar}
                     className="excerpt-author-info-avatar"
                   />
                 </a>
@@ -58,7 +58,7 @@ const ExcerptList = (props) => {
               {
                 item.tags.map((tag) => {
                   return (
-                    <Tag key={tag} className="excerpt-tag" color="blue"><a href={`/tag/${tag}`}>{tag}</a></Tag>
+                    <Tag key={tag} className="excerpt-tag" color="blue">{tag}</Tag>
                   );
                 })
               }

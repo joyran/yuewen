@@ -10,8 +10,11 @@ var userSchema = new Schema({
   password: String,
   mail: String,
   avatar: String,
+  smAvatar: String,
   followedTags: Array,
   prestige: Number,
+  banner: String,
+  bio: String,
   state: Boolean,
   isAdmin: Boolean,
   createAt: String

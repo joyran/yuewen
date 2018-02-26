@@ -14,10 +14,10 @@ var User = require('../models/user');
  */
 router.post('/api/v1/article/collection', async ctx => {
   const { aid } = ctx.request.body;
-  const userObjectId = ctx.session.objectId;
+  const uid = ctx.session.uid;
 
   // 查找该篇文章是否被当前登录用户收藏
-  var ret = await Collection.findOne({ article: aid, user: userObjectId });
+  var ret = await Collection.findOne({ article: aid, user: uid });
 
   // 如果已经收藏过则取消收藏，反之添加收藏
   if (ret) {
@@ -27,7 +27,7 @@ router.post('/api/v1/article/collection', async ctx => {
   } else {
     // 添加收藏
     var createAt = parseInt(Date.now()/1000);
-    await Collection.create({ article: aid, user: userObjectId, createAt });
+    await Collection.create({ article: aid, user: uid, createAt });
     var hasCollected = true
   }
 

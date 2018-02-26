@@ -16,15 +16,15 @@ var Notice = require('../models/notice');
 router.get('/api/v1/notice', async ctx => {
   const state = ctx.query.state;
   // 当前登录用户 id
-  const userObjectId = ctx.session.objectId;
+  const uid = ctx.session.uid;
 
   // 获取所有通知消息，包括点赞和评论 ，已读和未读
-  var notices = await Notice.find({ at: userObjectId }).sort({'createAt': -1}).populate('initiator').lean();
+  var notices = await Notice.find({ at: uid }).sort({ createAt: -1 }).populate('initiator').lean();
 
   notices.map((notice) => {
-    notice.initiatorAvatar = notice.initiator.avatar;
-    notice.initiatorId = notice.initiator._id;
-    notice.initiator = notice.initiator.username;
+    // 删除不必要显示的敏感信息
+    delete notice.initiator.password;
+    delete notice.initiator.isAdmin;
   });
 
   ctx.status = 200;
@@ -38,26 +38,26 @@ router.get('/api/v1/notice', async ctx => {
 router.get('/api/v1/notice/unview', async ctx => {
   const state = ctx.query.state;
   // 当前登录用户 id
-  const userObjectId = ctx.session.objectId;
+  const uid = ctx.session.uid;
 
   // 获取未读评论消息
-  var unviewComments = await  Notice.find({ at: userObjectId, hasView: false, type: 'comment' })
-                                    .sort({'createAt': -1}).populate('initiator').lean();
+  var unviewComments = await  Notice.find({ at: uid, hasView: false, type: 'comment' })
+                                    .sort({ createAt: -1 }).populate('initiator').lean();
 
   unviewComments.map((unviewComment) => {
-    unviewComment.initiatorAvatar = unviewComment.initiator.avatar;
-    unviewComment.initiatorId = unviewComment.initiator._id;
-    unviewComment.initiator = unviewComment.initiator.username;
+    // 删除不必要显示的敏感信息
+    delete unviewComment.initiator.password;
+    delete unviewComment.initiator.isAdmin;
   });
 
   // 获取未读点赞消息
-  var unviewLikes = await Notice.find({ at: userObjectId, hasView: false, type: 'like' })
-                                .sort({'createAt': -1}).populate('initiator').lean();
+  var unviewLikes = await Notice.find({ at: uid, hasView: false, type: 'like' })
+                                .sort({ createAt: -1 }).populate('initiator').lean();
 
   unviewLikes.map((unviewLike) => {
-    unviewLike.initiatorAvatar = unviewLike.initiator.avatar;
-    unviewLike.initiatorId = unviewLike.initiator._id;
-    unviewLike.initiator = unviewLike.initiator.username;
+    // 删除不必要显示的敏感信息
+    delete unviewLike.initiator.password;
+    delete unviewLike.initiator.isAdmin;
   });
 
   // 未读评论通知数量
@@ -80,14 +80,14 @@ router.get('/api/v1/notice/unview', async ctx => {
 router.post('/api/v1/notice/toview', async ctx => {
   const { nid, type } = ctx.request.body;
   // 当前登录用户 id
-  const userObjectId = ctx.session.objectId;
+  const uid = ctx.session.uid;
 
   if (nid == 0) {
     // 清空所有通知，修改 hasView 为 true
-    await Notice.update({ at: userObjectId, hasView: false, type }, { hasView: true }, { multi: true }).exec();
+    await Notice.update({ at: uid, hasView: false, type }, { hasView: true }, { multi: true }).exec();
   } else {
     // 修改单条通知状态为已读
-    await Notice.update({ _id: nid, at: userObjectId, hasView: false, type }, { hasView: true }).exec();
+    await Notice.update({ _id: nid, at: uid, hasView: false, type }, { hasView: true }).exec();
   }
 
   ctx.status = 200;

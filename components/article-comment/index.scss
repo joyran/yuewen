@@ -18,17 +18,17 @@
   min-height: 90px;
   padding: 16px 0;
   transition: all 0.2s;
-  display: table;
+  display: flex;
   width: 100%;
   border-bottom: 1px solid $grey-lighter;
 }
 
 .comment-item-avatar {
-  float: left;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   display: block;
   margin-right: 20px;
+  flex: 0 0 40px;
 
   img {
     width: 100%;
@@ -38,9 +38,8 @@
 }
 
 .comment-item-main {
-  float: left;
-  width: 94%;
   font-size: 14px;
+  flex: 1;
 }
 
 .comment-item-header {
@@ -48,7 +47,7 @@
 }
 
 .comment-item-header-username {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .comment-item-header-datetime {
