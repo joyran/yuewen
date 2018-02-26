@@ -58,6 +58,7 @@ const Markdown = () => {
 Markdown.getInitialProps = async ({ store, req, query }) => {
   // 文章索引 aid
   const aid = typeof query.aid !== 'undefined' ? query.aid : '';
+
   if (aid) {
     // ----- 读取文章内容，作者等
     const articleRes = await fetch(`http://${req.headers.host}/api/v1/article?aid=${aid}`, {

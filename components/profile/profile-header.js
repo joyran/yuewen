@@ -7,7 +7,7 @@ import { Button, Upload, message, Icon, Modal, Slider } from 'antd';
 import AvatarEditor from 'react-avatar-editor';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { cropAvatar, cropBanner } from '../../reducers/profile';
+import { cropAvatar, cropBanner, deleteBanner } from '../../reducers/profile';
 
 // 时间汉化
 moment.locale('zh-cn');
@@ -80,6 +80,7 @@ class ProfileHeader extends Component {
 
   onCancelBanner() {
     this.setState({ bannerEditorModalVisible: !this.state.bannerEditorModalVisible });
+    this.props.dispatch(deleteBanner(this.state.bannerEditorUrl));
   }
 
   onOkAvatar() {

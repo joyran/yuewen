@@ -13,7 +13,7 @@ import zhCN from 'antd/lib/locale-provider/zh_CN';
 import { reducers, readArticlesByUserSuccess } from '../reducers/manage';
 import { readSessionSuccess } from '../reducers/session';
 import { readUnviewNoticeSuccess } from '../reducers/notice';
-import ArticleManage from '../components/manage/index';
+import ArticleManage from '../components/article-manage/index';
 import Nav from '../components/nav/index';
 import stylesheet from '../styles/index.scss';
 
@@ -21,31 +21,16 @@ const { Header, Content, Footer } = Layout;
 
 // 初始默认 state
 const initialState = {
-  manage: {
-    articles: []
-  },
-  session: {
-    uid: null,
-    username: null,
-    avatar: null,
-    followedTags: []
-  },
-  notice: {
-    comments: [],
-    likes: [],
-    unviewComments: [],
-    unviewLikes: [],
-    unviewCommentsCount: 5,
-    unviewLikesCount: 5,
-    unviewAllCount: 10
-  }
+  manage: {},
+  session: {},
+  notice: {}
 };
 
 const initStore = (state = initialState) => {
   return createStore(reducers, state, composeWithDevTools(applyMiddleware(thunkMiddleware)));
 };
 
-const Manage = () => {
+const Index = () => {
   return (
     <LocaleProvider locale={zhCN}>
       <Layout>
@@ -66,7 +51,7 @@ const Manage = () => {
   );
 };
 
-Manage.getInitialProps = async ({ store, req }) => {
+Index.getInitialProps = async ({ store, req }) => {
   var res;
 
   // ----- 读取用户发表的所有文章
@@ -95,4 +80,4 @@ Manage.getInitialProps = async ({ store, req }) => {
 };
 
 
-export default withRedux(initStore, null)(Manage);
+export default withRedux(initStore, null)(Index);

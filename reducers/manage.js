@@ -44,7 +44,7 @@ export const deleteArticle = aid => (dispatch) => {
 export const manage = handleActions({
   READ_ARTICLES_BY_USER_SUCCESS: (state, action) => ({
     ...state,
-    articles: action.payload
+    dataSource: action.payload
   })
 }, {});
 

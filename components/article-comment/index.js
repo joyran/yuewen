@@ -77,7 +77,7 @@ class ArticleComment extends Component {
                         <p>{comment.comment}</p>
                       </div>
                       <span className="comment-item-reply-label" onClick={this.toggleCommentReply}>回复</span>
-                      <ReplyEditor atUserId={comment.atuser._id} rid={comment._id} />
+                      <ReplyEditor atUserId={comment.author._id} rid={comment._id} />
                       <ul className="comment-item-reply-list clearfix">
                         { comment.replys.map((reply) => {
                           return (

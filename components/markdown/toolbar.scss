@@ -1,32 +1,27 @@
 @import "././styles/variable";
+$toolbar-height : 48px;
 
 .toolbar {
-  height: 40px;
+  height: $toolbar-height;
   background: $grey-darker;
 
   li {
     float: left;
-    height: 40px;
-    line-height: 40px;
-    width: 40px;
+    height: $toolbar-height;
+    line-height: $toolbar-height;
+    width: $toolbar-height;
     text-align: center;
     cursor: pointer;
 
     .anticon {
       color: #fff;
       font-size: 16px;
-      margin-top: 12px;
     }
   }
 
   .release {
     margin-right: 60px;
     float: right;
-
-    button {
-      height: 30px;
-      margin-top: 5px;
-    }
   }
 }
 

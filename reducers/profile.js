@@ -69,6 +69,27 @@ export const cropBanner = (width, height, x, y, filename) => () => {
     });
 };
 
+/**
+ * 删除文章封面图
+ */
+export const deleteBanner = filepath => () => {
+  return fetch('/api/v1/upload/banner', {
+    credentials: 'include',
+    method: 'delete',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ filepath })
+  })
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => {
+      console.error(err.message);
+      message.error(networkErrorMsg, 5);
+    });
+};
+
 // ------------------------
 // REDUCERS
 // ------------------------

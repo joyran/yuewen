@@ -56,17 +56,17 @@ const AddImgModal = Form.create()(
             { getFieldDecorator('imgUrl', {
               rules: [{ required: true, message: '请输入图片地址' }],
             })(
-              <Input placeholder="可以为网络图片地址" />
+              <Input placeholder="地址" />
             )}
           </FormItem>
           <FormItem {...formItemLayout} label="描述" >
             { getFieldDecorator('imgDesc')(
-              <Input placeholder="鼠标移动到图片上显示的内容" />
+              <Input placeholder="描述" />
             )}
           </FormItem>
           <FormItem {...formItemLayout} label="链接" >
             { getFieldDecorator('imgLink')(
-              <Input placeholder="点击图片跳转的链接" />
+              <Input placeholder="链接" />
             )}
           </FormItem>
         </Form>

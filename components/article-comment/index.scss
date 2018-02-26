@@ -77,6 +77,29 @@
   }
 }
 
+.btn-cancel {
+  position: absolute;
+  bottom: 20px;
+  font-size: 14px;
+  color: $grey-light;
+  right: 100px;
+
+  &:hover {
+    color: $grey;
+  }
+}
+
+.ant-btn-disabled {
+  cursor: default;
+  background: #8bc7ff;
+  border-color: #8bc7ff;
+
+  &:hover {
+    background: #8bc7ff;
+    border-color: #8bc7ff;
+  }
+}
+
 .hidden {
   display: none;
 }
@@ -124,6 +147,10 @@
   margin-top: 24px;
   margin-right: 20px;
   cursor: pointer;
+
+  &:hover {
+    color: #1890ff;
+  }
 }
 
 .comment-pagination {

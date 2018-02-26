@@ -3,7 +3,7 @@
  */
 
 import React, { Component } from 'react';
-import { Input, Button, Icon } from 'antd';
+import { Input, Button, Icon, Tooltip, Popover } from 'antd';
 import { connect } from 'react-redux';
 import { Picker } from 'emoji-mart';
 import { createArticleComment } from '../../reducers/article';
@@ -38,7 +38,6 @@ class CommentEditor extends Component {
     this.onChangeValue = this.onChangeValue.bind(this);
     this.onClickButton = this.onClickButton.bind(this);
     this.addEmoji = this.addEmoji.bind(this);
-    this.toogleEmojiPicker = this.toogleEmojiPicker.bind(this);
   }
 
   // 评论输入框最少输入5个字符，否则评论按钮灰显，不可提交评论
@@ -52,10 +51,11 @@ class CommentEditor extends Component {
 
   // 点击评论按钮提交评论
   onClickButton = () => {
+    if (this.state.disabled) return false;
     // 提交评论
     this.props.dispatch(createArticleComment(this.props.article._id, this.state.comment));
     // 清空评论框
-    this.setState({ comment: '' });
+    this.setState({ comment: '', disabled: true });
   }
 
   // 点击emoji表情 添加 emoji native 原生表情到评论框中
@@ -63,13 +63,19 @@ class CommentEditor extends Component {
     this.setState({ comment: this.state.comment + emoji.native });
   }
 
-  // 切换显示隐藏 emoji 表情选择框
-  toogleEmojiPicker = () => {
-    const picker = document.getElementsByClassName('emoji-mart')[0];
-    picker.style.display = picker.style.display === 'block' ? 'none' : 'block';
-  }
-
   render() {
+    const content = (
+      <Picker
+        onClick={this.addEmoji}
+        native
+        showPreview={false}
+        i18n={i18n}
+        emojiSize={18}
+        exclude={exclude}
+        style={{ width: '310px' }}
+      />
+    );
+
     return (
       <div className="comment-input-textarea clearfix">
         <TextArea
@@ -79,23 +85,18 @@ class CommentEditor extends Component {
           value={this.state.comment}
           onPressEnter={this.onClickButton}
         />
-        <Picker
-          onClick={this.addEmoji}
-          native
-          showPreview={false}
-          i18n={i18n}
-          emojiSize={18}
-          exclude={exclude}
-          style={{ width: '310px', display: 'none', position: 'absolute', zIndex: 10000, right: '124px', top: '76px' }}
-        />
         <Button
           type="primary"
-          disabled={this.state.disabled}
+          className={this.state.disabled ? 'ant-btn-disabled' : ''}
           onClick={this.onClickButton}
         >
           评论
         </Button>
-        <Icon type="smile-o" className="emoji-show" onClick={this.toogleEmojiPicker} />
+        <Popover content={content} trigger="click" placement="bottom">
+          <Tooltip placement="bottom" title="添加 emoji 表情">
+            <Icon type="smile-o" className="emoji-show" />
+          </Tooltip>
+        </Popover>
       </div>
     );
   }

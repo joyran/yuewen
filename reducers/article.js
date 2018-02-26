@@ -152,10 +152,8 @@ export const createArticleReply = (aid, reply, atuser, rid) => (dispatch) => {
   })
     .then(res => res.json())
     .then((res) => {
-      if (res.status === 200) {
-        dispatch(readArticleCommentsSuccess(res.comments));
-        message.success('评论回复成功');
-      }
+      dispatch(readArticleCommentsSuccess(res));
+      message.success('评论回复成功');
     })
     .catch((err) => {
       console.error(err.message);

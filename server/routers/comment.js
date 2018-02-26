@@ -140,7 +140,7 @@ router.post('/api/v1/article/reply', async ctx => {
   var newComment = await Comment.create({ author, atuser, rid, article: aid, comment: reply, createAt });
 
   // 评论写入成功后更新文章评论数量 comments
-  await Article.findByIdAndUpdate({ _id: aid }, {comments: article.comments + 1}).exec();
+  await Article.findByIdAndUpdate({ _id: aid }, { comments: article.comments + 1 }).exec();
 
   // 生成新的评论回复通知消息
   await Notice.create({
@@ -156,11 +156,11 @@ router.post('/api/v1/article/reply', async ctx => {
 
   // 写入成功后重新读取所有的评论并返回给前端显示
   var comments = await readArticleComments(aid);
-  const status = 200;
+  var total = await Comment.find({ article: aid, rid }).count({});
 
   // 输出返回值
-  const body = { status, comments };
-  ctx.status = status;
+  const body = { dataSource: comments, total };
+  ctx.status = 200;
   ctx.body = body;
 });
 

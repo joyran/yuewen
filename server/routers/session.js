@@ -23,7 +23,7 @@ router.del('/api/v1/session', async ctx => {
 
   ctx.status = 204;
   ctx.body = {};
-})
+});
 
 
 /**

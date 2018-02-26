@@ -23,6 +23,7 @@ class ReplyEditor extends Component {
     };
     this.onChangeValue = this.onChangeValue.bind(this);
     this.onClickButton = this.onClickButton.bind(this);
+    this.onClickCancel = this.onClickCancel.bind(this);
   }
 
   // 评论输入框最少输入5个字符，否则评论按钮灰显，不可提交评论
@@ -34,14 +35,24 @@ class ReplyEditor extends Component {
     }
   }
 
+  // 点击 回复 按钮回复评论
   onClickButton = (e) => {
+    if (this.state.disabled) return false;
+
     const { atUserId, rid } = this.props;
-    const aid = this.props.article.aid;
+    const aid = this.props.article._id;
     const reply = this.state.reply;
     // 提交评论回复
     this.props.dispatch(createArticleReply(aid, reply, atUserId, rid));
     // 清空回复框
     this.setState({ reply: '' });
+    // 隐藏评论框
+    const className = e.target.parentNode.className;
+    e.target.parentNode.className = `${className} hidden`;
+  }
+
+  // 点击 取消 按钮隐藏评论框
+  onClickCancel = (e) => {
     // 隐藏评论框
     const className = e.target.parentNode.className;
     e.target.parentNode.className = `${className} hidden`;
@@ -57,9 +68,10 @@ class ReplyEditor extends Component {
           value={this.state.reply}
           onPressEnter={this.onClickButton}
         />
+        <a className="btn-cancel" onClick={this.onClickCancel}>取 消</a>
         <Button
           type="primary"
-          disabled={this.state.disabled}
+          className={this.state.disabled ? 'ant-btn-disabled' : ''}
           onClick={this.onClickButton}
         >
           回复

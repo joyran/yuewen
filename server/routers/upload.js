@@ -119,6 +119,21 @@ router.post('/api/v1/upload/banner/crop', async ctx => {
   ctx.body = body;
 });
 
+/**
+ * 删除文章封面图
+ */
+router.del('/api/v1/upload/banner', async ctx => {
+  var status = 204;
+  const { filepath } = ctx.request.body;
+
+  fs.unlink(`server/static${filepath}`, function (err) {
+    if (err) status = 500;
+  });
+
+  ctx.status = status;
+  ctx.body = {};
+});
+
 
 // ------------------------------------
 // 上传个人头像 avatar 路由配置

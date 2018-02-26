@@ -15,12 +15,12 @@ moment.locale('zh-cn');
 
 const ArticleManage = (props) => {
   // 用户发表的文章数量
-  const count = props.manage.articles.length;
+  const count = props.manage.dataSource.length;
 
   const onClickDelete = (aid, title) => {
     confirm({
       title: '确定要删除文章吗',
-      content: `${title} 被删除不可恢复`,
+      content: `文章 《${title}》 被删除不可恢复`,
       onOk() {
         props.dispatch(deleteArticle(aid));
       },
@@ -31,16 +31,19 @@ const ArticleManage = (props) => {
   const columns = [{
     title: '标题',
     dataIndex: 'title',
-    width: '40%'
+    width: '60%',
+    render: (text, record) => (
+      <a href={`/article/${record._id}`}>{text}</a>
+    )
   }, {
     title: '时间',
     dataIndex: 'createAt',
-    width: '20%',
+    width: '25%',
     render: text => <span>{ moment(text, 'X').format('YYYY-MM-DD HH:mm:ss') }</span>
   }, {
     title: '操作',
     dataIndex: 'action',
-    width: '20%',
+    width: '15%',
     render: (text, record) => (
       <span>
         <a onClick={() => onClickDelete(record._id, record.title)}>删除</a>
@@ -52,7 +55,7 @@ const ArticleManage = (props) => {
 
   // 分页组件
   const pagination = {
-    total: { count },
+    total: count,
     showSizeChanger: true,
     showTotal: total => `总数 ${total}`
   };
@@ -62,7 +65,7 @@ const ArticleManage = (props) => {
       <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
       <Table
         columns={columns}
-        dataSource={props.manage.articles}
+        dataSource={props.manage.dataSource}
         pagination={pagination}
         rowKey="_id"
         style={{ marginTop: 24 }}
