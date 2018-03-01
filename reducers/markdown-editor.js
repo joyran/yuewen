@@ -10,11 +10,17 @@ const networkErrorMsg = '网络连接失败，请刷新重试！';
 export const {
   createArticleSuccess,
   updateMarkdown,
-  updateTextareaCursorIndex
+  updateCursorRange,
+  updateModeToView,
+  updateModeToEdit,
+  updateModeToNormal
 } = createActions(
   'CREATE_ARTICLE_SUCCESS',
   'UPDATE_MARKDOWN',
-  'UPDATE_TEXTAREA_CURSOR_INDEX'
+  'UPDATE_CURSOR_RANGE',
+  'UPDATE_MODE_TO_VIEW',
+  'UPDATE_MODE_TO_EDIT',
+  'UPDATE_MODE_TO_NORMAL'
 );
 
 export const createArticle = (title, digest, tags, markup) => (dispatch, getState) => {
@@ -53,9 +59,30 @@ export const meditor = handleActions({
     markdown: action.payload
   }),
 
-  // 更新文本编辑框中光标位置
-  UPDATE_TEXTAREA_CURSOR_INDEX: (state, action) => ({
+  // 更新 CodeMirror 光标范围
+  UPDATE_CURSOR_RANGE: (state, action) => ({
     ...state,
-    cursorIndex: action.payload
+    cursor: action.payload
+  }),
+
+  // 修改模式为 阅读模式
+  UPDATE_MODE_TO_VIEW: state => ({
+    ...state,
+    editorClassName: 'markdown-editor-hidden',
+    previewClassName: 'markdown-preview-show'
+  }),
+
+  // 修改模式为 编辑模式
+  UPDATE_MODE_TO_EDIT: state => ({
+    ...state,
+    editorClassName: 'markdown-editor-show',
+    previewClassName: 'markdown-preview-hidden'
+  }),
+
+  // 修改模式为 阅读和编辑共存模式
+  UPDATE_MODE_TO_NORMAL: state => ({
+    ...state,
+    editorClassName: 'markdown-editor',
+    previewClassName: 'markdown-preview'
   })
 }, {});

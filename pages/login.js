@@ -28,7 +28,7 @@ const Login = () => {
     <div>
       <Head>
         <title>悦文 · 登录</title>
-        <link rel="stylesheet" href="/css/antd.min.css" />
+        <link rel="stylesheet" href="/css/antd.css" />
       </Head>
       <LoginForm />
     </div>

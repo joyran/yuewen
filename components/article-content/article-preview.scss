@@ -1,5 +1,7 @@
 // 文章内容显示
-.article-preview {
+.article-preview,
+.markdown-preview,
+.markdown-preview-show {
   font-size: 14px;
   line-height: 2;
   color: $grey-darker;
@@ -109,8 +111,9 @@
   }
 
   hr {
-    margin: 24px 0;
-    color: $grey-lighter;
+    margin: 32px 0;
+    border: 0;
+    border-bottom: 1px dashed #ccc;
   }
 
   a {

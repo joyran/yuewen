@@ -16,25 +16,32 @@ var Collection = require('../models/collection');
  */
 router.get('/api/v1/article', async ctx => {
   // 文章索引 id
-  const aid = ctx.query.aid;
+  const { aid, createdByUser } = ctx.query;
 
-  // mongoose find 查询返回的结果默认不可以修改，除非用 .lean() 查询。
-  // 或者用.toObject()转换成 objcet对象
-  var article = await Article.findOne({ _id: aid }).populate('author').lean();
+  if (createdByUser) {
+    var article = await Article.findOne({ _id: aid, author: ctx.session.uid }).populate('author').lean();
+  } else {
+    var article = await Article.findOne({ _id: aid }).populate('author').lean();
+  }
 
-  // 判断文章是否已经被用户收藏
-  var collection = await Collection.findOne({ user: ctx.session.uid, article: aid }).lean();
-  var hasCollected = collection ? true : false;
-  article.hasCollected = hasCollected;
+  if (!article) {
+    var status = 404;
+    ctx.status = status;
+    ctx.body = { msg: 'error' };
+  } else {
+    var status = 200;
+    // 判断文章是否已经被用户收藏
+    var collection = await Collection.findOne({ user: ctx.session.uid, article: aid }).lean();
+    var hasCollected = collection ? true : false;
+    article.hasCollected = hasCollected;
 
-  // 删除用户密码
-  delete article.author.password;
-  // 删除 markdown
-  delete article.markdown;
+    // 删除用户密码
+    delete article.author.password;
 
-  // 输出返回值
-  ctx.status = 200;
-  ctx.body = article;
+    // 输出返回值
+    ctx.status = status;
+    ctx.body = article;
+  }
 });
 
 

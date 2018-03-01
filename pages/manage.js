@@ -36,7 +36,7 @@ const Index = () => {
       <Layout>
         <Head>
           <title>悦文 · 与世界分享你的知识、经验和见解</title>
-          <link rel="stylesheet" href="/css/antd.min.css" />
+          <link rel="stylesheet" href="/css/antd.css" />
           <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         </Head>
         <Header>

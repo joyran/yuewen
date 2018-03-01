@@ -14,6 +14,7 @@ import { readSessionSuccess } from '../reducers/session';
 import { readUnviewNoticeSuccess } from '../reducers/notice';
 import ArticleContent from '../components/article-content/index';
 import ArticleComment from '../components/article-comment/index';
+import Error from '../components/error/index';
 import Nav from '../components/nav/index';
 import stylesheet from '../styles/index.scss';
 
@@ -35,12 +36,16 @@ const initStore = (state = initialState) => {
   return createStore(reducers, state, composeWithDevTools(applyMiddleware(thunkMiddleware)));
 };
 
-const Index = () => {
+const Index = (props) => {
+  if (props.statusCode !== 200) {
+    return <Error statusCode={props.statusCode} />;
+  }
+
   return (
     <Layout>
       <Head>
         <title>悦文 · 与世界分享你的知识、经验和见解</title>
-        <link rel="stylesheet" href="/css/antd.min.css" />
+        <link rel="stylesheet" href="/css/antd.css" />
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
       </Head>
       <Header>
@@ -58,17 +63,18 @@ const Index = () => {
 
 Index.getInitialProps = async ({ store, req, query }) => {
   var res;
-  // 文章索引 aid
-  const aid = typeof query.aid !== 'undefined' ? query.aid : '';
   const { limit } = store.getState().article.comment;
 
+  // 文章索引 aid, 为空显示 404 页面
+  const aid = query.aid;
+  if (!aid) return { statusCode: 404 };
+
   // ----- 读取文章内容，作者等
-  // 请求 url 必须为完整路径，不能为绝对路径 /api/v1/digests
-  // isomorphic-fetch 在 node 端不会自动带上 cookie，需要手动添加 headers: { Cookie: req.headers.cookie }
   res = await fetch(`http://${req.headers.host}/api/v1/article?aid=${aid}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
+  if (res.status !== 200) return { statusCode: res.status };
   const article = await res.json();
   store.dispatch(readArticleSuccess(article));
 
@@ -77,6 +83,7 @@ Index.getInitialProps = async ({ store, req, query }) => {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
+  if (res.status !== 200) return { statusCode: res.status };
   res = await res.json();
   store.dispatch(readArticleLikesSuccess(res.like));
 
@@ -85,6 +92,7 @@ Index.getInitialProps = async ({ store, req, query }) => {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
+  if (res.status !== 200) return { statusCode: res.status };
   res = await res.json();
   store.dispatch(readArticleCommentsSuccess(res));
 
@@ -94,6 +102,7 @@ Index.getInitialProps = async ({ store, req, query }) => {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
+  if (res.status !== 200) return { statusCode: res.status };
   res = await res.json();
   store.dispatch(readSessionSuccess(res.user));
 
@@ -102,8 +111,11 @@ Index.getInitialProps = async ({ store, req, query }) => {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
+  if (res.status !== 200) return { statusCode: res.status };
   const notice = await res.json();
   store.dispatch(readUnviewNoticeSuccess(notice));
+
+  return { statusCode: 200 };
 };
 
 

@@ -13,6 +13,7 @@ const eslintrc = {
     'import'
   ],
   rules: {
+    'global-require': 0,
     'no-var': 0,
     'semi': 1,
     'no-console': ['error', { allow: ['log', 'warn', 'error'] }],

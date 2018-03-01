@@ -41,7 +41,7 @@ const Index = (props) => {
     <Layout style={{ background: '#f6f6f6' }}>
       <Head>
         <title>{`${props.profile.username} - 悦文`}</title>
-        <link rel="stylesheet" href="/css/antd.min.css" />
+        <link rel="stylesheet" href="/css/antd.css" />
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
       </Head>
       <Header>
