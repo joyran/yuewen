@@ -102,6 +102,7 @@ class Markdown extends Component {
             source={this.props.meditor.markdown}
             className={this.props.meditor.previewClassName}
             renderers={{ code: CodeBlock }}
+            escapeHtml={false}
           />
         </div>
       </Spin>

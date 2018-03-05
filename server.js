@@ -6,7 +6,7 @@ const koaSession = require("koa-session2");
 const mongoose = require('./server/utils/mongoose');
 const SessionStore = require("./server/utils/session-store");
 const server = require('koa-static');
-// const multer = require('koa-multer');
+const User = require('./server/models/user');
 
 // 导入路由
 const session = require('./server/routers/session');
@@ -17,7 +17,6 @@ const like = require('./server/routers/like');
 const notice = require('./server/routers/notice');
 const collection = require('./server/routers/collection');
 const profile = require('./server/routers/profile');
-const auth = require('./server/routers/auth');
 const search = require('./server/routers/search');
 const upload = require('./server/routers/upload');
 
@@ -43,43 +42,87 @@ app.prepare().then(() => {
 
   // 登录页面路由
   router.get('/login', async ctx => {
-    await app.render(ctx.req, ctx.res, '/login', ctx.params);
-    ctx.respond = false;
-  })
+    // 已登录则跳转到主页
+    if (ctx.session.uid) {
+      await ctx.redirect('/');
+      await app.render(ctx.req, ctx.res, '/index', ctx.params);
+    } else {
+      await app.render(ctx.req, ctx.res, '/login', ctx.params);
+    }
 
-  // 标签页路由, 依旧输出主页 index
-  router.get('/tag/:tag', async ctx => {
-    await app.render(ctx.req, ctx.res, '/index', ctx.params);
     ctx.respond = false;
   })
 
   // 文章详情页路由
   router.get('/article/:aid', async ctx => {
-    await app.render(ctx.req, ctx.res, '/article', ctx.params);
+    // 已登录进入 article 页面，未登录则跳转到 login 登录页面
+    if (ctx.session.uid) {
+      await app.render(ctx.req, ctx.res, '/article', ctx.params);
+    } else {
+      await ctx.redirect('/login');
+      await app.render(ctx.req, ctx.res, '/login', ctx.params);
+    }
+
     ctx.respond = false;
   })
 
-  // 写文章路由
+  // 编辑文章路由
   router.get('/markdown/:aid', async ctx => {
-    await app.render(ctx.req, ctx.res, '/markdown', ctx.params);
+    if (ctx.session.uid) {
+      await app.render(ctx.req, ctx.res, '/markdown', ctx.params);
+    } else {
+      await ctx.redirect('/login');
+      await app.render(ctx.req, ctx.res, '/login', ctx.params);
+    }
+
+    ctx.respond = false;
+  })
+
+  // 写新文章路由
+  router.get('/markdown', async ctx => {
+    if (ctx.session.uid) {
+      await app.render(ctx.req, ctx.res, '/markdown', ctx.params);
+    } else {
+      await ctx.redirect('/login');
+      await app.render(ctx.req, ctx.res, '/login', ctx.params);
+    }
+
     ctx.respond = false;
   })
 
   // 文章管理路由
   router.get('/manage', async ctx => {
-    await app.render(ctx.req, ctx.res, '/manage', ctx.params);
+    if (ctx.session.uid) {
+      await app.render(ctx.req, ctx.res, '/manage', ctx.params);
+    } else {
+      await ctx.redirect('/login');
+      await app.render(ctx.req, ctx.res, '/login', ctx.params);
+    }
+
     ctx.respond = false;
   })
 
   // 个人主页
   router.get('/profile/:uid', async ctx => {
-    await app.render(ctx.req, ctx.res, '/profile', ctx.params);
+    if (ctx.session.uid) {
+      await app.render(ctx.req, ctx.res, '/profile', ctx.params);
+    } else {
+      await ctx.redirect('/login');
+      await app.render(ctx.req, ctx.res, '/login', ctx.params);
+    }
+
     ctx.respond = false;
   })
 
   // 主页路由
   router.get('/', async ctx => {
-    await app.render(ctx.req, ctx.res, '/index', ctx.params);
+    if (ctx.session.uid) {
+      await app.render(ctx.req, ctx.res, '/index', ctx.params);
+    } else {
+      await ctx.redirect('/login');
+      await app.render(ctx.req, ctx.res, '/login', ctx.params);
+    }
+
     ctx.respond = false;
   })
 
@@ -95,8 +138,23 @@ app.prepare().then(() => {
   koa.use(search.routes()).use(search.allowedMethods());
   koa.use(upload.routes()).use(upload.allowedMethods());
 
-  // 特定路由放在通用路由 * 之前
+  // 特定路由放在通用路由 * 之前, 检查用户登录状态
   router.get('*', async ctx => {
+    // session.uid不存在则判断 cookie.uid是否合法，在数据库中查找 uid
+    if (!ctx.session.uid) {
+      if (ctx.cookies.get('uid')) {
+        const uid = ctx.cookies.get('uid');
+        const user = await User.findOne({ uid });
+
+        // cookie.uid 合法则将 uid,username,avator 写入session
+        if (user) {
+          ctx.session.uid       = user.uid;
+          ctx.session.username  = user.username;
+          ctx.session.avatar    = user.avatar;
+        }
+      }
+    }
+
     await handle(ctx.req, ctx.res);
     ctx.respond = false;
   })
