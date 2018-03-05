@@ -1,5 +1,4 @@
 @import "././styles/variable";
-@import "emoji-mart";
 
 .comment-wrapper {
   margin-top: 120px;
@@ -141,7 +140,7 @@
   cursor: pointer;
 }
 
-.emoji-show {
+.show-emoji-icon {
   font-size: 20px;
   float: right;
   margin-top: 24px;
@@ -150,6 +149,42 @@
 
   &:hover {
     color: #1890ff;
+  }
+}
+
+.emojis {
+  box-sizing: content-box;
+  width: 270px;
+  height: 210px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+
+  li {
+    display: block;
+    float: left;
+    width: 30px;
+    height: 30px;
+    margin: 0;
+    padding: 0;
+    color: #fff;
+    border-radius: 3px;
+    font-size: 18px;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+
+    &:hover {
+      background: #1890ff;
+    }
+  }
+}
+
+.popover-emojis {
+  .ant-popover-arrow,
+  .ant-popover-inner-content {
+    background: #333;
   }
 }
 

@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Tooltip, Icon, Button, message, Select } from 'antd';
+import { Tooltip, Icon, Button, message, Select, Popover } from 'antd';
 import { connect } from 'react-redux';
 import AddImgModal from './add-img-modal';
 import AddLinkModal from './add-link-modal';
@@ -249,6 +249,33 @@ const Toolbar = (props) => {
     props.dispatch(toggleReleaseArticleModal());
   };
 
+  // 光标位置处插入 emoji 表情
+  const addEmoji = (emoji) => {
+    const { from, to } = props.meditor.cursor;
+    codemirror.doc.replaceRange(emoji, from, to);
+    codemirror.focus();
+  };
+
+  const emojis = [
+    '😂', '😘', '😍', '👏', '😁', '💯', '👍', '👎', '🎉',
+    '🤣', '😲', '😄', '😊', '😃', '😅', '🤠', '😎', '😆',
+    '🤝', '🤑', '🤤', '😤', '🙃', '🤡', '😪', '😴', '😜',
+    '😓', '😷', '🤓', '👻', '😥', '🙄', '☹️', '☠️', '😰',
+    '😩', '😒', '💀', '😨', '😱', '😭', '😠', '🙌', '😋',
+    '😇', '💔', '💖', '👊', '💋', '🖕', '✌️', '👌', '👄',
+    '💩', '👿', '😡', '🚀', '🏀', '⚽', '🐶', '🐷', '🎤'
+  ];
+
+  const content = (
+    <ul className="emojis">
+      {
+        emojis.map((emoji, index) => {
+          return <li data-emoji={emoji} onClick={() => addEmoji(emoji)} key={index}>{emoji}</li>;
+        })
+      }
+    </ul>
+  );
+
   return (
     <div className="toolbar">
       <ol>
@@ -287,6 +314,11 @@ const Toolbar = (props) => {
         <Tooltip placement="bottom" title="无序列表">
           <li onClick={addOlItem}><Icon type="ol" /></li>
         </Tooltip>
+        <Popover overlayClassName="popover-emojis" content={content} trigger="click" placement="bottom">
+          <Tooltip placement="bottom" title="添加 emoji 表情">
+            <li><Icon type="smile-o" /></li>
+          </Tooltip>
+        </Popover>
         <Tooltip placement="bottom" title="编辑模式">
           <li onClick={changeModeToEdit} style={{ marginLeft: 100 }}><Icon type="edit" /></li>
         </Tooltip>

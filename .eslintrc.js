@@ -42,6 +42,7 @@ const eslintrc = {
     'jsx-a11y/no-static-element-interactions': 0,
     'jsx-a11y/anchor-has-content': 0,
     'jsx-a11y/no-noninteractive-element-interactions': 0,
+    'jsx-a11y/accessible-emoji': 0,
     'import/extensions': 0,
     'import/no-unresolved': 0,
     'import/no-extraneous-dependencies': 0
