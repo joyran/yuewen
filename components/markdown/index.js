@@ -6,7 +6,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Spin } from 'antd';
 import ReactMarkdown from 'react-markdown';
-// import CodeMirror from 'react-codemirror';
 import CodeBlock from './code-block';
 import Toolbar from './toolbar';
 import { updateMarkdown, updateCursorRange } from '../../reducers/markdown-editor';

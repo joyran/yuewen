@@ -1,46 +1,119 @@
 @import "././styles/variable";
 
-.nav {
-  width: 100%;
+.header {
+  width: $layout-width;
   background: #fff;
-  box-shadow: 0px 1px 3px rgba(26,26,26,.1);
+  margin: 0 auto;
+}
 
-  .nav-menu {
-    width: $layout-width;
-    margin: 0 auto;
-    border-bottom: none;
-    line-height: 60px;
-  }
-
-  .ant-menu-horizontal {
-    border-bottom: none;
-  }
-
-  .nav-avatar {
-    float: right;
-
-    .ant-menu-submenu-title {
-      padding: 0;
-    }
-  }
-
-  .nav-notification {
-    float: right;
-    margin-right: 24px;
-
-    .anticon {
-      font-size: 20px;
-      vertical-align: middle;
-    }
-  }
-
-  .ant-menu-item {
+.header-left {
+  a {
+    display: inline-block;
     width: 64px;
     text-align: center;
   }
 }
 
-.notification {
+.header-right {
+  height: $header-height;
+
+  .ant-badge {
+    display: inline;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    float: right;
+    margin-top: 22px;
+    margin-right: 48px;
+    cursor: pointer;
+
+    sup {
+      margin-left: 8px;
+    }
+  }
+
+  .ant-avatar {
+    cursor: pointer;
+    float: right;
+    margin-top: 12px;
+  }
+}
+
+.search-box {
+  input {
+    border: none;
+    outline: none;
+    height: 48px;
+    padding-left: 12px;
+
+    &:hover,
+    &:focus {
+      border: none;
+      outline: none;
+    }
+  }
+
+  .anticon {
+    margin-right: 10px;
+  }
+}
+
+.dropdown-search {
+  width: 600px;
+
+  .ant-dropdown-menu-item {
+    overflow: hidden;
+    padding: 12px 24px;
+    white-space: normal;
+    border-bottom: 1px solid #eee;
+
+    em {
+      color: #ff0000;
+      font-style: normal;
+    }
+
+    .title {
+      margin-bottom: 4px;
+      color: $grey-dark;
+    }
+
+    .excerpt {
+      font-size: 12px;
+      margin-bottom: 0px;
+      max-height: 44px;
+      overflow: hidden;
+    }
+  }
+}
+
+input::placeholder {
+  color: $grey;
+}
+
+.popover-avatar {
+  .ant-popover-inner-content {
+    padding: 8px 0;
+  }
+
+  a {
+    display: block;
+    line-height: 36px;
+    height: 36px;
+    padding: 0 24px;
+    cursor: pointer;
+    color: $grey-dark;
+
+    &:hover {
+      background: #e6f7ff;
+    }
+
+    .anticon {
+      margin-right: 8px;
+    }
+  }
+}
+
+.popover-notification {
   width: 360px;
 
   .ant-popover-inner-content {
@@ -119,9 +192,4 @@
 
 .ant-avatar-image {
   vertical-align: middle;
-}
-
-.search {
-  width: 200px;
-  position: absolute;
 }

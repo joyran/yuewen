@@ -6,7 +6,8 @@
     "test": "mocha",
     "dev": "node server.js",
     "build": "next build",
-    "start": "set NODE_ENV=production&& node server.js"
+    "start": "set NODE_ENV=production&& node server.js",
+    "mock": "node mock.js"
   },
   "repository": "http://github.com/joyran/yue",
   "keywords": [

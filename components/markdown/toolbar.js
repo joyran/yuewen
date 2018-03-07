@@ -279,11 +279,8 @@ const Toolbar = (props) => {
   return (
     <div className="toolbar">
       <ol>
-        <li style={{ marginLeft: 60 }}>
-          <a href="/">首页</a>
-        </li>
         <Tooltip placement="bottom" title="图片">
-          <li onClick={() => { props.dispatch(toggleAddImgModal()); }} style={{ marginLeft: 60 }} >
+          <li onClick={() => { props.dispatch(toggleAddImgModal()); }} style={{ marginLeft: 16 }} >
             <Icon type="picture" />
           </li>
         </Tooltip>
@@ -319,24 +316,25 @@ const Toolbar = (props) => {
             <li><Icon type="smile-o" /></li>
           </Tooltip>
         </Popover>
-        <Tooltip placement="bottom" title="编辑模式">
-          <li onClick={changeModeToEdit} style={{ marginLeft: 100 }}><Icon type="edit" /></li>
-        </Tooltip>
-        <Tooltip placement="bottom" title="阅读模式">
-          <li onClick={changeModeToView}><Icon type="desktop" /></li>
-        </Tooltip>
-        <Tooltip placement="bottom" title="正常模式">
-          <li onClick={changeModeToNormal}><Icon type="laptop" /></li>
-        </Tooltip>
-        <li className="release">
+        <div className="right-div">
+          <Tooltip placement="bottom" title="编辑模式">
+            <li onClick={changeModeToEdit}><Icon type="edit" /></li>
+          </Tooltip>
+          <Tooltip placement="bottom" title="阅读模式">
+            <li onClick={changeModeToView}><Icon type="desktop" /></li>
+          </Tooltip>
+          <Tooltip placement="bottom" title="正常模式">
+            <li onClick={changeModeToNormal}><Icon type="laptop" /></li>
+          </Tooltip>
           <Button
+            style={{ marginLeft: 46 }}
             type="primary"
             ghost
             onClick={onClickReleaseArticleButton}
           >
             发布文章
           </Button>
-        </li>
+        </div>
       </ol>
       {/* 插入图片模态框 */}
       <AddImgModal

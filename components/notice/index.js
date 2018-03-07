@@ -21,7 +21,7 @@ const Notice = (props) => {
     } else {
       props.dispatch(updateLikeNoticeToView(id, link));
     }
-  }
+  };
 
   return (
     <div className="notices">

@@ -9,7 +9,7 @@ var schema = new Schema({
   author: { type: Schema.Types.ObjectId, ref: 'User' },
   title: String,
   tags: Array,
-  digest: String,
+  excerpt: String,
   views: Number,
   comments: Number,
   likes: Number,

@@ -16,13 +16,15 @@
 .ant-layout-header {
   background: $background-color;
   padding: 0;
-  height: auto;
+  height: $header-height;
+  box-shadow: 1px 2px 8px $grey-lighter;
+  color: $grey-darker;
 }
 
 .ant-layout-content {
   width: $layout-width;
   margin: 0 auto;
-  color: $grey-dark;
+  color: $grey-darker;
   min-height: 600px;
 }
 
