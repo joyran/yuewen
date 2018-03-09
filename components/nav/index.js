@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import fetch from 'isomorphic-fetch';
 import { deleteSession } from '../../reducers/session';
 import NoticeTabPane from './notice-tab-pane';
+import WrappedChangePasswordModal from './change-password-modal';
 import stylesheet from './index.scss';
 
 const TabPane = Tabs.TabPane;
@@ -15,7 +16,10 @@ const TabPane = Tabs.TabPane;
 class Nav extends Component {
   constructor(props) {
     super(props);
-    this.state = { searchResult: [] };
+    this.state = {
+      searchResult: [],
+      visible: false
+    };
   }
 
   onSearch = (e) => {
@@ -30,6 +34,18 @@ class Nav extends Component {
       .then((res) => {
         this.setState({ searchResult: res.data });
       });
+  }
+
+  showModal = () => {
+    this.setState({ visible: true });
+  }
+
+  hiddenModal = () => {
+    this.setState({ visible: false });
+  }
+
+  handleChangePassword = () => {
+    this.setState({ visible: false });
   }
 
   render() {
@@ -52,6 +68,7 @@ class Nav extends Component {
         <a href={`/profile/${this.props.session.uid}`} ><Icon type="user" />个人主页</a>
         <a href="/markdown" target="_blank"><Icon type="edit" />写新文章</a>
         <a href="/manage"><Icon type="profile" />文章管理</a>
+        <a onClick={this.showModal}><Icon type="lock" />修改密码</a>
         <a onClick={() => dispatch(deleteSession())}><Icon type="logout" />退出登录</a>
       </div>
     );
@@ -106,10 +123,15 @@ class Nav extends Component {
             overlayClassName="popover-notification"
           >
             <Badge count={this.props.notice.unviewAllCount}>
-              <Icon type="notification" />
+              <Icon type="bell" />
             </Badge>
           </Popover>
         </Col>
+        <WrappedChangePasswordModal
+          visible={this.state.visible}
+          handleCancel={this.hiddenModal}
+          handleOk={this.hiddenModal}
+        />
       </Row>
     );
   }

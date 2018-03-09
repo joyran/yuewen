@@ -9,6 +9,7 @@ const server = require('koa-static');
 const User = require('./server/models/user');
 
 // 导入路由
+const user = require('./server/routers/user');
 const session = require('./server/routers/session');
 const excerpt = require('./server/routers/excerpt');
 const article = require('./server/routers/article');
@@ -127,6 +128,7 @@ app.prepare().then(() => {
   })
 
   // 应用外部路由文件
+  koa.use(user.routes()).use(user.allowedMethods());
   koa.use(excerpt.routes()).use(excerpt.allowedMethods());
   koa.use(session.routes()).use(session.allowedMethods());
   koa.use(article.routes()).use(article.allowedMethods());

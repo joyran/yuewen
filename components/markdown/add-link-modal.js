@@ -33,12 +33,12 @@ const AddLinkModal = Form.create()(
             { getFieldDecorator('linkUrl', {
               rules: [{ required: true, message: '请输入地址' }],
             })(
-              <Input placeholder="http://" />
+              <Input />
             )}
           </FormItem>
           <FormItem {...formItemLayout} label="描述" >
             { getFieldDecorator('linkDesc')(
-              <Input placeholder="描述" />
+              <Input />
             )}
           </FormItem>
         </Form>
