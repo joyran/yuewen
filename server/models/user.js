@@ -5,21 +5,22 @@
 // 从 mongoose.js 中导出 mongoose, Schema 两个变量
 var { mongoose, Schema } = require('../utils/mongoose');
 
-var userSchema = new Schema({
-  username: String,
+var schema = new Schema({
+  login: String,
+  name: String,
   password: String,
   mail: String,
-  avatar: String,
-  smAvatar: String,
-  followedTags: Array,
+  avatar_url: String,
+  small_avatar_url: String,
+  followed_tags: Array,
   prestige: Number,
-  banner: String,
+  banner_url: String,
   bio: String,
   state: Boolean,
-  isAdmin: Boolean,
-  createAt: String
+  admin: Boolean,
+  created_at: String
 }, { versionKey: false });
 
-var User = mongoose.model('User', userSchema);
+var User = mongoose.model('User', schema);
 
 module.exports = User;

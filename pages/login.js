@@ -23,7 +23,7 @@ const initStore = () => {
   return createStore(reducers, initialState, composeWithDevTools(applyMiddleware(thunkMiddleware)));
 };
 
-const Login = () => {
+const Index = () => {
   return (
     <div>
       <Head>
@@ -35,4 +35,4 @@ const Login = () => {
   );
 };
 
-export default withRedux(initStore, null)(Login);
+export default withRedux(initStore, null)(Index);

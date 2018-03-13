@@ -22,12 +22,7 @@ const { Header, Content, Footer } = Layout;
 
 // 初始默认 state
 const initialState = {
-  article: {
-    comment: {
-      skip: 0,
-      limit: 10  // comment 评论每次读取的数量
-    }
-  },
+  article: {},
   session: {},
   notice: {}
 };
@@ -63,14 +58,25 @@ const Index = (props) => {
 
 Index.getInitialProps = async ({ store, req, query }) => {
   var res;
-  const { limit } = store.getState().article.comment;
 
   // 文章索引 aid, 为空显示 404 页面
-  const aid = query.aid;
+  const { aid } = query;
   if (!aid) return { statusCode: 404 };
 
-  // ----- 读取文章内容，作者等
-  res = await fetch(`http://${req.headers.host}/api/v1/article?aid=${aid}`, {
+
+  // ----- 读取当前登录用户基本信息
+  res = await fetch(`http://${req.headers.host}/api/v1/user`, {
+    method: 'get',
+    headers: { Cookie: req.headers.cookie }
+  });
+  if (res.status !== 200) return { statusCode: res.status };
+  const user = await res.json();
+  store.dispatch(readSessionSuccess(user));
+  const { login } = store.getState().session;
+
+
+  // ----- 读取文章内容
+  res = await fetch(`http://${req.headers.host}/api/v1/articles/${aid}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
@@ -78,17 +84,19 @@ Index.getInitialProps = async ({ store, req, query }) => {
   const article = await res.json();
   store.dispatch(readArticleSuccess(article));
 
-  // ----- 读取文章点赞人列表和点赞人数
-  res = await fetch(`http://${req.headers.host}/api/v1/article/like?aid=${aid}`, {
+
+  // ----- 读取文章点赞用户数组
+  res = await fetch(`http://${req.headers.host}/api/v1/articles/${aid}/likes`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
   if (res.status !== 200) return { statusCode: res.status };
   res = await res.json();
-  store.dispatch(readArticleLikesSuccess(res.like));
+  store.dispatch(readArticleLikesSuccess(res));
 
-  // ----- 读取文章评论列表
-  res = await fetch(`http://${req.headers.host}/api/v1/article/comment?aid=${aid}&skip=0&limit=${limit}`, {
+
+  // ----- 读取文章评论数组
+  res = await fetch(`http://${req.headers.host}/api/v1/articles/${aid}/comments`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
@@ -97,23 +105,30 @@ Index.getInitialProps = async ({ store, req, query }) => {
   store.dispatch(readArticleCommentsSuccess(res));
 
 
-  // ----- 读取当前登录用户id, 用户名, 头像
-  res = await fetch(`http://${req.headers.host}/api/v1/session`, {
+  // ----- 读取用户未读通知消息数组
+  res = await fetch(`http://${req.headers.host}/api/v1/users/${login}/received_notices?has_view=false`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
-  res = await res.json();
-  store.dispatch(readSessionSuccess(res.user));
+  const unviewNotices = await res.json();
 
-  // ----- 读取当前登录用户未读消息
-  res = await fetch(`http://${req.headers.host}/api/v1/notice/unview`, {
-    method: 'get',
-    headers: { Cookie: req.headers.cookie }
+  // 过滤 comments
+  const comments = unviewNotices.filter((notice) => {
+    if (notice.type === 'comment') {
+      return notice;
+    }
+    return false;
   });
-  if (res.status !== 200) return { statusCode: res.status };
-  const notice = await res.json();
-  store.dispatch(readUnviewNoticeSuccess(notice));
+
+  // 过滤 likes
+  const likes = unviewNotices.filter((notice) => {
+    if (notice.type === 'like') {
+      return notice;
+    }
+    return false;
+  });
+
+  store.dispatch(readUnviewNoticeSuccess({ comments, likes }));
 
   return { statusCode: 200 };
 };

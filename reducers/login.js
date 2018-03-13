@@ -37,7 +37,7 @@ export const signin = (username, password, remember) => (dispatch) => {
         location.href = '/';
       } else {
         // 验证失败提示用户错误消息
-        message.error(res.msg, 5);
+        message.error(res.message, 5);
         dispatch(loginFailed());
       }
     })

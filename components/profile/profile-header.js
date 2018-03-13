@@ -24,25 +24,9 @@ class ProfileHeader extends Component {
       bannerEditorUrl: '',
       bannerScale: 1
     };
-
-    this.beforeUpload = this.beforeUpload.bind(this);
-
-    // avatar
-    this.onChangeAvatar = this.onChangeAvatar.bind(this);
-    this.onChangeAvatarScale = this.onChangeAvatarScale.bind(this);
-    this.onOkAvatar = this.onOkAvatar.bind(this);
-    this.onCancelAvatar = this.onCancelAvatar.bind(this);
-    this.avatarEditorRef = this.avatarEditorRef.bind(this);
-
-    // banner
-    this.onChangeBanner = this.onChangeBanner.bind(this);
-    this.onChangeBannerScale = this.onChangeBannerScale.bind(this);
-    this.onOkBanner = this.onOkBanner.bind(this);
-    this.onCancelBanner = this.onCancelBanner.bind(this);
-    this.bannerEditorRef = this.bannerEditorRef.bind(this);
   }
 
-  beforeUpload(file) {
+  beforeUpload = (file) => {
     // 允许上传的 mimetype
     const allowTypes = ['image/jpeg', 'image/gif', 'image/bmp', 'image/png'];
     if (allowTypes.indexOf(file.type) === -1) {
@@ -51,7 +35,7 @@ class ProfileHeader extends Component {
     }
   }
 
-  onChangeBanner(info) {
+  onChangeBanner = (info) => {
     const status = info.file.status;
     if (status === 'done') {
       // 上传完成后弹出对话框裁剪 banner
@@ -63,7 +47,7 @@ class ProfileHeader extends Component {
     }
   }
 
-  onChangeAvatar(info) {
+  onChangeAvatar = (info) => {
     const status = info.file.status;
     if (status === 'done') {
       // 上传完成后弹出对话框裁剪头像
@@ -74,16 +58,16 @@ class ProfileHeader extends Component {
     }
   }
 
-  onCancelAvatar() {
+  onCancelAvatar = () => {
     this.setState({ avatarEditorModalVisible: !this.state.avatarEditorModalVisible });
   }
 
-  onCancelBanner() {
+  onCancelBanner = () => {
     this.setState({ bannerEditorModalVisible: !this.state.bannerEditorModalVisible });
     this.props.dispatch(deleteBanner(this.state.bannerEditorUrl));
   }
 
-  onOkAvatar() {
+  onOkAvatar = () => {
     var originalWidth;
     var originalHeight;
 
@@ -121,7 +105,7 @@ class ProfileHeader extends Component {
     }
   }
 
-  onOkBanner() {
+  onOkBanner = () => {
     var originalWidth;
     var originalHeight;
 
@@ -159,20 +143,20 @@ class ProfileHeader extends Component {
     }
   }
 
-  onChangeAvatarScale(value) {
+  onChangeAvatarScale = (value) => {
     this.setState({ avatarScale: value });
   }
 
-  onChangeBannerScale(value) {
+  onChangeBannerScale = (value) => {
     this.setState({ bannerScale: value });
   }
 
-  avatarEditorRef(editor) {
+  avatarEditorRef = (editor) => {
     this.avatarEditor = editor;
     return this.avatarEditor;
   }
 
-  bannerEditorRef(editor) {
+  bannerEditorRef = (editor) => {
     this.bannerEditor = editor;
     return this.bannerEditor;
   }
@@ -180,8 +164,8 @@ class ProfileHeader extends Component {
   render() {
     return (
       <div className="profile-header">
-        <div className="profile-header-banner-tip" style={{ backgroundImage: `url(${this.props.profile.banner})` }}>
-          { this.props.session.uid === this.props.profile.uid ?
+        <div className="profile-header-banner-tip" style={{ backgroundImage: `url(${this.props.profile.banner_url})` }}>
+          { this.props.session._id === this.props.profile._id ?
             <Upload
               name="file"
               beforeUpload={this.beforeUpload}
@@ -190,15 +174,15 @@ class ProfileHeader extends Component {
               showUploadList={false}
             >
               {
-                this.props.profile.banner ? <Button ghost>编辑封面图片</Button> : <Button ghost>上传封面图片</Button>
+                this.props.profile.banner_url ? <Button ghost>编辑封面图片</Button> : <Button ghost>上传封面图片</Button>
               }
             </Upload> : ''
           }
         </div>
         <div className="profile-header-wrapper">
           <div className="profile-header-avatar-wrapper">
-            <img src={this.props.profile.avatar} alt={this.props.profile.username} className="profile-header-avatar" />
-            { this.props.session.uid === this.props.profile.uid ?
+            <img src={this.props.profile.avatar_url} alt={this.props.profile.name} className="profile-header-avatar" />
+            { this.props.session._id === this.props.profile._id ?
               <Upload
                 name="file"
                 beforeUpload={this.beforeUpload}
@@ -269,10 +253,10 @@ class ProfileHeader extends Component {
 
           <div className="profile-header-content">
             <div className="profile-header-title">
-              <span className="profile-header-username">{this.props.profile.username}</span>
+              <span className="profile-header-username">{this.props.profile.name}</span>
               <span className="profile-header-bio">{this.props.profile.bio}</span>
             </div>
-            { this.props.session.uid === this.props.profile.uid ?
+            { this.props.session._id === this.props.profile._id ?
               <Button type="primary" className="profile-header-edit">编辑个人资料</Button> : ''
             }
           </div>

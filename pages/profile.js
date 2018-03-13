@@ -8,14 +8,16 @@ import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunkMiddleware from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
-import { Layout, BackTop } from 'antd';
+import { Layout, BackTop, LocaleProvider } from 'antd';
 import Head from 'next/head';
+import zhCN from 'antd/lib/locale-provider/zh_CN';
 import { reducers, readProfileSuccess } from '../reducers/profile';
 import { readExcerptsSuccessByServer } from '../reducers/excerpt';
 import { readSessionSuccess } from '../reducers/session';
 import { readUnviewNoticeSuccess } from '../reducers/notice';
 import Profile from '../components/profile/index';
 import Nav from '../components/nav/index';
+import Error from '../components/error/index';
 import stylesheet from '../styles/index.scss';
 
 const { Header, Content, Footer } = Layout;
@@ -25,8 +27,8 @@ const initialState = {
   profile: {},
   excerpt: {
     loading: false,
-    skip: 0,
-    limit: 10
+    page: 1,
+    per_page: 10
   },
   session: {},
   notice: {}
@@ -37,61 +39,92 @@ const initStore = (state = initialState) => {
 };
 
 const Index = (props) => {
+  if (props.statusCode !== 200) {
+    return <Error statusCode={props.statusCode} />;
+  }
+
   return (
-    <Layout style={{ background: '#f6f6f6' }}>
-      <Head>
-        <title>{`${props.profile.username} - 悦文`}</title>
-        <link rel="stylesheet" href="/css/antd.css" />
-        <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
-      </Head>
-      <Header>
-        <Nav />
-      </Header>
-      <Content>
-        <Profile />
-      </Content>
-      <Footer />
-      <BackTop />
-    </Layout>
+    <LocaleProvider locale={zhCN}>
+      <Layout style={{ background: '#f6f6f6' }}>
+        <Head>
+          <title>{`${props.profile.name} - 悦文`}</title>
+          <link rel="stylesheet" href="/css/antd.css" />
+          <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
+        </Head>
+        <Header>
+          <Nav />
+        </Header>
+        <Content>
+          <Profile />
+        </Content>
+        <Footer />
+        <BackTop />
+      </Layout>
+    </LocaleProvider>
   );
 };
 
 Index.getInitialProps = async ({ store, req, query }) => {
   var res;
-  const uid = query.uid;
-  const { limit } = store.getState().excerpt;
+  const { user } = query;
+  const excerpt = store.getState().excerpt;
 
-  // ----- 读取当前用户个人基本信息
-  res = await fetch(`http://${req.headers.host}/api/v1/profile?uid=${uid}`, {
+  // ----- 读取用户个人基本信息
+  res = await fetch(`http://${req.headers.host}/api/v1/users/${user}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
+  if (res.status !== 200) return { statusCode: res.status };
   const profile = await res.json();
   store.dispatch(readProfileSuccess(profile));
 
   // ----- 读取当前用户所有发表的文章摘录
-  res = await fetch(`http://${req.headers.host}/api/v1/excerpts/user/${uid}?sortby=created&skip=0&limit=${limit}`, {
+  res = await fetch(`http://${req.headers.host}/api/v1/users/${user}/excerpts/created?page=${excerpt.page}&per_page=${excerpt.per_page}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  const excerpt = await res.json();
-  store.dispatch(readExcerptsSuccessByServer(excerpt));
+  if (res.status !== 200) return { statusCode: res.status };
+  const excerpts = await res.json();
+  store.dispatch(readExcerptsSuccessByServer(excerpts));
 
-  // ----- 读取当前登录用户id, 用户名, 头像
-  res = await fetch(`http://${req.headers.host}/api/v1/session`, {
+  // ----- 读取当前登录用户所有信息
+  res = await fetch(`http://${req.headers.host}/api/v1/user`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  const session = await res.json();
-  store.dispatch(readSessionSuccess(session.user));
+  if (res.status !== 200) return { statusCode: res.status };
+  res = await res.json();
+  store.dispatch(readSessionSuccess(res));
+  const { login } = store.getState().session;
 
-  // ----- 读取当前登录用户未读消息
-  res = await fetch(`http://${req.headers.host}/api/v1/notice/unview`, {
+
+  // ----- 读取用户未读通知消息数组
+  res = await fetch(`http://${req.headers.host}/api/v1/users/${login}/received_notices?has_view=false`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  const notice = await res.json();
-  store.dispatch(readUnviewNoticeSuccess(notice));
+  if (res.status !== 200) return { statusCode: res.status };
+  const unviewNotices = await res.json();
+
+  // 过滤 comments
+  const comments = unviewNotices.filter((notice) => {
+    if (notice.type === 'comment') {
+      return notice;
+    }
+    return false;
+  });
+
+  // 过滤 likes
+  const likes = unviewNotices.filter((notice) => {
+    if (notice.type === 'like') {
+      return notice;
+    }
+    return false;
+  });
+
+  store.dispatch(readUnviewNoticeSuccess({ comments, likes }));
+
+  return { statusCode: 200 };
 };
 
 

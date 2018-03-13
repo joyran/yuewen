@@ -13,24 +13,44 @@ const networkErrorMsg = '网络连接失败，请刷新重试！';
 // ACTIONS
 // ------------------------
 export const {
-  readArticlesByUserSuccess
+  readArticlesSuccess
 } = createActions(
-  'READ_ARTICLES_BY_USER_SUCCESS'
+  'READ_ARTICLES_SUCCESS'
 );
 
-export const deleteArticle = aid => (dispatch) => {
-  return fetch('/api/v1/article', {
+export const readArticles = (current, pageSize) => (dispatch, getState) => {
+  const { login } = getState().session;
+  return fetch(`/api/v1/users/${login}/articles?page=${current}&per_page=${pageSize}`, {
+    credentials: 'include',
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(res => res.json())
+    .then((res) => {
+      dispatch(readArticlesSuccess(res));
+    })
+    .catch((err) => {
+      console.error(err.message);
+      message.error(networkErrorMsg, 5);
+    });
+};
+
+
+export const deleteArticle = aid => () => {
+  return fetch(`/api/v1/articles/${aid}`, {
     credentials: 'include',
     method: 'delete',
     headers: {
       'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ aid })
+    }
   })
-    .then(res => res.json())
     .then((res) => {
-      dispatch(readArticlesByUserSuccess(res));
-      message.success('删除成功');
+      if (res.status === 204) {
+        message.success('删除文章成功');
+        top.location = '/manage';
+      }
     })
     .catch((err) => {
       console.error(err.message);
@@ -42,9 +62,9 @@ export const deleteArticle = aid => (dispatch) => {
 // REDUCERS
 // ------------------------
 export const manage = handleActions({
-  READ_ARTICLES_BY_USER_SUCCESS: (state, action) => ({
+  READ_ARTICLES_SUCCESS: (state, action) => ({
     ...state,
-    dataSource: action.payload
+    articles: action.payload
   })
 }, {});
 

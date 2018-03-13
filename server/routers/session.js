@@ -37,26 +37,28 @@ router.post('/api/v1/session', async ctx => {
   var user = await User.findOne({
                       state: false,
                       $or: [
-                        { username: username },
-                        { mail:     username }
+                        { login: username },
+                        { name:  username },
+                        { mail:  username }
                     ]});
 
   if (user) {
-    var msg = '账号被禁用，请联系管理员';
+    var message = '账号被禁用，请联系管理员';
     var status  = 401;
   } else {
     // password 和 username,email 中任何一个匹配成功则登录成功，反之登录失败
     var user = await User.findOne({
                         password: password,
                         $or: [
-                          { username: username },
-                          { mail:     username }
+                          { login: username },
+                          { name:  username },
+                          { mail:  username }
                       ]});
 
     if (user) {
       // 登录成功
       var status  = 201;
-      var msg = '登录成功';
+      var message = '登录成功';
 
       // 登录成功则将 uid, username, avator, smAvatar 写入session
       ctx.session.username  = user.username;
@@ -75,38 +77,13 @@ router.post('/api/v1/session', async ctx => {
     } else {
       // 登录失败
       var status  = 401;
-      var msg = '登录失败，用户名或者密码错误！';
+      var message = '登录失败，用户名或者密码错误！';
     }
   }
 
   // 输出返回值
-  var body = { status, msg };
   ctx.status = status;
-  ctx.body = body;
-});
-
-/**
- * 读取当前登录用户基本信息
- */
-router.get('/api/v1/session', async ctx => {
-  // 当前登录用户 uid
-  var { uid } = ctx.session;
-  var result = await User.findOne({ _id: uid });
-
-  // 返回用户名，uid, 头像url, 关注 tag
-  var user = {
-    username: result.username,
-    uid,
-    avatar: result.avatar,
-    smAvatar: result.smAvatar,
-    followedTags: ['new', 'hot'].concat(result.followedTags)
-  };
-
-  // 输出返回值
-  var status = 200;
-  var body = { status, user };
-  ctx.status = status;
-  ctx.body = body;
+  ctx.body = { status, message };
 });
 
 module.exports = router;

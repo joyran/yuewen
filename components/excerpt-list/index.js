@@ -27,7 +27,7 @@ const ExcerptList = (props) => {
                   {item.title}
                 </a>
                 <span className="excerpt-date">
-                  {moment(item.createAt, 'X').fromNow()}
+                  {moment(item.created_at, 'X').fromNow()}
                 </span>
               </div>
               <div className="excerpt-author-info">
@@ -36,24 +36,24 @@ const ExcerptList = (props) => {
                   className="excerpt-author-info-avatar-link"
                 >
                   <img
-                    alt={item.author.username}
-                    src={item.author.smAvatar}
+                    alt={item.author.name}
+                    src={item.author.small_avatar_url}
                     className="excerpt-author-info-avatar"
                   />
                 </a>
                 <div className="excerpt-author-info-content">
                   <a
                     className="excerpt-author-info-content-username"
-                    href={`/profile/${item.author._id}`}
-                  >{item.author.username}</a>
+                    href={`/user/${item.author.name}`}
+                  >{item.author.name}</a>
                   <p className="excerpt-author-info-content-bio">{item.author.bio}</p>
                 </div>
               </div>
               <p className="excerpt-content">{item.excerpt}</p>
               <span className="excerpt-footer">
-                阅读 {item.views} ·
-                评论 {item.comments} ·
-                点赞 {item.likes}
+                阅读 {item.views_count} ·
+                评论 {item.comments_count} ·
+                点赞 {item.likes_count}
               </span>
               {
                 item.tags.map((tag) => {
@@ -69,7 +69,7 @@ const ExcerptList = (props) => {
       { dataSource.length === 0 && !loading ?
         <div className="excerpt-not-found">
           <img src="/imgs/article.svg" alt="空空而已" />
-          <p>还没有文章，敬请期待</p>
+          <p>空空而已</p>
         </div> : ''
       }
     </ul>

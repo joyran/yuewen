@@ -17,6 +17,7 @@ import {
 } from '../../reducers/markdown-toolbar';
 import {
   createArticle,
+  updateArticle,
   updateModeToView,
   updateModeToEdit,
   updateModeToNormal
@@ -220,12 +221,20 @@ const Toolbar = (props) => {
     releaseArticleForm.validateFields((err, values) => {
       if (!err) {
         const { title, tags } = values;
+
         // markdown 解析后的 html
-        const markup = document.getElementsByClassName('article-preview')[0].innerHTML;
+        const html = document.getElementsByClassName('markdown-preview')[0].innerHTML;
+
         // 摘要，取 html前 150个字符
-        const digest = document.getElementsByClassName('article-preview')[0].textContent.substring(0, 150);
-        // 发布文章
-        props.dispatch(createArticle(title, digest, tags, markup));
+        const excerpt = document.getElementsByClassName('markdown-preview')[0].textContent.substring(0, 150);
+
+        if (props.meditor.aid) {
+          // 更新文章
+          props.dispatch(updateArticle(props.meditor.aid, title, excerpt, tags, html));
+        } else {
+          // 新增文章
+          props.dispatch(createArticle(title, excerpt, tags, html));
+        }
       }
     });
   };

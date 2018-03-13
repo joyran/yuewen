@@ -13,13 +13,13 @@ const networkErrorMsg = '网络连接失败，请刷新重试！';
 export const {
   readArticleSuccess,
   readArticleLikesSuccess,
-  updateArticleLikesSuccess,
+  createArticleLikesSuccess,
   readArticleCommentsSuccess,
   updateArticleCollectionSuccess
 } = createActions(
   'READ_ARTICLE_SUCCESS',
   'READ_ARTICLE_LIKES_SUCCESS',
-  'UPDATE_ARTICLE_LIKES_SUCCESS',
+  'CREATE_ARTICLE_LIKES_SUCCESS',
   'READ_ARTICLE_COMMENTS_SUCCESS',
   'UPDATE_ARTICLE_COLLECTION_SUCCESS'
 );
@@ -28,27 +28,23 @@ export const {
  * 更新文章点赞用户及用户总数
  * @param aid 文章索引 id
  */
-export const updateArticleLikes = aid => (dispatch, getState) => {
-  const { hasLike } = getState().article;
-  if (hasLike) {
+export const createArticleLikes = aid => (dispatch, getState) => {
+  if (getState().article.has_liked) {
     message.warn('你已经点过赞');
     return false;
   }
 
-  return fetch('/api/v1/article/like', {
+  return fetch(`/api/v1/articles/${aid}/likes`, {
     credentials: 'include',
     method: 'post',
     headers: {
       'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ aid })
+    }
   })
     .then(res => res.json())
     .then((res) => {
-      if (res.status === 200) {
-        dispatch(updateArticleLikesSuccess(res.likers));
-        message.success('点赞成功');
-      }
+      dispatch(createArticleLikesSuccess(res));
+      message.success('点赞成功');
     })
     .catch((err) => {
       console.error(err.message);
@@ -60,22 +56,24 @@ export const updateArticleLikes = aid => (dispatch, getState) => {
 /**
  * 收藏和取消收藏文章
  */
-export const updateArticleCollection = aid => (dispatch) => {
-  return fetch('/api/v1/article/collection', {
+export const updateArticleCollection = aid => (dispatch, getState) => {
+  const method = getState().article.has_collected ? 'delete' : 'post';
+
+  return fetch(`/api/v1/articles/${aid}/collect`, {
     credentials: 'include',
-    method: 'post',
+    method,
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ aid })
   })
-    .then(res => res.json())
     .then((res) => {
-      dispatch(updateArticleCollectionSuccess());
-      if (res.hasCollected) {
+      if (res.status === 201) {
         message.success('收藏文章成功');
-      } else {
+        dispatch(updateArticleCollectionSuccess());
+      } else if (res.status === 204) {
         message.success('取消收藏文章成功');
+        dispatch(updateArticleCollectionSuccess());
       }
     })
     .catch((err) => {
@@ -90,13 +88,13 @@ export const updateArticleCollection = aid => (dispatch) => {
  * @param comment 评论内容
  */
 export const createArticleComment = (aid, comment) => (dispatch) => {
-  return fetch('/api/v1/article/comment', {
+  return fetch(`/api/v1/articles/${aid}/comments`, {
     credentials: 'include',
     method: 'post',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ aid, comment })
+    body: JSON.stringify({ comment })
   })
     .then(res => res.json())
     .then((res) => {
@@ -112,8 +110,8 @@ export const createArticleComment = (aid, comment) => (dispatch) => {
 /**
  * 读取文章评论
  */
-export const readArticleComments = (aid, skip, limit) => (dispatch) => {
-  return fetch(`/api/v1/article/comment?aid=${aid}&skip=${skip}&limit=${limit}`, {
+export const readArticleComments = (aid, page) => (dispatch) => {
+  return fetch(`/api/v1/articles/${aid}/comments?page=${page}`, {
     credentials: 'include',
     method: 'get',
     headers: {
@@ -139,16 +137,16 @@ export const readArticleComments = (aid, skip, limit) => (dispatch) => {
  * @param aid 文章索引 id
  * @param reply 评论内容
  * @param atuser 被@的用户
- * @param rid 被回复的评论 id
+ * @param cid 被回复的评论 id
  */
-export const createArticleReply = (aid, reply, atuser, rid) => (dispatch) => {
-  return fetch('/api/v1/article/reply', {
+export const createArticleCommentReply = (aid, reply, atuser, cid) => (dispatch) => {
+  return fetch(`/api/v1/articles/${aid}/comments/${cid}/replys`, {
     credentials: 'include',
     method: 'post',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ aid, reply, atuser, rid })
+    body: JSON.stringify({ reply, atuser })
   })
     .then(res => res.json())
     .then((res) => {
@@ -173,29 +171,24 @@ export const article = handleActions({
 
   READ_ARTICLE_LIKES_SUCCESS: (state, action) => ({
     ...state,
-    hasLike: action.payload.hasLike,
-    likers: action.payload.likers,
-    likerCount: action.payload.likers.length
+    likes: action.payload
   }),
 
-  UPDATE_ARTICLE_LIKES_SUCCESS: (state, action) => ({
+  CREATE_ARTICLE_LIKES_SUCCESS: (state, action) => ({
     ...state,
-    hasLike: !state.hasLike,
-    likers: action.payload,
-    likerCount: action.payload.length
+    has_liked: true,
+    likes: action.payload,
+    likes_count: action.payload.length
   }),
 
   READ_ARTICLE_COMMENTS_SUCCESS: (state, action) => ({
     ...state,
-    comment: {
-      ...state.comment,
-      ...action.payload
-    }
+    ...action.payload
   }),
 
   UPDATE_ARTICLE_COLLECTION_SUCCESS: state => ({
     ...state,
-    hasCollected: !state.hasCollected
+    has_collected: !state.has_collected
   })
 }, {});
 

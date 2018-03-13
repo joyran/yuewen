@@ -13,10 +13,7 @@ const user = require('./server/routers/user');
 const session = require('./server/routers/session');
 const excerpt = require('./server/routers/excerpt');
 const article = require('./server/routers/article');
-const comment = require('./server/routers/comment');
-const like = require('./server/routers/like');
 const notice = require('./server/routers/notice');
-const collection = require('./server/routers/collection');
 const profile = require('./server/routers/profile');
 const search = require('./server/routers/search');
 const upload = require('./server/routers/upload');
@@ -104,7 +101,7 @@ app.prepare().then(() => {
   })
 
   // 个人主页
-  router.get('/profile/:uid', async ctx => {
+  router.get('/user/:user', async ctx => {
     if (ctx.session.uid) {
       await app.render(ctx.req, ctx.res, '/profile', ctx.params);
     } else {
@@ -132,10 +129,7 @@ app.prepare().then(() => {
   koa.use(excerpt.routes()).use(excerpt.allowedMethods());
   koa.use(session.routes()).use(session.allowedMethods());
   koa.use(article.routes()).use(article.allowedMethods());
-  koa.use(comment.routes()).use(comment.allowedMethods());
-  koa.use(like.routes()).use(like.allowedMethods());
   koa.use(notice.routes()).use(notice.allowedMethods());
-  koa.use(collection.routes()).use(collection.allowedMethods());
   koa.use(profile.routes()).use(profile.allowedMethods());
   koa.use(search.routes()).use(search.allowedMethods());
   koa.use(upload.routes()).use(upload.allowedMethods());

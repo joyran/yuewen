@@ -5,7 +5,7 @@
 import { Tooltip, Icon, Button } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { updateArticleLikes, updateArticleCollection } from '../../reducers/article';
+import { createArticleLikes, updateArticleCollection } from '../../reducers/article';
 import stylesheet from './index.scss';
 
 // 时间汉化
@@ -25,8 +25,8 @@ const ArticleContent = (props) => {
             className="article-author-info-avatar-link"
           >
             <img
-              alt={article.author.username}
-              src={article.author.smAvatar}
+              alt={article.author.name}
+              src={article.author.small_avatar_url}
               className="article-author-info-avatar"
             />
           </a>
@@ -34,43 +34,43 @@ const ArticleContent = (props) => {
             <a
               className="article-author-info-content-username"
               href={`/profile/${article.author._id}`}
-            >{article.author.username}</a>
+            >{article.author.name}</a>
             <p className="article-author-info-content-bio">{article.author.bio}</p>
           </div>
         </div>
       </div>
       {/* 文章主体内容 */}
       <div className="article-preview">
-        <div dangerouslySetInnerHTML={{ __html: article.markup }} />
+        <div dangerouslySetInnerHTML={{ __html: article.html }} />
       </div>
       {/* 点赞 div */}
       <div className="article-like">
         {/* 点赞按钮，已点赞实心，未点赞空心 */}
         <Button
           className="like-button"
-          type={article.hasLike ? 'primary' : 'default'}
+          type={article.has_liked ? 'primary' : 'default'}
           size="large"
           icon="like"
-          onClick={() => { props.dispatch(updateArticleLikes(article._id)); }}
+          onClick={() => { props.dispatch(createArticleLikes(article._id)); }}
         >
-          {article.likerCount}
+          {article.likes_count}
         </Button>
         {/* 收藏按钮 */}
-        <Tooltip title={article.hasCollected ? '取消收藏' : '收藏文章'}>
+        <Tooltip title={article.has_collected ? '取消收藏' : '收藏文章'}>
           <Icon
             onClick={() => { props.dispatch(updateArticleCollection(article._id)); }}
             className="article-star"
-            type={props.article.hasCollected ? 'star' : 'star-o'}
+            type={article.has_collected ? 'star' : 'star-o'}
           />
         </Tooltip>
         {/* 点赞人列表 */}
-        <ol className="likers">
-          {article.likers.map((liker) => {
+        <ol className="likes">
+          {article.likes.map((like) => {
             return (
-              <Tooltip placement="top" title={liker.user.username} key={liker.user._id}>
+              <Tooltip placement="top" title={like.user.name} key={like.user._id}>
                 <li>
-                  <a href={`/user/${liker.user._id}`}>
-                    <img alt={liker.user.username} src={liker.user.smAvatar} />
+                  <a href={`/user/${like.user._id}`}>
+                    <img alt={like.user.name} src={like.user.small_avatar_url} />
                   </a>
                 </li>
               </Tooltip>

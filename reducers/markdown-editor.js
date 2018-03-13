@@ -9,13 +9,16 @@ const networkErrorMsg = '网络连接失败，请刷新重试！';
 // ------------------------
 export const {
   createArticleSuccess,
+  updateArticleId,
   updateMarkdown,
   updateCursorRange,
   updateModeToView,
   updateModeToEdit,
-  updateModeToNormal
+  updateModeToNormal,
+  update
 } = createActions(
   'CREATE_ARTICLE_SUCCESS',
+  'UPDATE_ARTICLE_ID',
   'UPDATE_MARKDOWN',
   'UPDATE_CURSOR_RANGE',
   'UPDATE_MODE_TO_VIEW',
@@ -23,15 +26,18 @@ export const {
   'UPDATE_MODE_TO_NORMAL'
 );
 
-export const createArticle = (title, digest, tags, markup) => (dispatch, getState) => {
+/**
+ * 新增文章
+ */
+export const createArticle = (title, excerpt, tags, html) => (dispatch, getState) => {
   const { markdown } = getState().meditor;
-  return fetch('/api/v1/article', {
+  return fetch('/api/v1/articles', {
     credentials: 'include',
     method: 'post',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ title, digest, tags, markdown, markup })
+    body: JSON.stringify({ title, excerpt, tags, markdown, html })
   })
     .then(res => res.json())
     .then((res) => {
@@ -45,12 +51,42 @@ export const createArticle = (title, digest, tags, markup) => (dispatch, getStat
     });
 };
 
+/**
+ * 更新文章
+ */
+export const updateArticle = (aid, title, excerpt, tags, html) => (dispatch, getState) => {
+  const { markdown } = getState().meditor;
+  return fetch(`/api/v1/articles/${aid}`, {
+    credentials: 'include',
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ title, excerpt, tags, markdown, html })
+  })
+    .then(res => res.json())
+    .then(() => {
+      message.success('文章更新成功, 即将跳转到文章页面');
+      localStorage.markdown = '';
+      location.href = `/article/${aid}`;
+    })
+    .catch((err) => {
+      console.error(err.message);
+      message.error(networkErrorMsg, 5);
+    });
+};
+
 // ------------------------
 // REDUCERS
 // ------------------------
 export const meditor = handleActions({
   CREATE_ARTICLE_SUCCESS: state => ({
     ...state
+  }),
+
+  UPDATE_ARTICLE_ID: (state, action) => ({
+    ...state,
+    aid: action.payload
   }),
 
   // 更新文本编辑框中内容 markdown

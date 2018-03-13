@@ -15,7 +15,6 @@ router.get('/api/v1/profile', async ctx => {
   const { uid } = ctx.query;
   var user = await User.findOne({ _id: uid }).lean();
   delete user.password;
-  delete user.isAdmin;
 
   // 输出返回值
   ctx.status = 200;
@@ -29,9 +28,8 @@ router.get('/api/v1/profile', async ctx => {
 router.get('/api/v1/profile/articles', async ctx => {
   const { uid } = ctx.query;
 
-  const articles = await Article.find({ author: uid }).sort({createAt: -1}).populate('author').lean();
+  const articles = await Article.find({ author: uid }).sort({created_at: -1}).populate('author').lean();
   delete articles.author.password;
-  delete articles.author.isAdmin;
 
   // 输出返回值
   ctx.status = 200;

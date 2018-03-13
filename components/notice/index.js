@@ -5,24 +5,13 @@
 import { List, Avatar, Badge } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import {
-  updateCommentNoticeToView,
-  updateLikeNoticeToView
-} from '../../reducers/notice';
+import { updateNoticeToView } from '../../reducers/notice';
 import stylesheet from './index.scss';
 
 // 时间汉化
 moment.locale('zh-cn');
 
 const Notice = (props) => {
-  const updateNoticeToView = (type, id, link) => {
-    if (type === 'comment') {
-      props.dispatch(updateCommentNoticeToView(id, link));
-    } else {
-      props.dispatch(updateLikeNoticeToView(id, link));
-    }
-  };
-
   return (
     <div className="notices">
       <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
@@ -33,13 +22,13 @@ const Notice = (props) => {
           renderItem={item => (
             <List.Item
               key={item._id}
-              actions={[moment(item.createAt, 'X').fromNow()]}
-              className={item.hasView ? 'viewed' : 'unview'}
+              actions={[moment(item.created_at, 'X').fromNow()]}
+              className={item.has_view ? 'viewed' : 'unview'}
             >
-              <Badge status={item.hasView ? 'default' : 'processing'} />
+              <Badge status={item.has_view ? 'default' : 'processing'} />
               <List.Item.Meta
-                onClick={() => { updateNoticeToView(item.type, item._id, item.link); }}
-                avatar={<Avatar src={item.initiator.smAvatar} shape="square" />}
+                onClick={() => { props.dispatch(updateNoticeToView(item._id, item.link_url)); }}
+                avatar={<Avatar src={item.initiator.small_avatar_url} shape="square" />}
                 title={item.title}
                 description={item.content}
               />

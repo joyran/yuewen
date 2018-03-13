@@ -19,16 +19,12 @@ class ArticleComment extends Component {
   constructor(props) {
     super(props);
     this.state = { visible: false };
-    this.toggleCommentReply = this.toggleCommentReply.bind(this);
-    this.onChangePagination = this.onChangePagination.bind(this);
   }
 
   // 点击分页按钮切换评论分页
   onChangePagination = (page) => {
-    const { limit } = this.props.article.comment;
     const { _id } = this.props.article;
-    const skip = (page - 1) * limit;
-    this.props.dispatch(readArticleComments(_id, skip, limit));
+    this.props.dispatch(readArticleComments(_id, page));
   }
 
   // 切换评论回复框显示状态
@@ -56,19 +52,19 @@ class ArticleComment extends Component {
           {/* 评论列表 */}
           <ul className="comment-list" id="comment-list">
             {
-              this.props.article.comment.dataSource.map((comment) => {
+              this.props.article.comments.map((comment) => {
                 return (
                   <li className="comment-item" id={`comment-${comment._id}`} key={comment._id}>
                     {/* 评论人头像 */}
                     <a className="comment-item-avatar" href={`/profile/${comment.author._id}`}>
-                      <img src={comment.author.smAvatar} alt={comment.author.username} />
+                      <img src={comment.author.small_avatar_url} alt={comment.author.name} />
                     </a>
                     <div className="comment-item-main">
                       <div className="comment-item-header">
-                        <a className="comment-item-header-username" href={`/profile/${comment.author._id}`}>{comment.author.username}</a>
-                        <Tooltip title={moment(comment.createAt, 'X').format('LLL')}>
+                        <a className="comment-item-header-username" href={`/profile/${comment.author._id}`}>{comment.author.name}</a>
+                        <Tooltip title={moment(comment.created_at, 'X').format('LLL')}>
                           <span className="comment-item-header-datetime">
-                            { moment(comment.createAt, 'X').fromNow() }
+                            { moment(comment.created_at, 'X').fromNow() }
                           </span>
                         </Tooltip>
                       </div>
@@ -84,12 +80,12 @@ class ArticleComment extends Component {
                             <li className="comment-item-reply clearfix" id={`comment-${reply._id}`} key={reply._id}>
                               <div className="comment-item-reply-main">
                                 <div className="tip">
-                                  <a href={`/profile/${reply.author._id}`}>{reply.author.username}</a>
+                                  <a href={`/profile/${reply.author._id}`}>{reply.author.name}</a>
                                   <span>回复</span>
-                                  <a href={`/profile/${reply.atuser._id}`}>{reply.atuser.username}</a>
-                                  <Tooltip title={moment(reply.createAt, 'X').format('LLL')}>
+                                  <a href={`/profile/${reply.atuser._id}`}>{reply.atuser.name}</a>
+                                  <Tooltip title={moment(reply.created_at, 'X').format('LLL')}>
                                     <span className="comment-item-reply-main-datetime">
-                                      { moment(reply.createAt, 'X').fromNow() }
+                                      { moment(reply.created_at, 'X').fromNow() }
                                     </span>
                                   </Tooltip>
                                 </div>
@@ -110,10 +106,10 @@ class ArticleComment extends Component {
             }
           </ul>
           {/* 评论分页组件，当且仅当页数 pages > 1时才显示分页组件 */}
-          { this.props.article.comment.pages > 1 ?
+          { this.props.article.comments_pages > 1 ?
             <Pagination
               defaultCurrent={1}
-              total={this.props.article.comment.total}
+              total={this.props.article.comments_count}
               className="comment-pagination"
               style={{ marginTop: 24 }}
               onChange={this.onChangePagination}

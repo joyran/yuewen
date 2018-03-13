@@ -49,23 +49,23 @@ class Nav extends Component {
   }
 
   render() {
-    const { unviewComments, unviewLikes } = this.props.notice;
+    const { comments, likes } = this.props.notice;
     const { dispatch } = this.props;
 
     const notice = (
       <Tabs defaultActiveKey="1">
-        <TabPane tab={unviewComments.length === 0 ? '评论' : `评论 (${unviewComments.length})`} key="1">
-          <NoticeTabPane type="评论" dataSource={unviewComments} dispatch={dispatch} />
+        <TabPane tab={comments.length === 0 ? '评论' : `评论 (${comments.length})`} key="1">
+          <NoticeTabPane type="评论" dataSource={comments} dispatch={dispatch} />
         </TabPane>
-        <TabPane tab={unviewLikes.length === 0 ? '点赞' : `点赞 (${unviewLikes.length})`} key="2">
-          <NoticeTabPane type="点赞" dataSource={unviewLikes} dispatch={dispatch} />
+        <TabPane tab={likes.length === 0 ? '点赞' : `点赞 (${likes.length})`} key="2">
+          <NoticeTabPane type="点赞" dataSource={likes} dispatch={dispatch} />
         </TabPane>
       </Tabs>
     );
 
     const profile = (
       <div>
-        <a href={`/profile/${this.props.session.uid}`} ><Icon type="user" />个人主页</a>
+        <a href={`/user/${this.props.session.login}`} ><Icon type="user" />个人主页</a>
         <a href="/markdown" target="_blank"><Icon type="edit" />写新文章</a>
         <a href="/manage"><Icon type="profile" />文章管理</a>
         <a onClick={this.showModal}><Icon type="lock" />修改密码</a>
@@ -114,7 +114,7 @@ class Nav extends Component {
             placement="bottom"
             overlayClassName="popover-avatar"
           >
-            <Avatar src={this.props.session.smAvatar} size="large" shape="square" />
+            <Avatar src={this.props.session.small_avatar_url} size="large" shape="square" />
           </Popover>
           <Popover
             content={notice}
@@ -122,7 +122,7 @@ class Nav extends Component {
             placement="bottom"
             overlayClassName="popover-notification"
           >
-            <Badge count={this.props.notice.unviewAllCount}>
+            <Badge count={comments.length + likes.length}>
               <Icon type="bell" />
             </Badge>
           </Popover>

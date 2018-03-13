@@ -10,11 +10,12 @@ import fetch from 'isomorphic-fetch';
 import { Layout, LocaleProvider } from 'antd';
 import Head from 'next/head';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
-import { reducers, readArticlesByUserSuccess } from '../reducers/manage';
+import { reducers, readArticlesSuccess } from '../reducers/manage';
 import { readSessionSuccess } from '../reducers/session';
 import { readUnviewNoticeSuccess } from '../reducers/notice';
 import ArticleManage from '../components/article-manage/index';
 import Nav from '../components/nav/index';
+import Error from '../components/error/index';
 import stylesheet from '../styles/index.scss';
 
 const { Header, Content, Footer } = Layout;
@@ -30,7 +31,11 @@ const initStore = (state = initialState) => {
   return createStore(reducers, state, composeWithDevTools(applyMiddleware(thunkMiddleware)));
 };
 
-const Index = () => {
+const Index = (props) => {
+  if (props.statusCode !== 200) {
+    return <Error statusCode={props.statusCode} />;
+  }
+
   return (
     <LocaleProvider locale={zhCN}>
       <Layout>
@@ -54,29 +59,53 @@ const Index = () => {
 Index.getInitialProps = async ({ store, req }) => {
   var res;
 
+  // ----- 读取当前登录用户所有信息
+  res = await fetch(`http://${req.headers.host}/api/v1/user`, {
+    method: 'get',
+    headers: { Cookie: req.headers.cookie }
+  });
+  if (res.status !== 200) return { statusCode: res.status };
+  res = await res.json();
+  store.dispatch(readSessionSuccess(res));
+  const { login } = store.getState().session;
+
+
   // ----- 读取用户发表的所有文章
-  res = await fetch(`http://${req.headers.host}/api/v1/article/manage`, {
+  res = await fetch(`http://${req.headers.host}/api/v1/users/${login}/articles`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
+  if (res.status !== 200) return { statusCode: res.status };
   const articles = await res.json();
-  store.dispatch(readArticlesByUserSuccess(articles));
+  store.dispatch(readArticlesSuccess(articles));
 
-  // ----- 读取当前登录用户id, 用户名, 头像
-  res = await fetch(`http://${req.headers.host}/api/v1/session`, {
+  // ----- 读取用户未读通知消息数组
+  res = await fetch(`http://${req.headers.host}/api/v1/users/${login}/received_notices?has_view=false`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  const session = await res.json();
-  store.dispatch(readSessionSuccess(session.user));
+  if (res.status !== 200) return { statusCode: res.status };
+  const unviewNotices = await res.json();
 
-  // ----- 读取当前登录用户未读消息
-  res = await fetch(`http://${req.headers.host}/api/v1/notice/unview`, {
-    method: 'get',
-    headers: { Cookie: req.headers.cookie }
+  // 过滤 comments
+  const comments = unviewNotices.filter((notice) => {
+    if (notice.type === 'comment') {
+      return notice;
+    }
+    return false;
   });
-  const notice = await res.json();
-  store.dispatch(readUnviewNoticeSuccess(notice));
+
+  // 过滤 likes
+  const likes = unviewNotices.filter((notice) => {
+    if (notice.type === 'like') {
+      return notice;
+    }
+    return false;
+  });
+
+  store.dispatch(readUnviewNoticeSuccess({ comments, likes }));
+
+  return { statusCode: 200 };
 };
 
 

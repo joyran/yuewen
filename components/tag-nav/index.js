@@ -12,8 +12,8 @@ import stylesheet from './index.scss';
 const TabPane = Tabs.TabPane;
 
 const TagNav = (props) => {
-  const { followedTags } = props.session;
-  const { loading, hasMore } = props.excerpt;
+  const { followed_tags } = props.session;
+  const { loading } = props.excerpt;
 
   const onChangeTag = (key) => {
     props.dispatch(changeTag(key));
@@ -29,18 +29,18 @@ const TagNav = (props) => {
         animated={false}
       >
         {
-          followedTags.map((tag) => {
+          followed_tags.map((tag) => {
             return (
               <TabPane tab={tag} key={tag}>
                 <InfiniteScroll
                   initialLoad={false}
                   pageStart={0}
-                  loadMore={() => { !loading && hasMore && props.dispatch(readExcerptsByTag()); }}
-                  hasMore={!loading && hasMore}
+                  loadMore={() => { !loading && props.excerpt.has_more && props.dispatch(readExcerptsByTag()); }}
+                  hasMore={!loading && props.excerpt.has_more}
                   useWindow
                 >
-                  <ExcerptList dataSource={props.excerpt.dataSource} loading={loading} />
-                  { loading && hasMore && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
+                  <ExcerptList dataSource={props.excerpt.excerpts} loading={loading} />
+                  { loading && props.excerpt.has_more && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
                 </InfiniteScroll>
               </TabPane>
             );

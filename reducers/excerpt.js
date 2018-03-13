@@ -12,12 +12,10 @@ const networkErrorMsg = '网络连接失败，请刷新重试！';
 // ACTIONS
 // ------------------------
 export const {
-  readExcerptsStart,
   readExcerptsSuccess,
   readExcerptsSuccessByServer,
   changeTag
 } = createActions(
-  'READ_EXCERPTS_START',
   'READ_EXCERPTS_SUCCESS',
   'READ_EXCERPTS_SUCCESS_BY_SERVER',
   'CHANGE_TAG'
@@ -27,10 +25,9 @@ export const {
  * 根据文章标签 tag 读取文章摘录 excerpt
  */
 export const readExcerptsByTag = () => (dispatch, getState) => {
-  const { tag, skip, limit } = getState().excerpt;
-  dispatch(readExcerptsStart());
+  const excerpt = getState().excerpt;
 
-  fetch(`/api/v1/excerpts/tag/${tag}?&skip=${skip}&limit=${limit}`, {
+  fetch(`/api/v1/excerpts/tag/${excerpt.tag}?page=${excerpt.page}&per_page=${excerpt.per_page}`, {
     credentials: 'include',
     method: 'get'
   })
@@ -43,38 +40,15 @@ export const readExcerptsByTag = () => (dispatch, getState) => {
     });
 };
 
-
 /**
- * 根据用户 id 读取用户创建的文章摘录 excerpt
+ * 读取用户发表或者收藏的文章摘录 excerpts
+ * 参数: sortby created为发布的文章，collected为收藏的文章
  */
-export const readExcerptsByUserCreated = () => (dispatch, getState) => {
-  const { skip, limit } = getState().excerpt;
-  const { uid } = getState().profile;
-  dispatch(readExcerptsStart());
+export const readExcerptsByUser = sortby => (dispatch, getState) => {
+  const excerpt = getState().excerpt;
+  const { login } = getState().profile;
 
-  fetch(`/api/v1/excerpts/user/${uid}?sortby=created&skip=${skip}&limit=${limit}`, {
-    credentials: 'include',
-    method: 'get'
-  })
-    .then(res => res.json())
-    .then((res) => {
-      dispatch(readExcerptsSuccess(res));
-    }).catch((err) => {
-      console.error(err.message);
-      message.error(networkErrorMsg);
-    });
-};
-
-
-/**
- * 根据用户 id 读取用户收藏的文章摘录 excerpt
- */
-export const readExcerptsByUserCollected = () => (dispatch, getState) => {
-  const { skip, limit } = getState().excerpt;
-  const { uid } = getState().profile;
-  dispatch(readExcerptsStart());
-
-  fetch(`/api/v1/excerpts/user/${uid}?sortby=collected&skip=${skip}&limit=${limit}`, {
+  fetch(`/api/v1/users/${login}/excerpts/${sortby}?page=${excerpt.page}&per_page=${excerpt.per_page}`, {
     credentials: 'include',
     method: 'get'
   })
@@ -91,37 +65,27 @@ export const readExcerptsByUserCollected = () => (dispatch, getState) => {
 // REDUCERS
 // ------------------------
 export const excerpt = handleActions({
-  READ_EXCERPTS_START: state => ({
-    ...state,
-    loading: true
-  }),
-
   READ_EXCERPTS_SUCCESS: (state, action) => ({
     ...state,
-    skip: state.skip + state.limit,
-    dataSource: state.dataSource.concat(action.payload.dataSource),
-    loading: false,
-    hasMore: action.payload.hasMore,
-    total: action.payload.total
+    ...action.payload,
+    page: state.page + 1,
+    excerpts: state.excerpts.concat(action.payload.excerpts),
+    loading: false
   }),
 
   READ_EXCERPTS_SUCCESS_BY_SERVER: (state, action) => ({
     ...state,
-    skip: state.skip + state.limit,
-    dataSource: action.payload.dataSource,
-    hasMore: action.payload.hasMore,
-    total: action.payload.total,
-    totalCreated: action.payload.totalCreated,
-    totalCollected: action.payload.totalCollected
+    ...action.payload,
+    page: state.page + 1    // page + 1
   }),
 
-  // 点击 tag 标签，skip 和 dataSource 重置，loading 置为 true 是想显示 loading card
+  // 点击 tag 标签，page 和 excerpts 重置，loading 置为 true 是想显示 loading card
   CHANGE_TAG: (state, action) => ({
     ...state,
     tag: action.payload,
-    skip: 0,
-    dataSource: [],
+    page: 1,
+    excerpts: [],
     loading: true,
-    hasMore: true
+    has_more: true
   })
 }, {});

@@ -52,17 +52,21 @@
   float: right;
 }
 
-// 文章点赞
+// 文章点赞按钮
 .article-like {
   margin-top: 40px;
 
-  .like-button .anticon {
-    font-size: 18px;
-    margin-right: 12px;
-    color: inherit;
+  .like-button {
+    width: 80px;
+
+    .anticon {
+      font-size: 17px;
+      margin-right: 12px;
+      color: inherit;
+    }
   }
 
-  .likers {
+  .likes {
     margin-top: 30px;
 
     li {

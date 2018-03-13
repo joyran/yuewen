@@ -8,7 +8,7 @@ var { mongoose, Schema } = require('../utils/mongoose');
 var schema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User' },
   article: { type: Schema.Types.ObjectId, ref: 'Article' },
-  createAt: String
+  created_at: String
 }, { versionKey: false });
 
 var Collection = mongoose.model('Collection', schema);

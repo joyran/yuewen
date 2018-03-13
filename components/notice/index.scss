@@ -3,6 +3,10 @@
 .notices {
   margin-top: 24px;
 
+  .ant-avatar-image {
+    background: #fff;
+  }
+
   .ant-list-item {
     position: relative;
     padding: 16px 24px;

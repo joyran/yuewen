@@ -35,6 +35,7 @@ export const deleteSession = () => () => {
 export const session = handleActions({
   READ_SESSION_SUCCESS: (state, action) => ({
     ...state,
-    ...action.payload
+    ...action.payload,
+    followed_tags: ['new', 'hot'].concat(action.payload.followed_tags)
   })
 }, {});

@@ -10,13 +10,13 @@ var schema = new Schema({
   title: String,
   tags: Array,
   excerpt: String,
-  views: Number,
-  comments: Number,
-  likes: Number,
-  createAt: String,
-  updateAt: String,
+  views_count: Number,
+  comments_count: Number,
+  likes_count: Number,
+  created_at: String,
+  updated_at: String,
   markdown: String,
-  markup: String,
+  html: String,
   heat: Number
 }, { versionKey: false });
 

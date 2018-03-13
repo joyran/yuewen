@@ -5,7 +5,7 @@
 import React, { Component } from 'react';
 import { Input, Button } from 'antd';
 import { connect } from 'react-redux';
-import { createArticleReply } from '../../reducers/article';
+import { createArticleCommentReply } from '../../reducers/article';
 
 const { TextArea } = Input;
 
@@ -21,9 +21,6 @@ class ReplyEditor extends Component {
       atUserId,
       rid
     };
-    this.onChangeValue = this.onChangeValue.bind(this);
-    this.onClickButton = this.onClickButton.bind(this);
-    this.onClickCancel = this.onClickCancel.bind(this);
   }
 
   // 评论输入框最少输入5个字符，否则评论按钮灰显，不可提交评论
@@ -43,7 +40,7 @@ class ReplyEditor extends Component {
     const aid = this.props.article._id;
     const reply = this.state.reply;
     // 提交评论回复
-    this.props.dispatch(createArticleReply(aid, reply, atUserId, rid));
+    this.props.dispatch(createArticleCommentReply(aid, reply, atUserId, rid));
     // 清空回复框
     this.setState({ reply: '' });
     // 隐藏评论框

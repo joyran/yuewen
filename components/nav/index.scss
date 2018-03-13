@@ -36,6 +36,7 @@
     cursor: pointer;
     float: right;
     margin-top: 12px;
+    background: #fff;
   }
 }
 
@@ -170,6 +171,10 @@ input::placeholder {
       font-size: 12px;
       margin-top: 8px;
     }
+  }
+
+  img {
+    background: #fff;
   }
 }
 

@@ -96,10 +96,7 @@ export const deleteBanner = filepath => () => {
 export const profile = handleActions({
   READ_PROFILE_SUCCESS: (state, action) => ({
     ...state,
-    banner: action.payload.banner,
-    avatar: action.payload.avatar,
-    username: action.payload.username,
-    bio: action.payload.bio,
+    ...action.payload,
     uid: action.payload._id
   }),
 

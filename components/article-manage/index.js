@@ -5,7 +5,7 @@
 import { Table, Divider, Modal } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { deleteArticle } from '../../reducers/manage';
+import { deleteArticle, readArticles } from '../../reducers/manage';
 import stylesheet from './index.scss';
 
 const confirm = Modal.confirm;
@@ -14,9 +14,13 @@ const confirm = Modal.confirm;
 moment.locale('zh-cn');
 
 const ArticleManage = (props) => {
-  // 用户发表的文章数量
-  const count = props.manage.dataSource.length;
+  // 点击分页按钮
+  const onChange = (pagination) => {
+    const { current, pageSize } = pagination;
+    props.dispatch(readArticles(current, pageSize));
+  };
 
+  // 删除文章
   const onClickDelete = (aid, title) => {
     confirm({
       title: '确定要删除文章吗',
@@ -37,7 +41,7 @@ const ArticleManage = (props) => {
     )
   }, {
     title: '时间',
-    dataIndex: 'createAt',
+    dataIndex: 'created_at',
     width: '25%',
     render: text => <span>{ moment(text, 'X').format('YYYY-MM-DD HH:mm:ss') }</span>
   }, {
@@ -55,7 +59,7 @@ const ArticleManage = (props) => {
 
   // 分页组件
   const pagination = {
-    total: count,
+    total: props.session.articles_count,
     showSizeChanger: true,
     showTotal: total => `总数 ${total}`
   };
@@ -65,10 +69,11 @@ const ArticleManage = (props) => {
       <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
       <Table
         columns={columns}
-        dataSource={props.manage.dataSource}
+        dataSource={props.manage.articles}
         pagination={pagination}
         rowKey="_id"
         style={{ marginTop: 24 }}
+        onChange={onChange}
       />
     </div>
   );

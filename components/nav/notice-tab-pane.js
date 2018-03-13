@@ -1,10 +1,8 @@
 import { List, Avatar, Icon } from 'antd';
 import moment from 'moment';
 import {
-  updateCommentNoticeToView,
-  updateAllCommentNoticeToView,
-  updateLikeNoticeToView,
-  updateAllLikeNoticeToView
+  updateNoticeToView,
+  updateAllNoticeToView
 } from '../../reducers/notice';
 
 // 时间汉化
@@ -30,55 +28,37 @@ const NotFound = (
 
 // 通知卡片内容
 const NoticeTabPane = (props) => {
-  const { type, dataSource, dispatch } = props;
-  const count = dataSource.length;
-
-  const updateNoticeToView = (id, link) => {
-    if (type === '评论') {
-      dispatch(updateCommentNoticeToView(id, link));
-    } else {
-      dispatch(updateLikeNoticeToView(id, link));
-    }
-  };
-
-  const updateAllNoticeToView = () => {
-    if (type === '评论') {
-      dispatch(updateAllCommentNoticeToView());
-    } else if (type === '点赞') {
-      dispatch(updateAllLikeNoticeToView());
-    }
-  };
+  const { dataSource } = props;
 
   return (
     <div>
-      {
-        count !== 0 ?
-          <List
-            itemLayout="horizontal"
-            dataSource={dataSource}
-            renderItem={item => (
-              <List.Item
-                key={item._id}
-                actions={[moment(item.createAt, 'X').fromNow()]}
-              >
-                <List.Item.Meta
-                  onClick={() => { updateNoticeToView(item._id, item.link); }}
-                  avatar={<Avatar src={item.initiator.smAvatar} size="large" shape="square" />}
-                  title={item.title}
-                  description={item.content}
-                />
-              </List.Item>
-            )}
-            footer={
-              <div>
-                <span style={{ cursor: 'pointer' }} onClick={() => { updateAllNoticeToView(); }}>
-                  <Icon type="delete" style={{ marginRight: 8 }} />清空通知
-                </span>
-                <a style={{ float: 'right' }} href="/notice" >查看全部通知</a>
-              </div>
-            }
-          /> :
-          NotFound
+      { dataSource.length !== 0 ?
+        <List
+          itemLayout="horizontal"
+          dataSource={dataSource}
+          renderItem={item => (
+            <List.Item
+              key={item._id}
+              actions={[moment(item.created_at, 'X').fromNow()]}
+            >
+              <List.Item.Meta
+                onClick={() => props.dispatch(updateNoticeToView(item._id, item.link_url))}
+                avatar={<Avatar src={item.initiator.small_avatar_url} size="large" shape="square" />}
+                title={item.title}
+                description={item.content}
+              />
+            </List.Item>
+          )}
+          footer={
+            <div>
+              <span style={{ cursor: 'pointer' }} onClick={() => props.dispatch(updateAllNoticeToView())}>
+                <Icon type="delete" style={{ marginRight: 8 }} />清空通知
+              </span>
+              <a style={{ float: 'right' }} href="/notice" >查看全部通知</a>
+            </div>
+          }
+        /> :
+        NotFound
       }
     </div>
   );

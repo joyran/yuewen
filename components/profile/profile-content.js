@@ -7,49 +7,43 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import ExcerptList from '../excerpt-list/index';
-import { readExcerptsByUserCreated, readExcerptsByUserCollected, changeTag } from '../../reducers/excerpt';
+import { readExcerptsByUser, changeTag } from '../../reducers/excerpt';
 
 const TabPane = Tabs.TabPane;
 // 时间汉化
 moment.locale('zh-cn');
 
 const ProfileContent = (props) => {
-  const { loading, hasMore } = props.excerpt;
-
   const onChangeTag = (key) => {
     props.dispatch(changeTag(key));
-    if (key === 'created') {
-      props.dispatch(readExcerptsByUserCreated());
-    } else {
-      props.dispatch(readExcerptsByUserCollected());
-    }
+    props.dispatch(readExcerptsByUser(key));
   };
 
   return (
     <div className="profile-content">
       <Tabs defaultActiveKey="created" onChange={onChangeTag} animated={false}>
-        <TabPane tab={`文章 ${props.excerpt.totalCreated}`} key="created">
+        <TabPane tab={`文章 ${props.excerpt.excerpts_created_count}`} key="created">
           <InfiniteScroll
             initialLoad={false}
             pageStart={0}
-            loadMore={() => { !loading && hasMore && props.dispatch(readExcerptsByUserCreated()); }}
-            hasMore={!loading && hasMore}
+            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser('created')); }}
+            hasMore={!props.excerpt.loading && props.excerpt.has_more}
             useWindow
           >
-            <ExcerptList dataSource={props.excerpt.dataSource} loading={loading} />
-            { loading && hasMore && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
+            <ExcerptList dataSource={props.excerpt.excerpts} loading={props.excerpt.loading} />
+            { props.excerpt.loading && props.excerpt.has_more && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
           </InfiniteScroll>
         </TabPane>
-        <TabPane tab={`收藏 ${props.excerpt.totalCollected}`} key="collected">
+        <TabPane tab={`收藏 ${props.excerpt.excerpts_collected_count}`} key="collected">
           <InfiniteScroll
             initialLoad={false}
             pageStart={0}
-            loadMore={() => { !loading && hasMore && props.dispatch(readExcerptsByUserCollected()); }}
-            hasMore={!loading && hasMore}
+            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser('collected')); }}
+            hasMore={!props.excerpt.loading && props.excerpt.has_more}
             useWindow
           >
-            <ExcerptList dataSource={props.excerpt.dataSource} loading={loading} />
-            { loading && hasMore && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
+            <ExcerptList dataSource={props.excerpt.excerpts} loading={props.excerpt.loading} />
+            { props.excerpt.loading && props.excerpt.has_more && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
           </InfiniteScroll>
         </TabPane>
       </Tabs>
