@@ -1,5 +1,5 @@
 /**
- * 首页
+ * 话题
  */
 
 import { connect } from 'react-redux';
@@ -8,16 +8,14 @@ import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunkMiddleware from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
-import { Layout, BackTop, LocaleProvider, Card } from 'antd';
-import InfiniteScroll from 'react-infinite-scroller';
+import { Layout, BackTop, LocaleProvider } from 'antd';
 import Head from 'next/head';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
-import reducers from '../reducers/index';
-import { readExcerptsSuccess, readExcerptsByUser } from '../reducers/excerpt';
+import { reducers, readTopicSuccess, readTopicArticlesSuccess, readTopicFollowersSuccess } from '../reducers/topic';
 import { readSessionSuccess } from '../reducers/session';
 import { readUnviewNoticeSuccess } from '../reducers/notice';
 import Nav from '../components/nav/index';
-import ExcerptList from '../components/excerpt-list/index';
+import Topic from '../components/topic/index';
 import Error from '../components/error/index';
 import stylesheet from '../styles/index.scss';
 
@@ -25,10 +23,17 @@ const { Header, Content, Footer } = Layout;
 
 // 初始默认 state
 const initialState = {
-  excerpt: {
-    data: [],
-    page: 1,
-    per_page: 10
+  topic: {
+    followers: {
+      data: [],
+      page: 1,
+      per_page: 20
+    },
+    articles: {
+      data: [],
+      page: 1,
+      per_page: 10
+    }
   },
   session: {},
   notice: {}
@@ -55,19 +60,7 @@ const Index = (props) => {
           <Nav />
         </Header>
         <Content>
-          <InfiniteScroll
-            initialLoad={false}
-            pageStart={0}
-            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser(props.session.login, 'follow')); }}
-            hasMore={!props.excerpt.loading && props.excerpt.has_more}
-            useWindow
-          >
-            <ExcerptList
-              data={props.excerpt.data}
-              loading={props.excerpt.loading}
-            />
-            { props.excerpt.loading && props.excerpt.has_more && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
-          </InfiniteScroll>
+          <Topic />
         </Content>
         <Footer />
         <BackTop />
@@ -76,11 +69,14 @@ const Index = (props) => {
   );
 };
 
-Index.getInitialProps = async ({ store, req }) => {
+Index.getInitialProps = async ({ store, req, query }) => {
   var res;
+  // 服务端请求时不会带上主机地址，必须手动添加
+  const { host } = req.headers;
+  const { topic } = query;
 
   // ----- 读取当前登录用户所有信息
-  res = await fetch(`http://${req.headers.host}/api/v1/user`, {
+  res = await fetch(`http://${host}/api/v1/user`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
@@ -90,19 +86,40 @@ Index.getInitialProps = async ({ store, req }) => {
   const { login } = store.getState().session;
 
 
-  // ----- 读取用户关注的话题文章集合
-  const excerpt = store.getState().excerpt;
-  res = await fetch(`http://${req.headers.host}/api/v1/users/${login}/excerpts/follow?&page=${excerpt.page}&per_page=${excerpt.per_page}`, {
+  // ----- 读取话题基本信息
+  res = await fetch(`http://${host}/api/v1/topic/${topic}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
   if (res.status !== 200) return { statusCode: res.status };
-  const excerpts = await res.json();
-  store.dispatch(readExcerptsSuccess(excerpts));
+  res = await res.json();
+  store.dispatch(readTopicSuccess(res));
+
+
+  // ----- 读取话题下的文章
+  const articles = store.getState().topic.articles;
+  res = await fetch(`http://${host}/api/v1/topic/${topic}/articles?&page=${articles.page}&per_page=${articles.per_page}`, {
+    method: 'get',
+    headers: { Cookie: req.headers.cookie }
+  });
+  if (res.status !== 200) return { statusCode: res.status };
+  res = await res.json();
+  store.dispatch(readTopicArticlesSuccess(res));
+
+
+  // ----- 读取话题下的关注者
+  const followers = store.getState().topic.followers;
+  res = await fetch(`http://${host}/api/v1/topic/${topic}/followers?&page=${followers.page}&per_page=${followers.per_page}`, {
+    method: 'get',
+    headers: { Cookie: req.headers.cookie }
+  });
+  if (res.status !== 200) return { statusCode: res.status };
+  res = await res.json();
+  store.dispatch(readTopicFollowersSuccess(res));
 
 
   // ----- 读取用户未读通知消息数组
-  res = await fetch(`http://${req.headers.host}/api/v1/users/${login}/received_notices?has_view=false`, {
+  res = await fetch(`http://${host}/api/v1/users/${login}/received_notices?has_view=false`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });

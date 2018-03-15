@@ -6,7 +6,7 @@
 
 .excerpt-item {
   position: relative;
-  padding: 8px 20px 24px;
+  padding: 24px;
   background: #fff;
   margin-top: 12px;
   box-shadow: 0 1px 3px rgba(26,26,26,.1);
@@ -70,12 +70,11 @@
   display: inline-block;
   width: 100%;
   font-size: 20px;
-  font-weight: 400;
   color: $title-color;
   line-height: 1.5;
   vertical-align: middle;
   text-overflow: ellipsis;
-  margin: 8px 0;
+  margin-bottom: 8px;
   font-weight: bold;
 }
 
@@ -114,6 +113,6 @@
   color: $grey;
   background: #fff;
   padding-top: 24px;
-  margin: 0;
+  margin-top: 12px;
   height: 225px;
 }

@@ -113,6 +113,30 @@ app.prepare().then(() => {
     ctx.respond = false;
   })
 
+  // 话题
+  router.get('/topic/:topic', async ctx => {
+    if (ctx.session.uid) {
+      await app.render(ctx.req, ctx.res, '/topic', ctx.params);
+    } else {
+      await ctx.redirect('/login');
+      await app.render(ctx.req, ctx.res, '/login', ctx.params);
+    }
+
+    ctx.respond = false;
+  })
+
+  // 话题广场
+  router.get('/topics', async ctx => {
+    if (ctx.session.uid) {
+      await app.render(ctx.req, ctx.res, '/topics', ctx.params);
+    } else {
+      await ctx.redirect('/login');
+      await app.render(ctx.req, ctx.res, '/login', ctx.params);
+    }
+
+    ctx.respond = false;
+  })
+
   // 主页路由
   router.get('/', async ctx => {
     if (ctx.session.uid) {

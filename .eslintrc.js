@@ -14,6 +14,7 @@ const eslintrc = {
   ],
   rules: {
     'global-require': 0,
+    "camelcase": 0,
     'no-var': 0,
     'semi': 1,
     'no-console': 0,

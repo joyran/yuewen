@@ -32,7 +32,7 @@ const ExcerptList = (props) => {
               </div>
               <div className="excerpt-author-info">
                 <a
-                  href={`/profile/${item.author._id}`}
+                  href={`/user/${item.author.login}`}
                   className="excerpt-author-info-avatar-link"
                 >
                   <img
@@ -44,7 +44,7 @@ const ExcerptList = (props) => {
                 <div className="excerpt-author-info-content">
                   <a
                     className="excerpt-author-info-content-username"
-                    href={`/user/${item.author.name}`}
+                    href={`/user/${item.author.login}`}
                   >{item.author.name}</a>
                   <p className="excerpt-author-info-content-bio">{item.author.bio}</p>
                 </div>
@@ -58,7 +58,9 @@ const ExcerptList = (props) => {
               {
                 item.topics.map((topic) => {
                   return (
-                    <Tag key={topic} className="excerpt-topic" color="blue">{topic}</Tag>
+                    <Tag key={topic} className="excerpt-topic" color="blue">
+                      <a href={`/topic/${topic}`} target="_blank">{topic}</a>
+                    </Tag>
                   );
                 })
               }

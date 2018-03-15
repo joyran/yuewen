@@ -1,0 +1,90 @@
+@import "././styles/variable";
+
+.topic-header {
+  background: #fff;
+  padding: 24px;
+  margin-top: 12px;
+
+  .title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .description {
+    line-height: 2;
+  }
+
+  .followed {
+    background: #87d068;
+    border-color: #87d068;
+    color: #fff;
+
+    &:hover {
+      background: #9adc7d;
+      border-color: #9adc7d;
+    }
+  }
+
+  .unfollowed {
+    background: #1890ff;
+    border-color: #1890ff;
+    color: #fff;
+
+    &:hover {
+      background: #40a9ff;
+      border-color: #40a9ff;
+    }
+  }
+}
+
+.topic-body {
+  .ant-tabs-bar {
+    background: #fff;
+    margin-top: 12px;
+    margin-bottom: 0;
+  }
+}
+
+.topic-articles {
+  .excerpt-item {
+    margin: 0;
+    border-bottom: 1px solid $grey-lighter;
+  }
+}
+
+.topic-followers {
+  padding: 0 24px;
+  background: #fff;
+}
+
+.topic-follower {
+  display: flex;
+  padding: 24px 0;
+  border-bottom: 1px solid $grey-lighter;
+}
+
+.topic-follower-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 4px;
+}
+
+.topic-follower-content {
+  flex: 1;
+  margin-left: 24px;
+}
+
+.topic-follower-content-username {
+  font-size: 18px;
+}
+
+.topic-follower-content-bio {
+  padding-top: 8px;
+  margin-bottom: 0;
+  color: $grey-darker;
+}
+
+.topic-follower-button {
+  margin-top: 16px;
+}
