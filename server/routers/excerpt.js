@@ -10,10 +10,10 @@ var User = require('../models/user');
 
 
 /**
- * 根据文章标签 tag 读取文章摘录 excerpt
+ * 读取用户关注的话题文章集合 excerpts
  */
-router.get('/api/v1/excerpts/tag/:tag', async ctx => {
-  const { tag } = ctx.params;
+router.get('/api/v1/users/:login/excerpts/follow', async ctx => {
+  const { login } = ctx.params;
   const { uid } = ctx.session;
   const page  = ctx.query.page ? parseInt(ctx.query.page) : 1;
   const per_page = ctx.query.per_page ? parseInt(ctx.query.per_page) : 10;
@@ -25,41 +25,27 @@ router.get('/api/v1/excerpts/tag/:tag', async ctx => {
     return;
   }
 
-  switch (tag) {
-    case 'new':
-      // tag 为 new 根据发布时间降序返回所有文章
-      var excerpts = await Article.find({}).sort({ created_at: -1 }).populate('author').skip(skip).limit(per_page).lean();
-
-      // 读取文章总数
-      var total = await Article.count({});
-      break;
-
-    case 'hot':
-      // tag 为 hot 根据热度 heat 降序排序
-      var excerpts = await Article.find({}).sort({ heat: -1 }).populate('author').skip(skip).limit(per_page).lean();
-
-      // 读取文章总数
-      var total = await Article.count({});
-      break;
-
-    default:
-      // 根据对应的标签 tag 查找
-      var excerpts = await Article.find({ tags: tag }).sort({ created_at: -1 }).populate('author').skip(skip).limit(per_page).lean();
-
-      // 读取文章总数
-      var total = await Article.find({ tags: tag }).count({});
-      break;
+  var user = await User.findOne({ login }).lean();
+  if (!user) {
+    ctx.status = 404;
+    ctx.body = { message: 'Not Found' };
+    return;
   }
+
+  var excerpts = await Article.find({ topics: { $in: user.followed_topics }})
+                              .sort({ created_at: -1 }).populate('author')
+                              .skip(skip).limit(per_page).lean();
+
+  // 读取文章总数
+  var total = await Article.find({ topics: { $in: user.followed_topics }}).count({});
 
   // 删除一些敏感信息和冗余字段
   excerpts.map((excerpt) => {
     // 删除用户密码
     delete excerpt.author.password;
-
-    // 删除 markdown
+    // 删除文章 markdown
     delete excerpt.markdown;
-
-    // 删除 html
+    // 删除文章 html
     delete excerpt.html;
   });
 
@@ -68,15 +54,15 @@ router.get('/api/v1/excerpts/tag/:tag', async ctx => {
 
   // 输出返回值
   ctx.status = 200;
-  ctx.body = { has_more, excerpts };
+  ctx.body = { data: excerpts, has_more };
 });
 
 
 /**
  * 读取用户发表的文章摘录集合 excerpts
  */
-router.get('/api/v1/users/:user/excerpts/created', async ctx => {
-  const { user } = ctx.params;
+router.get('/api/v1/users/:login/excerpts/create', async ctx => {
+  const { login } = ctx.params;
   const { uid } = ctx.session;
   const page  = ctx.query.page ? parseInt(ctx.query.page) : 1;
   const per_page = ctx.query.per_page ? parseInt(ctx.query.per_page) : 10;
@@ -88,26 +74,24 @@ router.get('/api/v1/users/:user/excerpts/created', async ctx => {
     return;
   }
 
-  const result = await User.findOne({ login: user }).lean();
-  if (!result) {
+  const user = await User.findOne({ login }).lean();
+  if (!user) {
     ctx.status = 404;
     ctx.body = { message: 'Not Found' };
     return;
   }
 
-  var excerpts = await Article.find({ author: result._id }).sort({ created_at: -1 })
+  var excerpts = await Article.find({ author: user._id }).sort({ created_at: -1 })
                               .populate('author').skip(skip).limit(per_page).lean();
-  var excerpts_created_count = await Article.find({ author: result._id }).count({});
-  var excerpts_collected_count = await Collection.find({ user: result._id }).count({});
+  var excerpts_created_count = await Article.find({ author: user._id }).count({});
+  var excerpts_collected_count = await Collection.find({ user: user._id }).count({});
 
   excerpts.map((excerpt) => {
     // 删除用户密码
     delete excerpt.author.password;
-
-    // 删除 markdown
+    // 删除文章 markdown
     delete excerpt.markdown;
-
-    // 删除 html
+    // 删除文章 html
     delete excerpt.html;
   });
 
@@ -116,15 +100,15 @@ router.get('/api/v1/users/:user/excerpts/created', async ctx => {
 
   // 输出返回值
   ctx.status = 200;
-  ctx.body = { excerpts, excerpts_created_count, excerpts_collected_count, has_more };
+  ctx.body = { data: excerpts, excerpts_created_count, excerpts_collected_count, has_more };
 });
 
 
 /**
  * 读取用户发表的文章摘录集合 excerpts
  */
-router.get('/api/v1/users/:user/excerpts/collected', async ctx => {
-  const { user } = ctx.params;
+router.get('/api/v1/users/:login/excerpts/collect', async ctx => {
+  const { login } = ctx.params;
   const { uid } = ctx.session;
   const page  = ctx.query.page ? parseInt(ctx.query.page) : 1;
   const per_page = ctx.query.per_page ? parseInt(ctx.query.per_page) : 10;
@@ -136,15 +120,15 @@ router.get('/api/v1/users/:user/excerpts/collected', async ctx => {
     return;
   }
 
-  const result = await User.findOne({ login: user }).lean();
-  if (!result) {
+  const user = await User.findOne({ login }).lean();
+  if (!user) {
     ctx.status = 404;
     ctx.body = { message: 'Not Found' };
     return;
   }
 
   // 返回数组，格外为 [ { article: '5944f34301a2a6e76242147a' },{ article: '5944f2c501a2a6e762421466' } ]
-  var collections = await Collection.find({ user: result._id }, { _id: 0, article: 1, by: 1 })
+  var collections = await Collection.find({ user: user._id }, { _id: 0, article: 1, by: 1 })
                                     .sort({ created_at: -1 }).skip(skip).limit(per_page).lean();
 
   // 返回 article id 组成的数组，[ '5944f34301a2a6e76242147a', '5944f2c501a2a6e762421466' ]
@@ -152,16 +136,14 @@ router.get('/api/v1/users/:user/excerpts/collected', async ctx => {
 
   // 读取摘要
   var excerpts = await Article.find({ _id: { $in: collections }}).populate('author').lean();
-  var excerpts_collected_count = await Collection.find({ user: result._id }).count({});
+  var excerpts_collected_count = await Collection.find({ user: user._id }).count({});
 
   excerpts.map((excerpt) => {
     // 删除用户密码
     delete excerpt.author.password;
-
-    // 删除 markdown
+    // 删除文章 markdown
     delete excerpt.markdown;
-
-    // 删除 html
+    // 删除文章 html
     delete excerpt.html;
   });
 
@@ -170,7 +152,7 @@ router.get('/api/v1/users/:user/excerpts/collected', async ctx => {
 
   // 输出返回值
   ctx.status = 200;
-  ctx.body = { excerpts, excerpts_collected_count, has_more };
+  ctx.body = { data: excerpts, excerpts_collected_count, has_more };
 });
 
 module.exports = router;

@@ -8,7 +8,7 @@ var { mongoose, Schema } = require('../utils/mongoose');
 var schema = new Schema({
   author: { type: Schema.Types.ObjectId, ref: 'User' },
   title: String,
-  tags: Array,
+  topics: Array,
   excerpt: String,
   views_count: Number,
   comments_count: Number,

@@ -10,13 +10,13 @@ import stylesheet from './index.scss';
 moment.locale('zh-cn');
 
 const ExcerptList = (props) => {
-  const { dataSource, loading } = props;
+  const { data, loading } = props;
 
   return (
     <ul className="excerpt-list">
       <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
       {
-        dataSource.map((item) => {
+        data.map((item) => {
           return (
             <li className="excerpt-item" key={item._id}>
               <div className="excerpt-title-line">
@@ -56,9 +56,9 @@ const ExcerptList = (props) => {
                 点赞 {item.likes_count}
               </span>
               {
-                item.tags.map((tag) => {
+                item.topics.map((topic) => {
                   return (
-                    <Tag key={tag} className="excerpt-tag" color="blue">{tag}</Tag>
+                    <Tag key={topic} className="excerpt-topic" color="blue">{topic}</Tag>
                   );
                 })
               }
@@ -66,7 +66,7 @@ const ExcerptList = (props) => {
           );
         })
       }
-      { dataSource.length === 0 && !loading ?
+      { data.length === 0 && !loading ?
         <div className="excerpt-not-found">
           <img src="/imgs/article.svg" alt="空空而已" />
           <p>空空而已</p>

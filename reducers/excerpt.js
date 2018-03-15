@@ -13,11 +13,9 @@ const networkErrorMsg = '网络连接失败，请刷新重试！';
 // ------------------------
 export const {
   readExcerptsSuccess,
-  readExcerptsSuccessByServer,
   changeTag
 } = createActions(
   'READ_EXCERPTS_SUCCESS',
-  'READ_EXCERPTS_SUCCESS_BY_SERVER',
   'CHANGE_TAG'
 );
 
@@ -42,11 +40,10 @@ export const readExcerptsByTag = () => (dispatch, getState) => {
 
 /**
  * 读取用户发表或者收藏的文章摘录 excerpts
- * 参数: sortby created为发布的文章，collected为收藏的文章
+ * 参数: sortby create为发布的文章，collect为收藏的文章, follow
  */
-export const readExcerptsByUser = sortby => (dispatch, getState) => {
+export const readExcerptsByUser = (login, sortby) => (dispatch, getState) => {
   const excerpt = getState().excerpt;
-  const { login } = getState().profile;
 
   fetch(`/api/v1/users/${login}/excerpts/${sortby}?page=${excerpt.page}&per_page=${excerpt.per_page}`, {
     credentials: 'include',
@@ -69,22 +66,15 @@ export const excerpt = handleActions({
     ...state,
     ...action.payload,
     page: state.page + 1,
-    excerpts: state.excerpts.concat(action.payload.excerpts),
+    data: state.data.concat(action.payload.data),
     loading: false
   }),
 
-  READ_EXCERPTS_SUCCESS_BY_SERVER: (state, action) => ({
+  // 点击 tag 标签，page 和 data 重置，loading 置为 true 是想显示 loading card
+  CHANGE_TAG: state => ({
     ...state,
-    ...action.payload,
-    page: state.page + 1    // page + 1
-  }),
-
-  // 点击 tag 标签，page 和 excerpts 重置，loading 置为 true 是想显示 loading card
-  CHANGE_TAG: (state, action) => ({
-    ...state,
-    tag: action.payload,
     page: 1,
-    excerpts: [],
+    data: [],
     loading: true,
     has_more: true
   })

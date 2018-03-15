@@ -13,7 +13,7 @@ users.map(async item => {
     mail: item.mail,
     avatar_url: "/uploads/avatar/26566442.png",
     small_avatar_url: "/uploads/avatar/26566442_50.png",
-    followed_tags: [ "javascript", "css", "python", "html", "qos" ],
+    followed_topics: [ "javascript", "css", "python", "html", "qos" ],
     prestige : 20000,
     banner_url: "/uploads/banner/1519282508481.jpg",
     bio: item.bio,
@@ -29,7 +29,7 @@ users.map(async item => {
     var article = {
       author: uid,
       title: "悦文，一个能说会道的博客",
-      tags: [ "javascript", "css" ],
+      topics: [ "javascript", "css" ],
       excerpt,
       views_count: 0,
       likes_count: 0,

@@ -12,7 +12,7 @@ var schema = new Schema({
   mail: String,
   avatar_url: String,
   small_avatar_url: String,
-  followed_tags: Array,
+  followed_topics: Array,
   prestige: Number,
   banner_url: String,
   bio: String,

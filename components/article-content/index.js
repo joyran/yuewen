@@ -2,7 +2,7 @@
  * 文章内容展示
  */
 
-import { Tooltip, Icon, Button } from 'antd';
+import { Tooltip, Icon, Button, Tag } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { createArticleLikes, updateArticleCollection } from '../../reducers/article';
@@ -44,7 +44,16 @@ const ArticleContent = (props) => {
         <div dangerouslySetInnerHTML={{ __html: article.html }} />
       </div>
       {/* 点赞 div */}
-      <div className="article-like">
+      <div className="article-footer">
+        <div className="article-tags">
+          {
+            article.tags.map((tag) => {
+              return (
+                <Tag key={tag} className="excerpt-tag" color="blue">{tag}</Tag>
+              );
+            })
+          }
+        </div>
         {/* 点赞按钮，已点赞实心，未点赞空心 */}
         <Button
           className="like-button"
@@ -64,7 +73,7 @@ const ArticleContent = (props) => {
           />
         </Tooltip>
         {/* 点赞人列表 */}
-        <ol className="likes">
+        <ol className="article-likes">
           {article.likes.map((like) => {
             return (
               <Tooltip placement="top" title={like.user.name} key={like.user._id}>

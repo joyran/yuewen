@@ -8,15 +8,16 @@ import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunkMiddleware from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
-import { Layout, BackTop, LocaleProvider } from 'antd';
+import { Layout, BackTop, LocaleProvider, Card } from 'antd';
+import InfiniteScroll from 'react-infinite-scroller';
 import Head from 'next/head';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import reducers from '../reducers/index';
-import { readExcerptsSuccessByServer } from '../reducers/excerpt';
+import { readExcerptsSuccess, readExcerptsByUser } from '../reducers/excerpt';
 import { readSessionSuccess } from '../reducers/session';
 import { readUnviewNoticeSuccess } from '../reducers/notice';
 import Nav from '../components/nav/index';
-import TagNav from '../components/tag-nav/index';
+import ExcerptList from '../components/excerpt-list/index';
 import Error from '../components/error/index';
 import stylesheet from '../styles/index.scss';
 
@@ -25,8 +26,7 @@ const { Header, Content, Footer } = Layout;
 // 初始默认 state
 const initialState = {
   excerpt: {
-    tag: 'new',
-    loading: false,
+    data: [],
     page: 1,
     per_page: 10
   },
@@ -55,7 +55,19 @@ const Index = (props) => {
           <Nav />
         </Header>
         <Content>
-          <TagNav />
+          <InfiniteScroll
+            initialLoad={false}
+            pageStart={0}
+            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser(props.session.login, 'follow')); }}
+            hasMore={!props.excerpt.loading && props.excerpt.has_more}
+            useWindow
+          >
+            <ExcerptList
+              data={props.excerpt.data}
+              loading={props.excerpt.loading}
+            />
+            { props.excerpt.loading && props.excerpt.has_more && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
+          </InfiniteScroll>
         </Content>
         <Footer />
         <BackTop />
@@ -66,19 +78,6 @@ const Index = (props) => {
 
 Index.getInitialProps = async ({ store, req }) => {
   var res;
-  // ----- 根据标签读取文章摘要列表
-  const excerpt = store.getState().excerpt;
-
-  // 请求 url 必须为完整路径，不能为绝对路径 /api/v1/excerpts
-  // isomorphic-fetch 在 node 端不会自动带上 cookie，需要手动添加 headers: { Cookie: req.headers.cookie }
-  res = await fetch(`http://${req.headers.host}/api/v1/excerpts/tag/${excerpt.tag}?&page=${excerpt.page}&per_page=${excerpt.per_page}`, {
-    method: 'get',
-    headers: { Cookie: req.headers.cookie }
-  });
-  if (res.status !== 200) return { statusCode: res.status };
-  const excerpts = await res.json();
-  store.dispatch(readExcerptsSuccessByServer(excerpts));
-
 
   // ----- 读取当前登录用户所有信息
   res = await fetch(`http://${req.headers.host}/api/v1/user`, {
@@ -89,6 +88,17 @@ Index.getInitialProps = async ({ store, req }) => {
   res = await res.json();
   store.dispatch(readSessionSuccess(res));
   const { login } = store.getState().session;
+
+
+  // ----- 根据标签读取文章摘要列表
+  const excerpt = store.getState().excerpt;
+  res = await fetch(`http://${req.headers.host}/api/v1/users/${login}/excerpts/follow?&page=${excerpt.page}&per_page=${excerpt.per_page}`, {
+    method: 'get',
+    headers: { Cookie: req.headers.cookie }
+  });
+  if (res.status !== 200) return { statusCode: res.status };
+  const excerpts = await res.json();
+  store.dispatch(readExcerptsSuccess(excerpts));
 
 
   // ----- 读取用户未读通知消息数组

@@ -12,7 +12,7 @@ import { Layout, BackTop, LocaleProvider } from 'antd';
 import Head from 'next/head';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import { reducers, readProfileSuccess } from '../reducers/profile';
-import { readExcerptsSuccessByServer } from '../reducers/excerpt';
+import { readExcerptsSuccess } from '../reducers/excerpt';
 import { readSessionSuccess } from '../reducers/session';
 import { readUnviewNoticeSuccess } from '../reducers/notice';
 import Profile from '../components/profile/index';
@@ -26,7 +26,7 @@ const { Header, Content, Footer } = Layout;
 const initialState = {
   profile: {},
   excerpt: {
-    loading: false,
+    data: [],
     page: 1,
     per_page: 10
   },
@@ -79,13 +79,13 @@ Index.getInitialProps = async ({ store, req, query }) => {
   store.dispatch(readProfileSuccess(profile));
 
   // ----- 读取当前用户所有发表的文章摘录
-  res = await fetch(`http://${req.headers.host}/api/v1/users/${user}/excerpts/created?page=${excerpt.page}&per_page=${excerpt.per_page}`, {
+  res = await fetch(`http://${req.headers.host}/api/v1/users/${user}/excerpts/create?page=${excerpt.page}&per_page=${excerpt.per_page}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
   if (res.status !== 200) return { statusCode: res.status };
   const excerpts = await res.json();
-  store.dispatch(readExcerptsSuccessByServer(excerpts));
+  store.dispatch(readExcerptsSuccess(excerpts));
 
   // ----- 读取当前登录用户所有信息
   res = await fetch(`http://${req.headers.host}/api/v1/user`, {

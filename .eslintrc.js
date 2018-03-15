@@ -16,7 +16,7 @@ const eslintrc = {
     'global-require': 0,
     'no-var': 0,
     'semi': 1,
-    'no-console': ['error', { allow: ['log', 'warn', 'error'] }],
+    'no-console': 0,
     'no-multi-spaces': ['error', { ignoreEOLComments: true, exceptions: { 'VariableDeclarator': true, 'ImportDeclaration': true  } }],
     'func-names': 0,
     'arrow-body-style': 0,

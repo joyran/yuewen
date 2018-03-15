@@ -6,10 +6,9 @@
 
 .excerpt-item {
   position: relative;
-  // border-bottom: 1px solid $grey-lighter;
   padding: 8px 20px 24px;
   background: #fff;
-  margin-bottom: 12px;
+  margin-top: 12px;
   box-shadow: 0 1px 3px rgba(26,26,26,.1);
 }
 
@@ -95,7 +94,7 @@
   text-overflow: ellipsis;
 }
 
-.excerpt-tag {
+.excerpt-topic {
   height: 20px;
   border: none;
   &:hover {
@@ -103,7 +102,7 @@
   }
 }
 
-.excerpt-tag a {
+.excerpt-topic a {
   color: $link-color;
   &:hover {
     color: $link-color;

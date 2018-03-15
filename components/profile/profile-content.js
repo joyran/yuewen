@@ -16,33 +16,33 @@ moment.locale('zh-cn');
 const ProfileContent = (props) => {
   const onChangeTag = (key) => {
     props.dispatch(changeTag(key));
-    props.dispatch(readExcerptsByUser(key));
+    props.dispatch(readExcerptsByUser(props.profile.login, key));
   };
 
   return (
     <div className="profile-content">
-      <Tabs defaultActiveKey="created" onChange={onChangeTag} animated={false}>
-        <TabPane tab={`文章 ${props.excerpt.excerpts_created_count}`} key="created">
+      <Tabs defaultActiveKey="create" onChange={onChangeTag} animated={false}>
+        <TabPane tab={`文章 ${props.excerpt.excerpts_created_count}`} key="create">
           <InfiniteScroll
             initialLoad={false}
             pageStart={0}
-            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser('created')); }}
+            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser(props.profile.login, 'create')); }}
             hasMore={!props.excerpt.loading && props.excerpt.has_more}
             useWindow
           >
-            <ExcerptList dataSource={props.excerpt.excerpts} loading={props.excerpt.loading} />
+            <ExcerptList data={props.excerpt.data} loading={props.excerpt.loading} />
             { props.excerpt.loading && props.excerpt.has_more && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
           </InfiniteScroll>
         </TabPane>
-        <TabPane tab={`收藏 ${props.excerpt.excerpts_collected_count}`} key="collected">
+        <TabPane tab={`收藏 ${props.excerpt.excerpts_collected_count}`} key="collect">
           <InfiniteScroll
             initialLoad={false}
             pageStart={0}
-            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser('collected')); }}
+            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser(props.profile.login, 'collect')); }}
             hasMore={!props.excerpt.loading && props.excerpt.has_more}
             useWindow
           >
-            <ExcerptList dataSource={props.excerpt.excerpts} loading={props.excerpt.loading} />
+            <ExcerptList data={props.excerpt.data} loading={props.excerpt.loading} />
             { props.excerpt.loading && props.excerpt.has_more && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
           </InfiniteScroll>
         </TabPane>

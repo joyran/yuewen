@@ -6,7 +6,7 @@ var Router = require('koa-router');
 var router = new Router();
 var Article = require('../models/article');
 var Like = require('../models/like');
-var Tag = require('../models/tag');
+var Topic = require('../models/topic');
 var User = require('../models/user');
 var Collection = require('../models/collection');
 var Comment = require('../models/comment');
@@ -576,16 +576,5 @@ router.post('/api/v1/articles/:aid/likes', async ctx => {
   ctx.body = likes;
 });
 
-/**
- * 读取所有标签
- */
-router.get('/api/v1/tags', async ctx => {
-  // 读取所有标签  { _id: 0, tag: 1, by: 1 } _id:0 不返回 _id，tag:1, by:1 只返回 tag
-  var tags = await Tag.find({}).sort({'tag': -1});
-
-  // 输出返回值
-  ctx.status = 200;
-  ctx.body = tags;
-});
 
 module.exports = router;
