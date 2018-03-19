@@ -85,16 +85,26 @@
   }
 }
 
-.article-tags {
+.article-topics {
   margin-bottom: 24px;
+}
 
-  .ant-tag {
-    font-size: 14px;
-    height: 32px;
-    padding: 0 12px;
-    line-height: 32px;
-    border-radius: 10px;
-    border: none;
+.article-topic {
+  font-size: 14px;
+  height: 32px;
+  padding: 0 12px;
+  line-height: 32px;
+  border-radius: 10px;
+  border: none;
+  &:hover {
+    opacity: .85;
+  }
+}
+
+.article-topic a {
+  color: $link-color;
+  &:hover {
+    color: $link-color;
   }
 }
 

@@ -7,7 +7,13 @@ const networkErrorMsg = '网络连接失败，请刷新重试！';
 // ------------------------
 // ACTIONS
 // ------------------------
-export const { readSessionSuccess } = createActions('READ_SESSION_SUCCESS');
+export const {
+  readSessionSuccess,
+  updateFollowedTopic
+} = createActions(
+  'READ_SESSION_SUCCESS',
+  'UPDATE_FOLLOWED_TOPIC'
+);
 
 
 /**
@@ -35,7 +41,11 @@ export const deleteSession = () => () => {
 export const session = handleActions({
   READ_SESSION_SUCCESS: (state, action) => ({
     ...state,
-    ...action.payload,
-    followed_tags: ['new', 'hot'].concat(action.payload.followed_tags)
+    ...action.payload
+  }),
+
+  UPDATE_FOLLOWED_TOPIC: (state, action) => ({
+    ...state,
+    ...action.payload
   })
 }, {});

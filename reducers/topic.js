@@ -1,12 +1,12 @@
 /**
- * 文章摘录
+ * 话题
  */
 
 import fetch from 'isomorphic-fetch';
 import { createActions, handleActions } from 'redux-actions';
 import { combineReducers } from 'redux';
 import { message } from 'antd';
-import { session } from './session';
+import { session, updateFollowedTopic } from './session';
 import { notice } from './notice';
 
 const networkErrorMsg = '网络连接失败，请刷新重试！';
@@ -18,12 +18,16 @@ export const {
   readTopicSuccess,
   readTopicFollowersSuccess,
   readTopicArticlesSuccess,
-  followTopicSuccess
+  resetTopicArticles,
+  followTopicSuccess,
+  swapSortby
 } = createActions(
   'READ_TOPIC_SUCCESS',
   'READ_TOPIC_FOLLOWERS_SUCCESS',
   'READ_TOPIC_ARTICLES_SUCCESS',
-  'FOLLOW_TOPIC_SUCCESS'
+  'RESET_TOPIC_ARTICLES',
+  'FOLLOW_TOPIC_SUCCESS',
+  'SWAP_SORTBY'
 );
 
 /**
@@ -31,8 +35,9 @@ export const {
  */
 export const readTopicArticles = () => (dispatch, getState) => {
   const { topic, articles } = getState().topic;
+  const { sort_by } = articles;
 
-  fetch(`/api/v1/topic/${topic}/articles?page=${articles.page}&per_page=${articles.per_page}`, {
+  fetch(`/api/v1/topic/${topic}/articles?page=${articles.page}&per_page=${articles.per_page}&sort_by=${sort_by}`, {
     credentials: 'include',
     method: 'get'
   })
@@ -67,10 +72,11 @@ export const readTopicFollowers = () => (dispatch, getState) => {
 
 /**
  * 关注话题
+ * 参数: topic 话题
+ * 参数: method 方法，delete 取消关注话题，put 关注话题
  */
-export const followTopic = () => (dispatch, getState) => {
-  const { topic, has_followed } = getState().topic;
-  const method = has_followed ? 'delete' : 'put';
+export const followTopic = (topic, method) => (dispatch, getState) => {
+  var followed_topics = getState().session.followed_topics;
 
   fetch(`/api/v1/topic/${topic}/follow`, {
     credentials: 'include',
@@ -82,11 +88,14 @@ export const followTopic = () => (dispatch, getState) => {
     .then(res => res.json())
     .then((res) => {
       dispatch(followTopicSuccess(res));
-      if (has_followed) {
+      if (method === 'delete') {
+        followed_topics.splice(followed_topics.findIndex(i => i === topic), 1);
         message.success('取消关注话题成功');
       } else {
+        followed_topics = followed_topics.concat([topic]);
         message.success('关注话题成功');
       }
+      dispatch(updateFollowedTopic({ followed_topics }));
     }).catch((err) => {
       console.error(err.message);
       message.error(networkErrorMsg);
@@ -112,6 +121,15 @@ export const topic = handleActions({
     }
   }),
 
+  RESET_TOPIC_ARTICLES: state => ({
+    ...state,
+    articles: {
+      ...state.articles,
+      data: [],
+      page: 1
+    }
+  }),
+
   READ_TOPIC_FOLLOWERS_SUCCESS: (state, action) => ({
     ...state,
     followers: {
@@ -125,6 +143,14 @@ export const topic = handleActions({
   FOLLOW_TOPIC_SUCCESS: (state, action) => ({
     ...state,
     ...action.payload
+  }),
+
+  SWAP_SORTBY: state => ({
+    ...state,
+    articles: {
+      ...state.articles,
+      sort_by: state.articles.sort_by === 'time' ? 'heat' : 'time'
+    }
   })
 }, {});
 

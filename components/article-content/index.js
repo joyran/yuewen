@@ -45,11 +45,13 @@ const ArticleContent = (props) => {
       </div>
       {/* 点赞 div */}
       <div className="article-footer">
-        <div className="article-tags">
+        <div className="article-topics">
           {
-            article.tags.map((tag) => {
+            article.topics.map((topic) => {
               return (
-                <Tag key={tag} className="excerpt-tag" color="blue">{tag}</Tag>
+                <Tag key={topic} className="article-topic" color="blue">
+                  <a href={`/topic/${topic}`} target="_blank">{topic}</a>
+                </Tag>
               );
             })
           }

@@ -1,0 +1,89 @@
+@import "././styles/variable";
+
+.topics {
+
+}
+
+.ant-card {
+  margin-top: 12px;
+}
+
+.ant-card-bordered {
+  border: none;
+}
+
+.topic-row {
+  padding: 0;
+}
+
+.topic-col {
+  border-bottom: 1px solid $grey-lighter;
+  padding: 24px;
+}
+
+.followed {
+  margin-top: 8px;
+  background: #87d068;
+  border-color: #87d068;
+  color: #fff;
+
+  &:hover {
+    background: #9adc7d;
+    border-color: #9adc7d;
+  }
+}
+
+.unfollowed {
+  margin-top: 8px;
+  background: #1890ff;
+  border-color: #1890ff;
+  color: #fff;
+
+  &:hover {
+    background: #40a9ff;
+    border-color: #40a9ff;
+  }
+}
+
+.topic-row-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: $title-color;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.topic-row-description {
+  font-size: 14px;
+  line-height: 2;
+  color: $grey-darker;
+  max-height: 80px;
+  min-height: 80px;
+  overflow: hidden;
+}
+
+.all-topics {
+  .ant-card-body {
+    padding: 0;
+  }
+}
+
+.topic-tag {
+  font-size: 14px;
+  height: 32px;
+  padding: 0 12px;
+  line-height: 32px;
+  border-radius: 10px;
+  border: none;
+
+  &:hover {
+    opacity: .85;
+  }
+
+  a {
+    color: $link-color;
+    &:hover {
+      color: $link-color;
+    }
+  }
+}

@@ -54,10 +54,10 @@ class Nav extends Component {
 
     const notice = (
       <Tabs defaultActiveKey="1">
-        <TabPane tab={comments.length === 0 ? '评论' : `评论 (${comments.length})`} key="1">
+        <TabPane tab={comments.length === 0 ? '评论' : `评论 ${comments.length}`} key="1">
           <NoticeTabPane type="评论" dataSource={comments} dispatch={dispatch} />
         </TabPane>
-        <TabPane tab={likes.length === 0 ? '点赞' : `点赞 (${likes.length})`} key="2">
+        <TabPane tab={likes.length === 0 ? '点赞' : `点赞 ${likes.length}`} key="2">
           <NoticeTabPane type="点赞" dataSource={likes} dispatch={dispatch} />
         </TabPane>
       </Tabs>
@@ -100,6 +100,7 @@ class Nav extends Component {
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         <Col className="header-left" span={6}>
           <a href="/">首页</a>
+          <a href="/topics">话题</a>
         </Col>
         <Col className="search-box" span={6}>
           <Icon type="search" />

@@ -119,8 +119,8 @@ router.get('/api/v1/articles/:aid', async ctx => {
     return;
   }
 
-  // 每访问一次文章阅读数加 1
-  var result = await Article.findByIdAndUpdate({ _id: aid }, { views_count: article.views_count + 1 }).exec();
+  // 每访问一次文章阅读数加 1，热度加 1
+  await Article.findByIdAndUpdate({ _id: aid }, { views_count: article.views_count + 1, heat: article.heat + 1 }).exec();
 
   // 查找该篇文章是否已经被当前登录用户收藏
   var collection = await Collection.findOne({ user: uid, article: aid });

@@ -8,17 +8,33 @@ var User = require('../models/user');
  * 读取所有话题
  */
 router.get('/api/v1/topics', async ctx => {
+  const { uid } = ctx.session;
   const page  = ctx.query.page ? parseInt(ctx.query.page) : 1;
   const per_page = ctx.query.per_page ? parseInt(ctx.query.per_page) : 10;
   const skip = (page - 1) * per_page;
 
+  if (!uid) {
+    ctx.status = 401;
+    ctx.body = { message: '需要登录' };
+    return;
+  }
+
+  var user = await User.findOne({ _id: uid }).lean();
+
   // 读取所有话题, 按照文章数量降序排序
-  var topics = await Topic.find({}).sort({ articles: -1 }).skip(skip).limit(per_page);
+  var topics = await Topic.find({}).sort({ articles: -1 }).skip(skip).limit(per_page).lean();
+
+  // 话题总数
+  var total = await Topic.find({}).count({});
+
+  // 检测是否还有更多，总数小于 skip + per_page 则没有更多了。
+  const has_more = skip + per_page >= total ? false : true;
 
   // 输出返回值
   ctx.status = 200;
-  ctx.body = topics;
+  ctx.body = { data: topics, has_more };
 });
+
 
 /**
  * 读取话题基本信息
@@ -43,6 +59,9 @@ router.get('/api/v1/topic/:topic', async ctx => {
   var user = await User.findOne({ _id: uid, followed_topics: topic });
   result.has_followed = user ? true : false;
 
+  result.articles_url = `/api/v1/topic/${topic}/articles`;
+  result.followers_url = `/api/v1/topic/${topic}/followers`;
+
   // 输出返回值
   ctx.status = 200;
   ctx.body = result;
@@ -57,6 +76,7 @@ router.get('/api/v1/topic/:topic/articles', async ctx => {
   const { uid } = ctx.session;
   const page  = ctx.query.page ? parseInt(ctx.query.page) : 1;
   const per_page = ctx.query.per_page ? parseInt(ctx.query.per_page) : 10;
+  const sort_by = ctx.query.sort_by ? ctx.query.sort_by : 'time';
   const skip = (page - 1) * per_page;
 
   if (!uid) {
@@ -73,8 +93,23 @@ router.get('/api/v1/topic/:topic/articles', async ctx => {
   }
 
   // 根据对应的话题查找
-  var articles = await Article.find({ topics: topic }).sort({ created_at: -1 })
-                              .populate('author').skip(skip).limit(per_page).lean();
+  switch (sort_by) {
+    case 'time':
+      // 根据发布时间排序
+      var articles = await Article.find({ topics: topic }).sort({ created_at: -1 })
+                                  .populate('author').skip(skip).limit(per_page).lean();
+      break;
+
+    case 'heat':
+      // 根据热度排序
+      var articles = await Article.find({ topics: topic }).sort({ heat: -1 })
+                                  .populate('author').skip(skip).limit(per_page).lean();
+      break;
+
+    default:
+      break;
+  }
+
 
   // 话题文章总数量
   var total = await Article.find({ topics: topic }).count({});
@@ -162,13 +197,24 @@ router.put('/api/v1/topic/:topic/follow', async ctx => {
     return;
   }
 
+  // 话题关注者数量
+  var followers_count = result.followers_count;
+
   var user = await User.findOne({ _id: uid });
+
+  // 检查用户是否已经关注过改话题, 如果已经关注过则不做任何操作
+  var result = await User.findOne({ _id: uid, followed_topics: topic }).lean();
+  if (result) {
+    ctx.status = 404;
+    ctx.body = { message: 'Not Found' };
+    return;
+  }
 
   // 关注话题
   var user = await User.findByIdAndUpdate({ _id: uid }, { followed_topics: user.followed_topics.concat([topic]) }).exec();
 
   // 话题关注者数量加 1
-  const followers_count = result.followers_count + 1;
+  var followers_count = followers_count + 1;
   await Topic.update({ topic }, { followers_count }).exec();
 
   const has_followed = true;

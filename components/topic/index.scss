@@ -38,6 +38,17 @@
   }
 }
 
+.ant-tabs-extra-content {
+  line-height: 44px;
+  padding-right: 24px;
+  color: $grey;
+  cursor: pointer;
+
+  &:hover {
+    color: #888;
+  }
+}
+
 .topic-body {
   .ant-tabs-bar {
     background: #fff;
