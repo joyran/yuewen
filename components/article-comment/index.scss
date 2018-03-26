@@ -13,8 +13,7 @@
   border-bottom: 1px solid $grey-lighter;
 }
 
-.comment-editor-wrapper,
-.reply-editor-wrapper {
+.comment-editor-wrapper {
   position: relative;
 
   textarea {
@@ -106,6 +105,13 @@
   }
 
   .like {
+    margin-right: 16px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .has-like {
+    color: $link-color;
     margin-right: 16px;
     font-size: 14px;
     cursor: pointer;

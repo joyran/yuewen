@@ -6,7 +6,7 @@ import React from 'react';
 import { Modal, Tooltip, Icon } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { toggleConversationModal } from '../../reducers/article';
+import { toggleConversationModal, updateCommentLikes } from '../../reducers/article';
 
 // 时间汉化
 moment.locale('zh-cn');
@@ -44,11 +44,14 @@ const Conversation = (props) => {
                 </div>
               </div>
               {/* 评论内容 */}
-              <div className="comment-item-body">
-                {comment.content}
-              </div>
+              <div className="comment-item-body" dangerouslySetInnerHTML={{ __html: comment.content }} />
               <div className="comment-item-footer">
-                <span className="like"><Icon type="like" /> 赞</span>
+                <span
+                  className={comment.has_liked ? 'has-like' : 'like'}
+                  onClick={() => { props.dispatch(updateCommentLikes(comment._id, comment.has_liked, 'conversation')); }}
+                >
+                  <Icon type="like" /> 赞 {comment.likes_count > 0 ? comment.likes_count : ''}
+                </span>
               </div>
             </li>
           );

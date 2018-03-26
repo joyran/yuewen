@@ -33,8 +33,10 @@ class CommentEditor extends Component {
 
   // 点击评论按钮提交评论
   onClickButton = () => {
+    // 替换 \n 为 <br>
+    const comment = this.state.comment.replace(/\n/g, '<br>');
     // 提交评论
-    this.props.dispatch(createArticleComment(this.props.article._id, this.state.comment));
+    this.props.dispatch(createArticleComment(this.props.article._id, comment));
     // 清空评论框
     this.setState({ comment: '', disabled: true });
   }

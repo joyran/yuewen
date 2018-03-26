@@ -9,7 +9,7 @@ import moment from 'moment';
 import CommentEditor from './comment-editor';
 import ReplyEditor from './reply-editor';
 import Conversation from './conversation';
-import { readArticleComments, toggleCommentReplyEditor, readConversation } from '../../reducers/article';
+import { readArticleComments, toggleCommentReplyEditor, readConversation, updateCommentLikes } from '../../reducers/article';
 import stylesheet from './index.scss';
 
 // 时间汉化
@@ -61,11 +61,17 @@ class ArticleComment extends Component {
                       </div>
                     </div>
                     {/* 评论内容 */}
-                    <div className="comment-item-body">
-                      {comment.content}
-                    </div>
+                    <div className="comment-item-body" dangerouslySetInnerHTML={{ __html: comment.content }} />
                     <div className="comment-item-footer">
-                      { !comment.show_reply_editor ? <span className="like"><Icon type="like" /> 赞</span> : '' }
+                      { !comment.show_reply_editor ?
+                        <span
+                          className={comment.has_liked ? 'has-like' : 'like'}
+                          onClick={() => { this.props.dispatch(updateCommentLikes(comment._id, comment.has_liked, 'comment')); }}
+                        >
+                          <Icon type="like" /> 赞 {comment.likes_count > 0 ? comment.likes_count : ''}
+                        </span>
+                        : ''
+                      }
                       { !comment.show_reply_editor ?
                         <div className="extra-buttons">
                           <div onClick={() => { this.props.dispatch(toggleCommentReplyEditor(comment._id)); }}>
@@ -78,7 +84,7 @@ class ArticleComment extends Component {
                             <span className="reply">回复</span>
                           </div>
                           { comment.reply_to_author ?
-                            <div onClick={() => { this.props.dispatch(readConversation(this.props.article._id, comment._id)); }}>
+                            <div onClick={() => { this.props.dispatch(readConversation(comment._id)); }}>
                               <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" width="13" height="16" aria-hidden="true">
                                 <title />
                                 <g>

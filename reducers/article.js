@@ -18,7 +18,9 @@ export const {
   updateArticleCollectionSuccess,
   readConversationSuccess,
   toggleCommentReplyEditor,
-  toggleConversationModal
+  toggleConversationModal,
+  updateCommentLikesSuccess,
+  updateConversationLikesSuccess
 } = createActions(
   'READ_ARTICLE_SUCCESS',
   'READ_ARTICLE_LIKES_SUCCESS',
@@ -27,7 +29,9 @@ export const {
   'UPDATE_ARTICLE_COLLECTION_SUCCESS',
   'READ_CONVERSATION_SUCCESS',
   'TOGGLE_COMMENT_REPLY_EDITOR',
-  'TOGGLE_CONVERSATION_MODAL'
+  'TOGGLE_CONVERSATION_MODAL',
+  'UPDATE_COMMENT_LIKES_SUCCESS',
+  'UPDATE_CONVERSATION_LIKES_SUCCESS'
 );
 
 /**
@@ -116,10 +120,10 @@ export const readArticleComments = (aid, page) => (dispatch) => {
 /**
  * 读取评论对话
  */
-export const readConversation = (aid, cid) => (dispatch) => {
+export const readConversation = cid => (dispatch) => {
   dispatch(toggleConversationModal());
 
-  return fetch(`/api/v1/articles/${aid}/comments/${cid}/conversation`, {
+  return fetch(`/api/v1/comments/${cid}/conversation`, {
     credentials: 'include',
     method: 'get',
     headers: {
@@ -190,6 +194,33 @@ export const createArticleCommentReply = (aid, content, atuser, cid) => (dispatc
     });
 };
 
+/**
+ * 更新文章评论点赞
+ */
+export const updateCommentLikes = (cid, has_liked, type) => (dispatch) => {
+  const method = has_liked ? 'delete' : 'post';
+
+  return fetch(`/api/v1/comments/${cid}/likes`, {
+    credentials: 'include',
+    method,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(res => res.json())
+    .then((res) => {
+      if (type === 'comment') {
+        dispatch(updateCommentLikesSuccess(res));
+      } else {
+        dispatch(updateConversationLikesSuccess(res));
+      }
+    })
+    .catch((err) => {
+      console.error(err.message);
+      message.error(networkErrorMsg, 5);
+    });
+};
+
 
 // ------------------------
 // REDUCERS
@@ -245,7 +276,36 @@ export const article = handleActions({
   TOGGLE_CONVERSATION_MODAL: state => ({
     ...state,
     conversation_modal_visible: !state.conversation_modal_visible
-  })
+  }),
+
+  UPDATE_COMMENT_LIKES_SUCCESS: (state, action) => ({
+    ...state,
+    comments: state.comments.map((comment) => {
+      if (comment._id === action.payload.cid) {
+        comment.likes_count = action.payload.likes_count;
+        comment.has_liked = !comment.has_liked;
+      }
+      return comment;
+    })
+  }),
+
+  UPDATE_CONVERSATION_LIKES_SUCCESS: (state, action) => ({
+    ...state,
+    conversation: state.conversation.map((comment) => {
+      if (comment._id === action.payload.cid) {
+        comment.likes_count = action.payload.likes_count;
+        comment.has_liked = !comment.has_liked;
+      }
+      return comment;
+    }),
+    comments: state.comments.map((comment) => {
+      if (comment._id === action.payload.cid) {
+        comment.likes_count = action.payload.likes_count;
+        comment.has_liked = !comment.has_liked;
+      }
+      return comment;
+    })
+  }),
 }, {});
 
 export const reducers = combineReducers({ article, session, notice });

@@ -319,6 +319,12 @@ router.get('/api/v1/articles/:aid/comments', async ctx => {
     if (comment.reply_to_author) delete comment.reply_to_author.password;
   })
 
+  // 查找该条评论是否被当前用户点过赞
+  for (var i = 0; i < comments.length; i++) {
+    let result = await Like.findOne({ user: uid, comment: comments[i]._id });
+    comments[i].has_liked = result ? true : false;
+  }
+
   // 输出返回值
   ctx.status = 200;
   ctx.body = comments;
@@ -355,11 +361,10 @@ const findDownConversation = async comment => {
 /**
  * 读取评论的对话
  * 方法: GET
- * 参数: aid 文章索引
  * 参数: cid 评论索引
  */
-router.get('/api/v1/articles/:aid/comments/:cid/conversation', async ctx => {
-  const { aid, cid } = ctx.params;
+router.get('/api/v1/comments/:cid/conversation', async ctx => {
+  const { cid } = ctx.params;
   const { uid } = ctx.session;
 
   if (!uid) {
@@ -368,14 +373,7 @@ router.get('/api/v1/articles/:aid/comments/:cid/conversation', async ctx => {
     return;
   }
 
-  if (aid.length !== 24) {
-    ctx.status = 404;
-    ctx.body = { message: 'Not Found' };
-    return;
-  }
-
-  const article = await Article.findOne({ _id: aid }).lean();
-  if (!article) {
+  if (cid.length !== 24) {
     ctx.status = 404;
     ctx.body = { message: 'Not Found' };
     return;
@@ -390,12 +388,110 @@ router.get('/api/v1/articles/:aid/comments/:cid/conversation', async ctx => {
 
   const topConversation = await findUpConversation(comment);
   const downConversation = await findDownConversation(comment);
-  var conversation = topConversation.concat(comment._id).concat(downConversation);
-  var conversation = await Comment.find({ _id: { $in: conversation } }).sort({ created_at: 1 })
+  const conversation_ids = topConversation.concat(comment._id).concat(downConversation);
+  const conversation = await Comment.find({ _id: { $in: conversation_ids } }).sort({ created_at: 1 })
                                   .populate('author').populate('atuser').populate('reply_to_author').lean();
+
+  // 查找该条评论是否被当前用户点过赞
+  for (var i = 0; i < conversation.length; i++) {
+    let result = await Like.findOne({ user: uid, comment: conversation[i]._id });
+    conversation[i].has_liked = result ? true : false;
+  }
   ctx.status = 200;
   ctx.body = conversation;
 })
+
+
+/**
+ * 点赞文章评论
+ */
+router.post('/api/v1/comments/:cid/likes', async ctx => {
+  const { cid } = ctx.params;
+  const { uid } = ctx.session;
+
+  if (!uid) {
+    ctx.status = 401;
+    ctx.body = { message: '需要登录' };
+    return;
+  }
+
+  if (cid.length !== 24) {
+    ctx.status = 404;
+    ctx.body = { message: 'Not Found' };
+    return;
+  }
+
+  const comment = await Comment.findOne({ _id: cid }).lean();
+  if (!comment) {
+    ctx.status = 404;
+    ctx.body = { message: 'Not Found' };
+    return;
+  }
+  var likes_count = comment.likes_count;
+
+  // 查找当前评论是否被当前登录用户点过赞, 已经点过赞则直接退出
+  var like = await Like.findOne({ comment: cid, user: uid });
+  if (like) {
+    ctx.status = 200;
+    ctx.body = { cid, likes_count };
+    return;
+  }
+
+  // 添加点赞记录
+  const created_at = parseInt(Date.now()/1000);
+  await Like.create({ comment: cid, user: uid, created_at });
+  // 当前评论点赞数加 1
+  await Comment.findByIdAndUpdate({ _id: cid }, { likes_count: comment.likes_count + 1 }).exec();
+  var likes_count = likes_count + 1;
+
+  ctx.status = 200;
+  ctx.body = { cid, likes_count };
+});
+
+
+/**
+ * 删除文章评论的点赞记录
+ */
+router.delete('/api/v1/comments/:cid/likes', async ctx => {
+  const { cid } = ctx.params;
+  const { uid } = ctx.session;
+
+  if (!uid) {
+    ctx.status = 401;
+    ctx.body = { message: '需要登录' };
+    return;
+  }
+
+  if (cid.length !== 24) {
+    ctx.status = 404;
+    ctx.body = { message: 'Not Found' };
+    return;
+  }
+
+  const comment = await Comment.findOne({ _id: cid }).lean();
+  if (!comment) {
+    ctx.status = 404;
+    ctx.body = { message: 'Not Found' };
+    return;
+  }
+  var likes_count = comment.likes_count;
+
+  // 查找当前评论是否被当前登录用户点过赞, 没有点过赞则直接退出
+  var like = await Like.findOne({ comment: cid, user: uid });
+  if (!like) {
+    ctx.status = 200;
+    ctx.body = { cid, likes_count };
+    return;
+  }
+
+  // 删除点赞记录
+  await Like.remove({ comment: cid, user: uid }).exec();
+  // 当前评论点赞数减 1
+  await Comment.findByIdAndUpdate({ _id: cid }, { likes_count: comment.likes_count - 1 }).exec();
+  var likes_count = likes_count - 1;
+  ctx.status = 200;
+  ctx.body = { cid, likes_count };
+});
 
 
 /**
@@ -440,7 +536,7 @@ router.post('/api/v1/articles/:aid/comments', async ctx => {
   const created_at = parseInt(Date.now()/1000);
 
   // 写入评论
-  const comment = await Comment.create({ author: uid, atuser, rid, reply_to_author, article: aid, content, created_at });
+  const comment = await Comment.create({ author: uid, atuser, rid, reply_to_author, article: aid, content, created_at, likes_count: 0 });
 
   // 评论写入成功后文章评论数量 comments_count +1
   await Article.findByIdAndUpdate({ _id: aid }, { comments_count: article.comments_count + 1 }).exec();
@@ -495,7 +591,7 @@ router.post('/api/v1/articles/:aid/comments/:cid/replys', async ctx => {
   const created_at = parseInt(Date.now()/1000);
 
   // 写入评论的回复
-  var comment = await Comment.create({ author: uid, atuser, reply_to_author: atuser, rid: cid, article: aid, content, created_at });
+  var comment = await Comment.create({ author: uid, atuser, reply_to_author: atuser, rid: cid, article: aid, content, created_at, likes_count: 0 });
 
   // 评论写入成功后文章评论数量 comments_count + 1
   await Article.findByIdAndUpdate({ _id: aid }, { comments_count: article.comments_count + 1 }).exec();

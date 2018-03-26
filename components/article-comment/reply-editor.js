@@ -13,34 +13,34 @@ class ReplyEditor extends Component {
   constructor(props) {
     super(props);
     const { atUserId, rid } = this.props;
-    this.state = { disabled: true, reply: '', atUserId, rid, cursor: 0 };
+    this.state = { disabled: true, comment: '', atUserId, rid, cursor: 0 };
   }
 
   // 评论输入框最少输入5个字符，否则评论按钮灰显，不可提交评论
   onChangeValue = (e) => {
     const disabled = e.target.value.length < 6;
-    this.setState({ disabled, reply: e.target.value });
+    this.setState({ disabled, comment: e.target.value });
   }
 
   // 点击emoji表情 添加 emoji native 原生表情到评论框中
   addEmoji = (emoji) => {
-    const left = this.state.reply.substr(0, this.state.cursor);
-    const right = this.state.reply.substr(this.state.cursor);
-    const reply = `${left}${emoji}${right}`;
+    const left = this.state.comment.substr(0, this.state.cursor);
+    const right = this.state.comment.substr(this.state.cursor);
+    const comment = `${left}${emoji}${right}`;
 
     // 每个 emoji 表情占两个字符，所以 cursor + 2
-    this.setState({ reply, cursor: this.state.cursor + 2 });
+    this.setState({ comment, cursor: this.state.cursor + 2 });
   }
 
   // 点击回复按钮提交评论
   onClickButton = () => {
     const aid = this.props.article._id;
-    const reply = this.state.reply;
-
+    // 替换 \n 为 <br>
+    const comment = this.state.comment.replace(/\n/g, '<br>');
     // 提交评论回复
-    this.props.dispatch(createArticleCommentReply(aid, reply, this.state.atUserId, this.state.rid));
+    this.props.dispatch(createArticleCommentReply(aid, comment, this.state.atUserId, this.state.rid));
     // 清空回复框
-    this.setState({ reply: '' });
+    this.setState({ comment: '' });
 
     this.props.dispatch(toggleCommentReplyEditor(this.state.rid));
   }
@@ -68,12 +68,12 @@ class ReplyEditor extends Component {
     );
 
     return (
-      <div className="reply-editor-wrapper clearfix">
+      <div className="comment-editor-wrapper clearfix">
         <TextArea
           autosize
           placeholder="写下你的回复..."
           onChange={this.onChangeValue}
-          value={this.state.reply}
+          value={this.state.comment}
           onMouseUp={(e) => { this.setState({ cursor: e.target.selectionEnd }); }}
           onKeyUp={(e) => { this.setState({ cursor: e.target.selectionEnd }); }}
         />
