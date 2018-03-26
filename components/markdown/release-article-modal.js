@@ -8,7 +8,7 @@ const FormItem = Form.Item;
 
 const ReleaseArticleModal = Form.create()(
   (props) => {
-    const { visible, onCancel, onOk, form, tags } = props;
+    const { visible, onCancel, onOk, form, topics } = props;
     const { getFieldDecorator } = form;
 
     const formItemLayout = {
@@ -32,20 +32,19 @@ const ReleaseArticleModal = Form.create()(
             { getFieldDecorator('title', {
               rules: [{ required: true, message: '请输入标题' }],
             })(
-              <Input placeholder="标题" />
+              <Input />
             )}
           </FormItem>
-          <FormItem {...formItemLayout} label="标签" >
-            { getFieldDecorator('tags', {
-              rules: [{ required: true, message: '请选择标签' }],
+          <FormItem {...formItemLayout} label="话题" >
+            { getFieldDecorator('topics', {
+              rules: [{ required: true, message: '请选择话题' }],
             })(
               <Select
                 mode="multiple"
                 style={{ width: '100%' }}
                 tokenSeparators={[',']}
-                placeholder="标签"
               >
-                {tags}
+                {topics}
               </Select>
             )}
           </FormItem>

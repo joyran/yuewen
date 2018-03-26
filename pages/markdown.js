@@ -9,14 +9,19 @@ import thunkMiddleware from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
 import { Layout, LocaleProvider } from 'antd';
 import Head from 'next/head';
+import dynamic from 'next/dynamic';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
-import Markdown from '../components/markdown/index';
+// import Markdown from '../components/markdown/index';
 import Error from '../components/error/index';
 import reducers from '../reducers/markdown';
 import { readSessionSuccess } from '../reducers/session';
 import { updateMarkdown, updateArticleId } from '../reducers/markdown-editor';
-import { readTagsSuccessByServer } from '../reducers/markdown-toolbar';
+import { readTopicsSuccess } from '../reducers/topics';
 import stylesheet from '../styles/index.scss';
+
+const DynamicComponentWithNoSSR = dynamic(import('../components/markdown/index'), {
+  ssr: false
+});
 
 // 初始默认 state
 const initialState = {
@@ -29,6 +34,12 @@ const initialState = {
     addLinkModalVisible: false,
     addTableModalVisible: false,
     releaseArticleModalVisible: false
+  },
+  session: {},
+  topics: {
+    data: [],
+    page: 1,
+    per_page: 1000
   }
 };
 
@@ -49,7 +60,7 @@ const Index = (props) => {
           <link rel="stylesheet" href="/css/antd.css" />
           <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         </Head>
-        <Markdown />
+        <DynamicComponentWithNoSSR />
       </Layout>
     </LocaleProvider>
   );
@@ -83,14 +94,14 @@ Index.getInitialProps = async ({ store, req, query }) => {
   }
 
 
-  // ----- 读取所有 tags
-  res = await fetch(`http://${req.headers.host}/api/v1/tags`, {
+  // ----- 读取所有话题 topics
+  res = await fetch(`http://${req.headers.host}/api/v1/topics`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
   if (res.status !== 200) return { statusCode: res.status };
-  const tags = await res.json();
-  store.dispatch(readTagsSuccessByServer(tags));
+  const topics = await res.json();
+  store.dispatch(readTopicsSuccess(topics));
 
   return { statusCode: 200 };
 };

@@ -15,13 +15,19 @@ export const {
   readArticleLikesSuccess,
   createArticleLikesSuccess,
   readArticleCommentsSuccess,
-  updateArticleCollectionSuccess
+  updateArticleCollectionSuccess,
+  readConversationSuccess,
+  toggleCommentReplyEditor,
+  toggleConversationModal
 } = createActions(
   'READ_ARTICLE_SUCCESS',
   'READ_ARTICLE_LIKES_SUCCESS',
   'CREATE_ARTICLE_LIKES_SUCCESS',
   'READ_ARTICLE_COMMENTS_SUCCESS',
-  'UPDATE_ARTICLE_COLLECTION_SUCCESS'
+  'UPDATE_ARTICLE_COLLECTION_SUCCESS',
+  'READ_CONVERSATION_SUCCESS',
+  'TOGGLE_COMMENT_REPLY_EDITOR',
+  'TOGGLE_CONVERSATION_MODAL'
 );
 
 /**
@@ -82,30 +88,6 @@ export const updateArticleCollection = aid => (dispatch, getState) => {
     });
 };
 
-/**
- * 添加文章评论
- * @param aid 文章索引 id
- * @param comment 评论内容
- */
-export const createArticleComment = (aid, comment) => (dispatch) => {
-  return fetch(`/api/v1/articles/${aid}/comments`, {
-    credentials: 'include',
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ comment })
-  })
-    .then(res => res.json())
-    .then((res) => {
-      dispatch(readArticleCommentsSuccess(res));
-      message.success('评论成功');
-    })
-    .catch((err) => {
-      console.error(err.message);
-      message.error(networkErrorMsg, 5);
-    });
-};
 
 /**
  * 读取文章评论
@@ -131,26 +113,75 @@ export const readArticleComments = (aid, page) => (dispatch) => {
     });
 };
 
+/**
+ * 读取评论对话
+ */
+export const readConversation = (aid, cid) => (dispatch) => {
+  dispatch(toggleConversationModal());
+
+  return fetch(`/api/v1/articles/${aid}/comments/${cid}/conversation`, {
+    credentials: 'include',
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(res => res.json())
+    .then((res) => {
+      dispatch(readConversationSuccess(res));
+    })
+    .catch((err) => {
+      console.error(err.message);
+      message.error(networkErrorMsg, 5);
+    });
+};
+
+
+/**
+ * 添加文章评论
+ * @param aid 文章索引 id
+ * @param content 评论内容
+ */
+export const createArticleComment = (aid, content) => (dispatch) => {
+  return fetch(`/api/v1/articles/${aid}/comments`, {
+    credentials: 'include',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ content })
+  })
+    .then(res => res.json())
+    .then(() => {
+      dispatch(readArticleComments(aid, 1));
+      message.success('评论成功');
+    })
+    .catch((err) => {
+      console.error(err.message);
+      message.error(networkErrorMsg, 5);
+    });
+};
+
 
 /**
  * 添加文章评论回复
  * @param aid 文章索引 id
- * @param reply 评论内容
+ * @param content 评论内容
  * @param atuser 被@的用户
  * @param cid 被回复的评论 id
  */
-export const createArticleCommentReply = (aid, reply, atuser, cid) => (dispatch) => {
+export const createArticleCommentReply = (aid, content, atuser, cid) => (dispatch) => {
   return fetch(`/api/v1/articles/${aid}/comments/${cid}/replys`, {
     credentials: 'include',
     method: 'post',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ reply, atuser })
+    body: JSON.stringify({ content, atuser })
   })
     .then(res => res.json())
-    .then((res) => {
-      dispatch(readArticleCommentsSuccess(res));
+    .then(() => {
+      dispatch(readArticleComments(aid, 1));
       message.success('评论回复成功');
     })
     .catch((err) => {
@@ -183,12 +214,37 @@ export const article = handleActions({
 
   READ_ARTICLE_COMMENTS_SUCCESS: (state, action) => ({
     ...state,
-    ...action.payload
+    comments: action.payload.map((comment) => {
+      // 初始化所有评论的回复编辑框都处于隐藏状态
+      comment.show_reply_editor = false;
+      return comment;
+    })
   }),
 
   UPDATE_ARTICLE_COLLECTION_SUCCESS: state => ({
     ...state,
     has_collected: !state.has_collected
+  }),
+
+  READ_CONVERSATION_SUCCESS: (state, action) => ({
+    ...state,
+    conversation: action.payload
+  }),
+
+  TOGGLE_COMMENT_REPLY_EDITOR: (state, action) => ({
+    ...state,
+    comments: state.comments.map((comment) => {
+      // 切换显示评论的回复编辑框
+      if (comment._id === action.payload) {
+        comment.show_reply_editor = !comment.show_reply_editor;
+      }
+      return comment;
+    })
+  }),
+
+  TOGGLE_CONVERSATION_MODAL: state => ({
+    ...state,
+    conversation_modal_visible: !state.conversation_modal_visible
   })
 }, {});
 

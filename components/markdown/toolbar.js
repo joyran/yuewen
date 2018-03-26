@@ -373,7 +373,7 @@ const Toolbar = (props) => {
         visible={props.mtoolbar.releaseArticleModalVisible}
         onOk={e => onOkReleaseArticleModal(e)}
         onCancel={() => { props.dispatch(toggleReleaseArticleModal()); }}
-        tags={props.mtoolbar.tags.map(tag => <Option key={tag.tag}>{tag.tag}</Option>)}
+        topics={props.topics.data.map(topic => <Option key={topic.topic}>{topic.topic}</Option>)}
       />
     </div>
   );

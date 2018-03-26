@@ -6,21 +6,21 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Spin } from 'antd';
 import ReactMarkdown from 'react-markdown';
+import CodeMirror from 'react-codemirror';
 import CodeBlock from './code-block';
 import Toolbar from './toolbar';
 import { updateMarkdown, updateCursorRange } from '../../reducers/markdown-editor';
 import stylesheet from './index.scss';
 
-let CodeMirror = null;
-if (typeof window !== 'undefined' && typeof window.navigator !== 'undefined') {
-  CodeMirror = require('react-codemirror');
-  require('codemirror/mode/markdown/markdown');
-}
+// let CodeMirror = null;
+// if (typeof window !== 'undefined' && typeof window.navigator !== 'undefined') {
+//   CodeMirror = require('react-codemirror');
+//   require('codemirror/mode/markdown/markdown');
+// }
 
 class Markdown extends Component {
   constructor() {
     super();
-
     this.state = {
       loading: true
     };
@@ -82,21 +82,18 @@ class Markdown extends Component {
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         <Toolbar codemirror={this.codemirror} />
         <div id="markdown" style={{ display: 'flex' }}>
-          {
-            CodeMirror &&
-            <CodeMirror
-              ref={this.codemirrorRef}
-              className={this.props.meditor.editorClassName}
-              onChange={this.onChangeMarkdown}
-              onCursorActivity={this.onCursorActivity}
-              options={{
-                lineWrapping: true,
-                showCursorWhenSelecting: true,
-                mode: 'markdown'
-              }}
-              autoFocus
-            />
-          }
+          <CodeMirror
+            ref={this.codemirrorRef}
+            className={this.props.meditor.editorClassName}
+            onChange={this.onChangeMarkdown}
+            onCursorActivity={this.onCursorActivity}
+            options={{
+              lineWrapping: true,
+              showCursorWhenSelecting: true,
+              mode: 'markdown'
+            }}
+            autoFocus
+          />
           <ReactMarkdown
             source={this.props.meditor.markdown}
             className={this.props.meditor.previewClassName}

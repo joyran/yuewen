@@ -14,48 +14,6 @@ var Notice = require('../models/notice');
 
 
 /**
- * 根据 cid 和 aid 读取该评论的所有回复
- */
-const readArticleCommentReplys = async (aid, cid) => {
-  var replys = await Comment.find({ article: aid, cid }).sort({ created_at: -1 })
-                            .populate('author').populate('atuser').lean();
-
-  replys.map((reply) => {
-    // 删除用户密码
-    delete reply.author.password;
-    delete reply.atuser.password;
-  })
-
-  return replys;
-}
-
-/**
- * 读取指定文章的所有评论，包括评论的回复
- * @param aid  文章索引 id
- */
-const readArticleComments = async (aid, skip, limit) => {
-  // cid 为 "000000000000000000000000" 表示原始评论，否则为评论的回复
-  var comments = await Comment.find({ article: aid, cid: '000000000000000000000000' })
-                              .sort({ created_at: -1 }).populate('author').populate('atuser')
-                              .lean().skip(skip).limit(limit);
-
-  comments.map(comment => {
-    // 删除用户密码
-    delete comment.author.password;
-    delete comment.atuser.password;
-  })
-
-  // 不能在 map 中直接操作
-  for (var i = 0; i < comments.length; i++) {
-    var replys = await readArticleCommentReplys(aid, comments[i]._id);
-    comments[i].replys = replys;
-  }
-
-  return comments;
-}
-
-
-/**
  * 读取所有文章
  * 方法: GET
  * 参数: page, 第几页，默认第一页
@@ -349,23 +307,107 @@ router.get('/api/v1/articles/:aid/comments', async ctx => {
     return;
   }
 
-  const comments = await readArticleComments(aid, skip, per_page);
-  const comments_count = await Comment.find({ article: aid, cid: '000000000000000000000000' }).count({});
-  const comments_pages = parseInt(comments_count / per_page) + 1;
+  // 读取评论
+  const comments = await Comment.find({ article: aid }).sort({ created_at: -1 })
+                                .populate('author').populate('atuser').populate('reply_to_author')
+                                .skip(skip).limit(per_page).lean();
+
+  // 删除用户密码
+  comments.map(comment => {
+    delete comment.author.password;
+    delete comment.atuser.password;
+    if (comment.reply_to_author) delete comment.reply_to_author.password;
+  })
 
   // 输出返回值
   ctx.status = 200;
-  ctx.body = { comments, comments_count, comments_pages };
+  ctx.body = comments;
 });
+
+// 递归查找回复的评论，即这条评论是回复谁的，逆向向上查找
+const findUpConversation = async comment => {
+  const find_comment = await Comment.findOne({ _id: comment.rid }).populate('reply_to_author').lean();
+
+  // 查找不到回复则退出递归
+  if (!find_comment) return [];
+  // 原始评论，也就是 reply_to_author 为空的，退出递归
+  if (!find_comment.reply_to_author) return [find_comment._id];
+  // 如果被回复的评论的 reply_to_author 与当前评论的 author 不相等也退出递归
+  if (String(find_comment.reply_to_author._id) !== String(comment.author)) return [find_comment._id];
+
+  // 递归合并评论的索引 _id 到数组
+  return [find_comment._id].concat(await findUpConversation(find_comment));
+}
+
+// 递归查找评论的回复，即这条评论有哪些回复，
+const findDownConversation = async comment => {
+  const { _id, rid, author, reply_to_author } = comment;
+
+  // 查找评论的回复，且 author 和 reply_to_author 互换的
+  const find_comment = await Comment.findOne({ rid: _id, author: reply_to_author, reply_to_author: author }).lean();
+  // 查找不到回复则退出递归
+  if (!find_comment) return [];
+
+  // 递归合并评论的索引 _id 到数组
+  return [find_comment._id].concat(await findDownConversation(find_comment));
+}
+
+/**
+ * 读取评论的对话
+ * 方法: GET
+ * 参数: aid 文章索引
+ * 参数: cid 评论索引
+ */
+router.get('/api/v1/articles/:aid/comments/:cid/conversation', async ctx => {
+  const { aid, cid } = ctx.params;
+  const { uid } = ctx.session;
+
+  if (!uid) {
+    ctx.status = 401;
+    ctx.body = { message: '需要登录' };
+    return;
+  }
+
+  if (aid.length !== 24) {
+    ctx.status = 404;
+    ctx.body = { message: 'Not Found' };
+    return;
+  }
+
+  const article = await Article.findOne({ _id: aid }).lean();
+  if (!article) {
+    ctx.status = 404;
+    ctx.body = { message: 'Not Found' };
+    return;
+  }
+
+  const comment = await Comment.findOne({ _id: cid }).lean();
+  if (!comment) {
+    ctx.status = 404;
+    ctx.body = { message: 'Not Found' };
+    return;
+  }
+
+  const topConversation = await findUpConversation(comment);
+  const downConversation = await findDownConversation(comment);
+  var conversation = topConversation.concat(comment._id).concat(downConversation);
+  var conversation = await Comment.find({ _id: { $in: conversation } }).sort({ created_at: 1 })
+                                  .populate('author').populate('atuser').populate('reply_to_author').lean();
+  ctx.status = 200;
+  ctx.body = conversation;
+})
 
 
 /**
  * 创建新的评论
+ * 方法: POST
+ * 参数: aid 文章索引
+ * 参数: content 评论内容
  */
 router.post('/api/v1/articles/:aid/comments', async ctx => {
   const { aid } = ctx.params;
   const { uid } = ctx.session;
-  const { comment } = ctx.request.body;
+  const { content } = ctx.request.body;
 
   if (!uid) {
     ctx.status = 401;
@@ -393,21 +435,21 @@ router.post('/api/v1/articles/:aid/comments', async ctx => {
   // 当前登录用户
   const user = await User.findOne({ _id: uid }).lean();
 
-  // 文章评论 cid 为 000000000000000000000000
-  const cid = '000000000000000000000000';
+  // 文章评论 rid 为 000000000000000000000000
+  const rid = reply_to_author = '000000000000000000000000';
   const created_at = parseInt(Date.now()/1000);
 
   // 写入评论
-  const result = await Comment.create({ author: uid, atuser, cid, article: aid, comment, created_at });
+  const comment = await Comment.create({ author: uid, atuser, rid, reply_to_author, article: aid, content, created_at });
 
   // 评论写入成功后文章评论数量 comments_count +1
   await Article.findByIdAndUpdate({ _id: aid }, { comments_count: article.comments_count + 1 }).exec();
 
   // 生成新的评论通知消息
   await Notice.create({
-    atuser: atuser,
-    content: comment,
-    link_url: `/article/${aid}#comment-${result._id}`,
+    atuser,
+    content,
+    link_url: `/article/${aid}#comment-${comment._id}`,
     title: `${user.name} 评论了你的文章 《${article.title}》`,
     initiator: uid,
     has_view: false,
@@ -415,15 +457,9 @@ router.post('/api/v1/articles/:aid/comments', async ctx => {
     created_at
   });
 
-  // 写入成功后重新读取所有的评论并返回给前端显示
-  const per_page = 10;
-  const comments = await readArticleComments(aid, 0, per_page);
-  const comments_count = await Comment.find({ article: aid, cid }).count({});
-  const comments_pages = parseInt(comments_count / per_page) + 1;
-
   // 输出返回值
   ctx.status = 201;
-  ctx.body = { comments, comments_count, comments_pages };
+  ctx.body = comment;
 });
 
 
@@ -433,7 +469,7 @@ router.post('/api/v1/articles/:aid/comments', async ctx => {
 router.post('/api/v1/articles/:aid/comments/:cid/replys', async ctx => {
   const { aid, cid } = ctx.params;
   const { uid } = ctx.session;
-  const { reply, atuser } = ctx.request.body;
+  const { content, atuser } = ctx.request.body;
 
   if (!uid) {
     ctx.status = 401;
@@ -458,17 +494,17 @@ router.post('/api/v1/articles/:aid/comments/:cid/replys', async ctx => {
   const user = await User.findOne({ _id: uid }).lean();
   const created_at = parseInt(Date.now()/1000);
 
-  // 写入评论
-  var result = await Comment.create({ author: uid, atuser, cid, article: aid, comment: reply, created_at });
+  // 写入评论的回复
+  var comment = await Comment.create({ author: uid, atuser, reply_to_author: atuser, rid: cid, article: aid, content, created_at });
 
   // 评论写入成功后文章评论数量 comments_count + 1
   await Article.findByIdAndUpdate({ _id: aid }, { comments_count: article.comments_count + 1 }).exec();
 
   // 生成新的评论回复通知消息
   await Notice.create({
-    atuser: atuser,
-    content: reply,
-    link_url: `/article/${aid}#comment-${result._id}`,
+    atuser,
+    content,
+    link_url: `/article/${aid}#comment-${comment._id}`,
     title: `${user.name} 回复了你在文章 《${article.title}》 中的评论`,
     initiator: uid,
     has_view: false,
@@ -476,15 +512,9 @@ router.post('/api/v1/articles/:aid/comments/:cid/replys', async ctx => {
     created_at
   });
 
-  // 写入成功后重新读取所有的评论并返回给前端显示
-  const per_page = 10;
-  const comments = await readArticleComments(aid, 0, per_page);
-  const comments_count = await Comment.find({ article: aid, cid }).count({});
-  const comments_pages = parseInt(comments_count / per_page) + 1;
-
   // 输出返回值
   ctx.status = 201;
-  ctx.body = { comments, comments_count, comments_pages };
+  ctx.body = comment;
 });
 
 

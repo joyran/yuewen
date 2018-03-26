@@ -3,76 +3,93 @@
  */
 
 import React, { Component } from 'react';
-import { Input, Button } from 'antd';
+import { Input, Button, Tooltip, Popover, Icon } from 'antd';
 import { connect } from 'react-redux';
-import { createArticleCommentReply } from '../../reducers/article';
+import { createArticleCommentReply, toggleCommentReplyEditor } from '../../reducers/article';
 
 const { TextArea } = Input;
 
 class ReplyEditor extends Component {
   constructor(props) {
     super(props);
-
-    // atuser: 被@的用户  rid: 被回复的 comment id
     const { atUserId, rid } = this.props;
-    this.state = {
-      disabled: true,
-      reply: '',
-      atUserId,
-      rid
-    };
+    this.state = { disabled: true, reply: '', atUserId, rid, cursor: 0 };
   }
 
   // 评论输入框最少输入5个字符，否则评论按钮灰显，不可提交评论
   onChangeValue = (e) => {
-    if (e.target.value.length > 5) {
-      this.setState({ disabled: false, reply: e.target.value });
-    } else {
-      this.setState({ disabled: true, reply: e.target.value });
-    }
+    const disabled = e.target.value.length < 6;
+    this.setState({ disabled, reply: e.target.value });
   }
 
-  // 点击 回复 按钮回复评论
-  onClickButton = (e) => {
-    if (this.state.disabled) return false;
+  // 点击emoji表情 添加 emoji native 原生表情到评论框中
+  addEmoji = (emoji) => {
+    const left = this.state.reply.substr(0, this.state.cursor);
+    const right = this.state.reply.substr(this.state.cursor);
+    const reply = `${left}${emoji}${right}`;
 
-    const { atUserId, rid } = this.props;
+    // 每个 emoji 表情占两个字符，所以 cursor + 2
+    this.setState({ reply, cursor: this.state.cursor + 2 });
+  }
+
+  // 点击回复按钮提交评论
+  onClickButton = () => {
     const aid = this.props.article._id;
     const reply = this.state.reply;
+
     // 提交评论回复
-    this.props.dispatch(createArticleCommentReply(aid, reply, atUserId, rid));
+    this.props.dispatch(createArticleCommentReply(aid, reply, this.state.atUserId, this.state.rid));
     // 清空回复框
     this.setState({ reply: '' });
-    // 隐藏评论框
-    const className = e.target.parentNode.className;
-    e.target.parentNode.className = `${className} hidden`;
-  }
 
-  // 点击 取消 按钮隐藏评论框
-  onClickCancel = (e) => {
-    // 隐藏评论框
-    const className = e.target.parentNode.className;
-    e.target.parentNode.className = `${className} hidden`;
+    this.props.dispatch(toggleCommentReplyEditor(this.state.rid));
   }
 
   render() {
+    // emoji 表情列表
+    const emojis = [
+      '😂', '😘', '😍', '👏', '😁', '💯', '👍', '👎', '🎉',
+      '🤣', '😲', '😄', '😊', '😃', '😅', '🤠', '😎', '😆',
+      '🤝', '🤑', '🤤', '😤', '🙃', '🤡', '😪', '😴', '😜',
+      '😓', '😷', '🤓', '👻', '😥', '🙄', '☹️', '☠️', '😰',
+      '😩', '😒', '💀', '😨', '😱', '😭', '😠', '🙌', '😋',
+      '😇', '💔', '💖', '👊', '💋', '🖕', '✌️', '👌', '👄',
+      '💩', '👿', '😡', '🚀', '🏀', '⚽', '🐶', '🐷', '🎤'
+    ];
+
+    const emojisContent = (
+      <ul className="emojis">
+        {
+          emojis.map((emoji, index) => {
+            return <li data-emoji={emoji} onClick={() => this.addEmoji(emoji)} key={index}>{emoji}</li>;
+          })
+        }
+      </ul>
+    );
+
     return (
-      <div className="comment-reply-input-textarea clearfix hidden">
+      <div className="reply-editor-wrapper clearfix">
         <TextArea
-          autosize={{ minRows: 2 }}
+          autosize
           placeholder="写下你的回复..."
           onChange={this.onChangeValue}
           value={this.state.reply}
-          onPressEnter={this.onClickButton}
+          onMouseUp={(e) => { this.setState({ cursor: e.target.selectionEnd }); }}
+          onKeyUp={(e) => { this.setState({ cursor: e.target.selectionEnd }); }}
         />
-        <a className="btn-cancel" onClick={this.onClickCancel}>取 消</a>
-        <Button
-          type="primary"
-          className={this.state.disabled ? 'ant-btn-disabled' : ''}
-          onClick={this.onClickButton}
-        >
-          回复
-        </Button>
+        <div className="footer">
+          <Popover overlayClassName="popover-emojis" content={emojisContent} trigger="click" placement="bottom">
+            <Tooltip placement="bottom" title="emoji 表情">
+              <Icon type="smile-o" className="show-emoji-icon" />
+            </Tooltip>
+          </Popover>
+          <a className="btn-cancel" onClick={() => { this.props.dispatch(toggleCommentReplyEditor(this.state.rid)); }}>取 消</a>
+          <Button
+            type="primary"
+            disabled={this.state.disabled}
+            onClick={this.onClickButton}
+          >回复</Button>
+        </div>
       </div>
     );
   }

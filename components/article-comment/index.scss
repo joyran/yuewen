@@ -1,15 +1,7 @@
 @import "././styles/variable";
 
 .comment-wrapper {
-  margin-top: 120px;
-}
-
-.comment-item-reply-label {
-  display: inline-block;
-  font-size: 12px;
-  color: $grey-light;
-  cursor: pointer;
-  margin-bottom: 16px;
+  margin-top: 24px;
 }
 
 .comment-item {
@@ -17,100 +9,124 @@
   min-height: 90px;
   padding: 16px 0;
   transition: all 0.2s;
-  display: flex;
   width: 100%;
   border-bottom: 1px solid $grey-lighter;
 }
 
-.comment-item-avatar {
-  width: 40px;
-  height: 40px;
-  display: block;
-  margin-right: 20px;
-  flex: 0 0 40px;
+.comment-editor-wrapper,
+.reply-editor-wrapper {
+  position: relative;
 
-  img {
-    width: 100%;
-    height: 100%;
-    border-radius: 4px;
+  textarea {
+    font-size: 15px;
+    color: $grey-darker;
+    line-height: 2;
   }
-}
 
-.comment-item-main {
-  font-size: 15px;
-  flex: 1;
+  .footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 12px 0;
+
+    .anticon {
+      margin-right: 16px;
+      line-height: 32px;
+      cursor: pointer;
+      font-size: 18px;
+      color: $grey-light;
+
+      &:hover {
+        color: $link-color;
+      }
+    }
+
+    a {
+      margin-right: 16px;
+      line-height: 32px;
+      height: 32px;
+      color: $grey-light;
+
+      &:hover {
+        color: $link-color;
+      }
+    }
+  }
 }
 
 .comment-item-header {
-  margin-bottom: 12px;
+  display: flex;
+  margin-top: 8px;
+  margin-bottom: 16px;
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    border-radius: 4px;
+  }
+
+  .headline {
+    flex: 1;
+    height: 32px;
+    line-height: 32px;
+    font-size: 15px;
+    margin-left: 16px;
+
+    a {
+      font-weight: bold;
+      color: $grey-darker;
+    }
+
+    span {
+      margin: 0 8px;
+      color: $grey-light;
+    }
+
+    .datetime {
+      color: $grey-light;
+      float: right;
+      font-size: 14px;
+    }
+  }
 }
 
-.comment-item-header-username {
-  font-size: 14px;
-}
-
-.comment-item-header-datetime {
-  font-size: 12px;
-  color: $grey-light;
-  float: right;
-}
-
-
-.comment-item-content, .comment-item-reply-content {
+.comment-item-body {
   line-height: 2;
-  margin-bottom: 12px;
+  font-size: 15px;
+  color: $grey-darker;
 }
 
-.comment-input-textarea, .comment-reply-input-textarea {
-  position: relative;
-  margin: 12px 0;
-
-  textarea {
-    padding: 8px 12px;
-    font-size: 14px;
-    color: $grey-dark;
-  }
-
-  button {
-    float: right;
-    margin: 16px 0;
-  }
-}
-
-.btn-cancel {
-  position: absolute;
-  bottom: 20px;
-  font-size: 14px;
+.comment-item-footer {
+  margin-top: 12px;
   color: $grey-light;
-  right: 100px;
 
-  &:hover {
-    color: $grey;
+  &:hover .extra-buttons {
+    display: inline-block;
   }
-}
 
-.ant-btn-disabled {
-  cursor: default;
-  background: #8bc7ff;
-  border-color: #8bc7ff;
-
-  &:hover {
-    background: #8bc7ff;
-    border-color: #8bc7ff;
+  .like {
+    margin-right: 16px;
+    font-size: 14px;
+    cursor: pointer;
   }
-}
 
-.hidden {
-  display: none;
-}
+  .extra-buttons {
+    display: none;
 
-.comment-item-reply-list {
-  background: #f7f7f7;
-  border-radius: 4px;
-}
+    div {
+      display: inline-block;
+      color: $grey-light;
+      margin-right: 16px;
+      cursor: pointer;
 
-.comment-item-reply {
-  margin: 20px;
+      svg {
+        vertical-align: text-bottom;
+        fill: currentColor;
+        margin-right: 4px;
+      }
+    }
+  }
 }
 
 .comment-item-reply-main {
@@ -130,27 +146,10 @@
   }
 }
 
-.comment-item-reply-main-datetime {
-  font-size: 12px;
-  color: $grey-light;
-  margin-left: 12px;
-}
-
-.comment-item-reply-reply-label {
-  font-size: 12px;
-  color: $grey-light;
-  cursor: pointer;
-}
-
-.show-emoji-icon {
-  font-size: 20px;
-  float: right;
-  margin-top: 24px;
-  margin-right: 20px;
-  cursor: pointer;
-
-  &:hover {
-    color: $link-color;
+.popover-emojis {
+  .ant-popover-arrow,
+  .ant-popover-inner-content {
+    background: $grey-darker;
   }
 }
 
@@ -183,13 +182,22 @@
   }
 }
 
-.popover-emojis {
-  .ant-popover-arrow,
-  .ant-popover-inner-content {
-    background: $grey-darker;
-  }
-}
-
 .comment-pagination {
   text-align: center;
+}
+
+.comment-conversation {
+  height: calc(100vh - 48px);
+  top: 24px;
+  padding-bottom: 0;
+
+  .ant-modal-content {
+    height: 100%;
+  }
+
+  .ant-modal-body {
+    padding: 0 24px;
+    height: calc(100vh - 48px - 55px);
+    overflow-y: scroll;
+  }
 }

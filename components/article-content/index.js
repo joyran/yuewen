@@ -21,7 +21,7 @@ const ArticleContent = (props) => {
         <h1 className="article-title">{article.title}</h1>
         <div className="article-author-info">
           <a
-            href={`/profile/${article.author._id}`}
+            href={`/user/${article.author.login}`}
             className="article-author-info-avatar-link"
           >
             <img
@@ -33,7 +33,7 @@ const ArticleContent = (props) => {
           <div className="article-author-info-content">
             <a
               className="article-author-info-content-username"
-              href={`/profile/${article.author._id}`}
+              href={`/user/${article.author.login}`}
             >{article.author.name}</a>
             <p className="article-author-info-content-bio">{article.author.bio}</p>
           </div>
@@ -57,30 +57,41 @@ const ArticleContent = (props) => {
           }
         </div>
         {/* 点赞按钮，已点赞实心，未点赞空心 */}
-        <Button
-          className="like-button"
-          type={article.has_liked ? 'primary' : 'default'}
-          size="large"
-          icon="like"
-          onClick={() => { props.dispatch(createArticleLikes(article._id)); }}
-        >
-          {article.likes_count}
-        </Button>
-        {/* 收藏按钮 */}
-        <Tooltip title={article.has_collected ? '取消收藏' : '收藏文章'}>
-          <Icon
-            onClick={() => { props.dispatch(updateArticleCollection(article._id)); }}
-            className="article-star"
-            type={article.has_collected ? 'star' : 'star-o'}
-          />
-        </Tooltip>
+        <div className="buttons">
+          <Button
+            className={article.has_liked ? 'button-like' : 'button-no-like'}
+            type={article.has_liked ? 'primary' : 'default'}
+            size="large"
+            icon="like"
+            onClick={() => { props.dispatch(createArticleLikes(article._id)); }}
+          >
+            {article.likes_count}
+          </Button>
+          {/* 收藏按钮 */}
+          <div onClick={() => { props.dispatch(updateArticleCollection(article._id)); }} className="button">
+            <Icon type={article.has_collected ? 'star' : 'star-o'} style={{ fontSize: 15 }} />
+            <span>{ article.has_collected ? '已收藏' : '收藏' }</span>
+          </div>
+          <div className="button">
+            <Icon type="message" />
+            <span>{ `${article.comments_count} 条评论` }</span>
+          </div>
+          <div className="button">
+            <Icon type="file-pdf" />
+            <span>保存</span>
+          </div>
+          <div className="button">
+            <Icon type="clock-circle-o" />
+            <span>发布于 { moment(article.created_at, 'X').format('YYYY-MM-DD') }</span>
+          </div>
+        </div>
         {/* 点赞人列表 */}
-        <ol className="article-likes">
+        <ol className="article-likes clearfix">
           {article.likes.map((like) => {
             return (
               <Tooltip placement="top" title={like.user.name} key={like.user._id}>
                 <li>
-                  <a href={`/user/${like.user._id}`}>
+                  <a href={`/user/${like.user.login}`}>
                     <img alt={like.user.name} src={like.user.small_avatar_url} />
                   </a>
                 </li>

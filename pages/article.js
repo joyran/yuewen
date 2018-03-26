@@ -22,7 +22,10 @@ const { Header, Content, Footer } = Layout;
 
 // 初始默认 state
 const initialState = {
-  article: {},
+  article: {
+    conversation: [],
+    conversation_modal_visible: false
+  },
   session: {},
   notice: {}
 };
