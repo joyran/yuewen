@@ -5,6 +5,10 @@
 
 // 工具栏高度
 $toolbar-height : 48px;
+.markdown {
+  height: calc(100vh - 48px);
+  display: flex;
+}
 
 .markdown-editor {
   width: 50%;
@@ -59,6 +63,11 @@ $toolbar-height : 48px;
     .anticon {
       color: #fff;
       font-size: 16px;
+    }
+
+    // 解决 Edge 浏览器显示失败
+    .anticon-user-define:before {
+      font-family: "anticon-user" !important;
     }
   }
 

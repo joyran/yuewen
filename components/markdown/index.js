@@ -4,7 +4,7 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Spin } from 'antd';
+// import { Spin } from 'antd';
 import ReactMarkdown from 'react-markdown';
 import CodeMirror from 'react-codemirror';
 import CodeBlock from './code-block';
@@ -12,25 +12,11 @@ import Toolbar from './toolbar';
 import { updateMarkdown, updateCursorRange } from '../../reducers/markdown-editor';
 import stylesheet from './index.scss';
 
-// let CodeMirror = null;
-// if (typeof window !== 'undefined' && typeof window.navigator !== 'undefined') {
-//   CodeMirror = require('react-codemirror');
-//   require('codemirror/mode/markdown/markdown');
-// }
+// 加载 markdown 格式
+require('codemirror/mode/markdown/markdown');
 
 class Markdown extends Component {
-  constructor() {
-    super();
-    this.state = {
-      loading: true
-    };
-  }
-
   componentDidMount() {
-    // 设置markdown div高度和工具栏高度填满整个可视窗口
-    const height = document.documentElement.clientHeight - 48;
-    document.getElementById('markdown').style.height = `${height}px`;
-
     // 写新文章时才从 localStorage 中读取 markdown，编辑文章不读取
     if (!this.props.meditor.markdown) {
       this.props.dispatch(updateMarkdown(localStorage.markdown));
@@ -39,8 +25,6 @@ class Markdown extends Component {
       // 初始化设置 codemirror value
       this.codemirror.setValue(this.props.meditor.markdown);
     }
-
-    this.setState({ loading: false });
   }
 
   // CodeMirror 发生变化时更新 store 中 markdown并同步更新 localStorage
@@ -78,10 +62,10 @@ class Markdown extends Component {
 
   render() {
     return (
-      <Spin spinning={this.state.loading}>
+      <div>
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         <Toolbar codemirror={this.codemirror} />
-        <div id="markdown" style={{ display: 'flex' }}>
+        <div className="markdown">
           <CodeMirror
             ref={this.codemirrorRef}
             className={this.props.meditor.editorClassName}
@@ -101,7 +85,7 @@ class Markdown extends Component {
             escapeHtml={false}
           />
         </div>
-      </Spin>
+      </div>
     );
   }
 }

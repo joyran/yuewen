@@ -300,25 +300,25 @@ const Toolbar = (props) => {
           <li onClick={() => { props.dispatch(toggleAddTableModal()); }}><Icon type="table" /></li>
         </Tooltip>
         <Tooltip placement="bottom" title="粗体">
-          <li onClick={addBoldText}><Icon type="bold" /></li>
+          <li onClick={addBoldText}><Icon className="anticon-user-define" type="bold" /></li>
         </Tooltip>
         <Tooltip placement="bottom" title="斜体">
-          <li onClick={addItalicText}><Icon type="italic" /></li>
+          <li onClick={addItalicText}><Icon className="anticon-user-define" type="italic" /></li>
         </Tooltip>
         <Tooltip placement="bottom" title="引用">
-          <li onClick={addQuoteText}><Icon type="quote" /></li>
+          <li onClick={addQuoteText}><Icon className="anticon-user-define" type="quote" /></li>
         </Tooltip>
         <Tooltip placement="bottom" title="行内代码">
-          <li onClick={addInlineCode}><Icon type="code-inline" /></li>
+          <li onClick={addInlineCode}><Icon className="anticon-user-define" type="code-inline" /></li>
         </Tooltip>
         <Tooltip placement="bottom" title="代码块">
-          <li onClick={addBlockCode}><Icon type="code-block" /></li>
+          <li onClick={addBlockCode}><Icon className="anticon-user-define" type="code-block" /></li>
         </Tooltip>
         <Tooltip placement="bottom" title="有序列表">
-          <li onClick={addUlItem}><Icon type="ul" /></li>
+          <li onClick={addUlItem}><Icon className="anticon-user-define" type="ul" /></li>
         </Tooltip>
         <Tooltip placement="bottom" title="无序列表">
-          <li onClick={addOlItem}><Icon type="ol" /></li>
+          <li onClick={addOlItem}><Icon className="anticon-user-define" type="ol" /></li>
         </Tooltip>
         <Popover overlayClassName="popover-emojis" content={content} trigger="click" placement="bottom">
           <Tooltip placement="bottom" title="添加 emoji 表情">

@@ -390,7 +390,7 @@ mark {
 /* 新增自定义 iconfont anticon-user */
 .anticon:before {
   display: block;
-  font-family: "anticon", "anticon-user" !important;
+  font-family: "anticon" !important;
 }
 /* 自定义 iconfont */
 .anticon-ol:before {

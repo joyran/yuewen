@@ -204,6 +204,6 @@
   .ant-modal-body {
     padding: 0 24px;
     height: calc(100vh - 48px - 55px);
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 }

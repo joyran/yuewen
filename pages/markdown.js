@@ -7,11 +7,10 @@ import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunkMiddleware from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
-import { Layout, LocaleProvider } from 'antd';
+import { Layout, LocaleProvider, Spin } from 'antd';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
-// import Markdown from '../components/markdown/index';
 import Error from '../components/error/index';
 import reducers from '../reducers/markdown';
 import { readSessionSuccess } from '../reducers/session';
@@ -19,8 +18,9 @@ import { updateMarkdown, updateArticleId } from '../reducers/markdown-editor';
 import { readTopicsSuccess } from '../reducers/topics';
 import stylesheet from '../styles/index.scss';
 
-const DynamicComponentWithNoSSR = dynamic(import('../components/markdown/index'), {
-  ssr: false
+const Markdown = dynamic(import('../components/markdown/index'), {
+  ssr: false,
+  loading: () => <Spin style={{ marginTop: 200 }} />
 });
 
 // 初始默认 state
@@ -60,7 +60,7 @@ const Index = (props) => {
           <link rel="stylesheet" href="/css/antd.css" />
           <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         </Head>
-        <DynamicComponentWithNoSSR />
+        <Markdown />
       </Layout>
     </LocaleProvider>
   );
