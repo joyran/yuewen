@@ -50,7 +50,7 @@ const Index = (props) => {
           <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         </Head>
         <Header>
-          <Nav />
+          <Nav active="topics" />
         </Header>
         <Content>
           <Topics />

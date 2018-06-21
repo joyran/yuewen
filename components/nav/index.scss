@@ -9,8 +9,15 @@
 .header-left {
   a {
     display: inline-block;
-    width: 64px;
+    width: $header-height;
+    height: $header-height;
     text-align: center;
+    color: $grey-dark;
+  }
+
+  .active {
+    border-bottom: 2px solid $link-color;
+    color: $link-color;
   }
 }
 

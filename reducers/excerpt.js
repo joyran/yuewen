@@ -21,12 +21,12 @@ export const {
 
 /**
  * 读取用户发表或者收藏的文章摘录 excerpts
- * 参数: sortby create为发布的文章，collect为收藏的文章, follow
+ * 参数: sortby create为发布的文章，collect为收藏的文章
  */
-export const readExcerptsByUser = (login, sortby) => (dispatch, getState) => {
-  const excerpt = getState().excerpt;
+export const readExcerptsByUser = login => (dispatch, getState) => {
+  const { page, sortby, per_page } = getState().excerpt;
 
-  fetch(`/api/v1/users/${login}/excerpts/${sortby}?page=${excerpt.page}&per_page=${excerpt.per_page}`, {
+  fetch(`/api/v1/users/${login}/excerpts/${sortby}?page=${page}&per_page=${per_page}`, {
     credentials: 'include',
     method: 'get'
   })
@@ -52,8 +52,9 @@ export const excerpt = handleActions({
   }),
 
   // 点击 tag 标签，page 和 data 重置，loading 置为 true 是想显示 loading card
-  CHANGE_TAG: state => ({
+  CHANGE_TAG: (state, action) => ({
     ...state,
+    sortby: action.payload,
     page: 1,
     data: [],
     loading: true,

@@ -26,6 +26,7 @@ const { Header, Content, Footer } = Layout;
 // 初始默认 state
 const initialState = {
   excerpt: {
+    sortby: 'follow',
     data: [],
     page: 1,
     per_page: 10
@@ -52,13 +53,13 @@ const Index = (props) => {
           <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         </Head>
         <Header>
-          <Nav />
+          <Nav active="index" />
         </Header>
         <Content>
           <InfiniteScroll
             initialLoad={false}
             pageStart={0}
-            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser(props.session.login, 'follow')); }}
+            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser(props.session.login)); }}
             hasMore={!props.excerpt.loading && props.excerpt.has_more}
             useWindow
           >

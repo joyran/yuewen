@@ -33,12 +33,11 @@ router.get('/api/v1/articles', async ctx => {
 
   var articles = await Article.find({}).sort({ created_at: -1 })
                               .skip(skip).limit(per_page).populate('author').lean();
+
   articles.map((article) => {
     delete article.author.password;
-
     // 文章评论 url
     article.comments_url = `/api/v1/articles/${article._id}/comments`;
-
     // 文章点赞用户 url
     article.likes_url = `/api/v1/articles/${article._id}/likes`;
   })
@@ -107,13 +106,13 @@ router.get('/api/v1/articles/:aid', async ctx => {
  * 方法: POST
  * 参数: title      标题
  * 参数: excerpt    摘要
- * 参数: tags       标签
+ * 参数: topics     标签
  * 参数: markdown   markdown 原始格式
  * 参数: html     markdown 解析后的 html 格式
  */
 router.post('/api/v1/articles', async ctx => {
   const { uid } = ctx.session;
-  const { title, excerpt, tags, markdown, html } = ctx.request.body;
+  const { title, excerpt, topics, markdown, html } = ctx.request.body;
 
   if (!uid) {
     ctx.status = 401;
@@ -125,7 +124,7 @@ router.post('/api/v1/articles', async ctx => {
   const updated_at = created_at = parseInt(Date.now()/1000);
 
   // 写入文章
-  const article = await Article.create({ author: uid, title, tags, excerpt, views_count: 0,
+  const article = await Article.create({ author: uid, title, topics, excerpt, views_count: 0,
                                         comments_count: 0, likes_count: 0, created_at, updated_at,
                                         markdown, html, heat: 0 });
 
@@ -139,14 +138,14 @@ router.post('/api/v1/articles', async ctx => {
  * 方法: PUT
  * 参数: title      标题
  * 参数: excerpt    摘要
- * 参数: tags       标签
+ * 参数: topics     标签
  * 参数: markdown   markdown 原始格式
  * 参数: html     markdown 解析后的 html 格式
  */
 router.put('/api/v1/articles/:aid', async ctx => {
   const { uid } = ctx.session;
   const { aid } = ctx.params;
-  const { title, excerpt, tags, markdown, html } = ctx.request.body;
+  const { title, excerpt, topics, markdown, html } = ctx.request.body;
 
   if (!uid) {
     ctx.status = 401;
@@ -161,12 +160,11 @@ router.put('/api/v1/articles/:aid', async ctx => {
   }
 
   // 文章发布时间和更新时间戳
-  const updated_at = created_at = parseInt(Date.now()/1000);
+  const updated_at = parseInt(Date.now()/1000);
 
   // 更新文章
-  const article = await Article.findByIdAndUpdate({ _id: aid }, { author: uid, title, tags, excerpt, views_count: 0,
-                                                  comments_count: 0, likes_count: 0, created_at,
-                                                  updated_at, markdown, html, heat: 0 }).exec();
+  const article = await Article.findByIdAndUpdate({ _id: aid }, { title, topics, excerpt,
+                                                  updated_at, markdown, html }).exec();
 
   ctx.status = 201;
   ctx.body = article;
@@ -538,7 +536,7 @@ router.post('/api/v1/articles/:aid/comments', async ctx => {
   // 写入评论
   const comment = await Comment.create({ author: uid, atuser, rid, reply_to_author, article: aid, content, created_at, likes_count: 0 });
 
-  // 评论写入成功后文章评论数量 comments_count +1
+  // 评论写入成功后文章评论数量 comments_count +1, 热度加 10
   await Article.findByIdAndUpdate({ _id: aid }, { comments_count: article.comments_count + 1 }).exec();
 
   // 生成新的评论通知消息

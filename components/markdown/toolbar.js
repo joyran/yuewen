@@ -220,7 +220,7 @@ const Toolbar = (props) => {
     e.preventDefault();
     releaseArticleForm.validateFields((err, values) => {
       if (!err) {
-        const { title, tags } = values;
+        const { title, topics } = values;
 
         // markdown 解析后的 html
         const html = document.getElementsByClassName('markdown-preview')[0].innerHTML;
@@ -230,10 +230,10 @@ const Toolbar = (props) => {
 
         if (props.meditor.aid) {
           // 更新文章
-          props.dispatch(updateArticle(props.meditor.aid, title, excerpt, tags, html));
+          props.dispatch(updateArticle(props.meditor.aid, title, excerpt, topics, html));
         } else {
           // 新增文章
-          props.dispatch(createArticle(title, excerpt, tags, html));
+          props.dispatch(createArticle(title, excerpt, topics, html));
         }
       }
     });

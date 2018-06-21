@@ -29,7 +29,7 @@ export const {
 /**
  * 新增文章
  */
-export const createArticle = (title, excerpt, tags, html) => (dispatch, getState) => {
+export const createArticle = (title, excerpt, topics, html) => (dispatch, getState) => {
   const { markdown } = getState().meditor;
   return fetch('/api/v1/articles', {
     credentials: 'include',
@@ -37,7 +37,7 @@ export const createArticle = (title, excerpt, tags, html) => (dispatch, getState
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ title, excerpt, tags, markdown, html })
+    body: JSON.stringify({ title, excerpt, topics, markdown, html })
   })
     .then(res => res.json())
     .then((res) => {
@@ -54,7 +54,7 @@ export const createArticle = (title, excerpt, tags, html) => (dispatch, getState
 /**
  * 更新文章
  */
-export const updateArticle = (aid, title, excerpt, tags, html) => (dispatch, getState) => {
+export const updateArticle = (aid, title, excerpt, topics, html) => (dispatch, getState) => {
   const { markdown } = getState().meditor;
   return fetch(`/api/v1/articles/${aid}`, {
     credentials: 'include',
@@ -62,7 +62,7 @@ export const updateArticle = (aid, title, excerpt, tags, html) => (dispatch, get
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ title, excerpt, tags, markdown, html })
+    body: JSON.stringify({ title, excerpt, topics, markdown, html })
   })
     .then(res => res.json())
     .then(() => {

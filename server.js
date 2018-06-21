@@ -30,7 +30,7 @@ app.prepare().then(() => {
   const koa = new Koa();
   const router = new Router();
 
-  koa.keys = ['i love yue'];
+  koa.keys = ['my queen'];
 
   // 定义静态文件存储路径
   koa.use(server('./server/static'));

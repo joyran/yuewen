@@ -10,7 +10,7 @@
 1. 下载 [Elasticsearch](https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.5.1.zip)
 2. 下载中文分词器`ik`, elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v5.5.1/elasticsearch-analysis-ik-5.5.1.zip
 3. 解压后进入到 bin 目录，双击 elasticsearch.bat 运行
-4. 打开浏览器访问 http://localhost:9200/
+4. 打开浏览器访问 http://localhost:9200/ 查看是否启动成功
 5. 新建索引 yue, 并设置 type 为 articles，设置字段 markdown 和 title 分词器为 ik_max_word
 ```
 $ curl -X PUT 'localhost:9200/accounts' -d '
@@ -103,6 +103,7 @@ http 状态码有以下几种
 ```
 
 ## TODO
-1. 个人主页切换到【文章】tab，向下滚动不加载用户发表的文章，而是加载用户收藏的文章
-2. 火狐和 Edge 浏览器打不开写文章页面
-3. 标签管理
+1. [已解决] 个人主页切换到【文章】tab，向下滚动不加载用户发表的文章，而是加载用户收藏的文章
+2. [已解决] 火狐和 Edge 浏览器打不开写文章页面
+3. [已解决] 标签管理
+4. 编辑个人资料

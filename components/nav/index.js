@@ -99,8 +99,8 @@ class Nav extends Component {
       <Row className="header">
         <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         <Col className="header-left" span={6}>
-          <a href="/">首页</a>
-          <a href="/topics">话题</a>
+          <a href="/" className={this.props.active === 'index' ? 'active' : ''}>首页</a>
+          <a href="/topics" className={this.props.active === 'topics' ? 'active' : ''}>话题</a>
         </Col>
         <Col className="search-box" span={6}>
           <Icon type="search" />

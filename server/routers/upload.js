@@ -109,14 +109,13 @@ router.post('/api/v1/upload/banner/crop', async ctx => {
   });
 
   // 重新裁剪后的 banner 相对路径
-  const banner = `/uploads/banner/${cropBanner}`;
+  const banner_url = `/uploads/banner/${cropBanner}`;
 
   // 更新用户 banner
-  User.findByIdAndUpdate({ _id: ctx.session.uid }, { banner }).exec();
+  User.findByIdAndUpdate({ _id: ctx.session.uid }, { banner_url }).exec();
 
-  const body = { status, banner };
   ctx.status = status;
-  ctx.body = body;
+  ctx.body = { banner_url };
 });
 
 /**
@@ -209,15 +208,14 @@ router.post('/api/v1/upload/avatar/crop', async ctx => {
   });
 
   // 重新裁剪后的头像相对路径
-  const avatar = `/uploads/avatar/${cropAvatar}`;
-  const smAvatar = `/uploads/avatar/${resizeAvatar}`;
+  const avatar_url = `/uploads/avatar/${cropAvatar}`;
+  const small_avatar_url = `/uploads/avatar/${resizeAvatar}`;
 
   // 更新用户头像 avatar
-  await User.findByIdAndUpdate({ _id: ctx.session.uid }, { avatar, smAvatar }).exec();
+  await User.findByIdAndUpdate({ _id: ctx.session.uid }, { avatar_url, small_avatar_url }).exec();
 
-  const body = { status, avatar, smAvatar };
   ctx.status = status;
-  ctx.body = body;
+  ctx.body = { status, avatar_url, small_avatar_url };
 });
 
 module.exports = router;

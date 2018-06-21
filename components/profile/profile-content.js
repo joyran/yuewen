@@ -26,7 +26,7 @@ const ProfileContent = (props) => {
           <InfiniteScroll
             initialLoad={false}
             pageStart={0}
-            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser(props.profile.login, 'create')); }}
+            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser(props.profile.login)); }}
             hasMore={!props.excerpt.loading && props.excerpt.has_more}
             useWindow
           >
@@ -38,7 +38,7 @@ const ProfileContent = (props) => {
           <InfiniteScroll
             initialLoad={false}
             pageStart={0}
-            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser(props.profile.login, 'collect')); }}
+            loadMore={() => { !props.excerpt.loading && props.excerpt.has_more && props.dispatch(readExcerptsByUser(props.profile.login)); }}
             hasMore={!props.excerpt.loading && props.excerpt.has_more}
             useWindow
           >
