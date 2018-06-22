@@ -19,6 +19,9 @@
   height: $header-height;
   box-shadow: 1px 2px 8px $grey-lighter;
   color: $grey-darker;
+  // position: fixed;         // 导航栏固定
+  // z-index: 1;
+  // width: 100%;
 }
 
 .ant-layout-content {
@@ -26,6 +29,7 @@
   margin: 0 auto;
   color: $grey-darker;
   min-height: 600px;
+  // margin-top: 64px;        // 导航栏固定
 }
 
 .ant-layout-footer {
