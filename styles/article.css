@@ -1,0 +1,131 @@
+/* 用于转换文章为 pdf 时提供样式 */
+
+.article {
+  font-size: 15px;
+  line-height: 2;
+  color: #333;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.title {
+  text-align: center;
+  font-size: 30px;
+  font-weight: bold;
+  padding-bottom: 20px;
+}
+
+.author {
+  text-align: right;
+  padding-bottom: 20px;
+}
+
+h1, h2 {
+  font-size: 22px;
+  line-height: 22px;
+  font-weight: bold;
+  padding-bottom: 12px;
+  margin: 16px 0;
+  color: #333;
+  border-bottom: 1px solid #eee;
+}
+
+h3, h4, h5, h6 {
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 22px;
+  margin: 16px 0;
+  color: #333;
+}
+
+p {
+  margin-bottom: 16px;
+  word-wrap: break-word;
+}
+
+ol {
+  list-style-type: decimal;
+  padding-left: 16px;
+  margin-bottom: 16px;
+}
+
+ul {
+  list-style-type: disc;
+  padding-left: 16px;
+  margin-bottom: 16px;
+}
+
+img {
+  margin: 40px auto;
+  display: block;
+  max-width: 100%;
+}
+
+code {
+  margin: 0 5px;
+  padding: 0 5px;
+  color: #c7254e;
+  background-color: #f7f7f7;
+  border-radius: 4px;
+}
+
+pre {
+  background: #282c34;
+  margin-bottom: 16px;
+  padding: 0;
+  overflow: auto;
+  line-height: 1.5;
+  border-radius: 4px;
+}
+
+pre > code {
+  word-wrap: break-word;
+  padding: 20px;
+  margin: 0;
+  display: block;
+  color: #abb2bf;
+  background: #282c34;
+  font-family: Consolas, "Microsoft YaHei", "Helvetica Neue", Helvetica, Roboto, "PingFang SC", "Hiragino Sans GB";
+}
+
+table {
+  display: table;
+  overflow: auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 24px auto;
+  max-width: 100%;
+}
+
+table td {
+  padding: 8px 12px;
+  border: 1px solid #eee;
+}
+
+table th {
+  padding: 8px 12px;
+  border: 1px solid #eee;
+  font-weight: bold;
+}
+
+hr {
+  margin: 32px 0;
+  border: 0;
+  border-bottom: 1px dashed #ccc;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+blockquote {
+  border-left: 4px solid #bbb;
+  padding-left: 20px;
+  margin-left: 0;
+  font-style: italic;
+  color: #999;
+}
+
+.hljs-string {
+  white-space: normal !important;
+}

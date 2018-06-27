@@ -40,6 +40,7 @@ const eslintrc = {
     'react/no-danger': 0,
     'react/no-multi-comp': 0,
     'react/no-did-mount-set-state': 0,
+    'react/no-children-prop': 0,
     'jsx-a11y/no-static-element-interactions': 0,
     'jsx-a11y/anchor-has-content': 0,
     'jsx-a11y/no-noninteractive-element-interactions': 0,

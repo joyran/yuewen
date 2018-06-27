@@ -18,6 +18,7 @@ const topic = require('./server/routers/topic');
 const profile = require('./server/routers/profile');
 const search = require('./server/routers/search');
 const upload = require('./server/routers/upload');
+const admin = require('./server/routers/admin');
 
 // 端口号
 const port = parseInt(process.env.PORT, 10) || 527;
@@ -137,6 +138,18 @@ app.prepare().then(() => {
     ctx.respond = false;
   })
 
+  // 后台管理
+  router.get('/admin', async ctx => {
+    if (ctx.session.uid) {
+      await app.render(ctx.req, ctx.res, '/admin', ctx.params);
+    } else {
+      await ctx.redirect('/login');
+      await app.render(ctx.req, ctx.res, '/login', ctx.params);
+    }
+
+    ctx.respond = false;
+  })
+
   // 主页路由
   router.get('/', async ctx => {
     if (ctx.session.uid) {
@@ -159,6 +172,7 @@ app.prepare().then(() => {
   koa.use(profile.routes()).use(profile.allowedMethods());
   koa.use(search.routes()).use(search.allowedMethods());
   koa.use(upload.routes()).use(upload.allowedMethods());
+  koa.use(admin.routes()).use(admin.allowedMethods());
 
   // 特定路由放在通用路由 * 之前, 检查用户登录状态
   router.get('*', async ctx => {

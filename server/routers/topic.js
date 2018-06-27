@@ -25,14 +25,11 @@ router.get('/api/v1/topics', async ctx => {
   var topics = await Topic.find({}).sort({ articles: -1 }).skip(skip).limit(per_page).lean();
 
   // 话题总数
-  var total = await Topic.find({}).count({});
-
-  // 检测是否还有更多，总数小于 skip + per_page 则没有更多了。
-  const has_more = skip + per_page >= total ? false : true;
+  var count = await Topic.find({}).count({});
 
   // 输出返回值
   ctx.status = 200;
-  ctx.body = { data: topics, has_more };
+  ctx.body = { data: topics, count };
 });
 
 

@@ -6,6 +6,7 @@
 .article-header {
 
 }
+
 .article-title {
   margin: 32px 0;
   font-size: 32px;
@@ -90,8 +91,10 @@
       color: #8590a6;
       cursor: pointer;
 
-      span {
+      span, a {
+        display: inline-block;
         margin-left: 4px;
+        color: #8590a6;
       }
     }
   }

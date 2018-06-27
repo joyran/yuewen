@@ -23,11 +23,7 @@ const { Header, Content, Footer } = Layout;
 
 // 初始默认 state
 const initialState = {
-  topics: {
-    data: [],
-    page: 1,
-    per_page: 10
-  },
+  topics: {},
   session: {},
   notice: {}
 };

@@ -23,8 +23,7 @@ export const {
 /**
  * 读取所有话题
  */
-export const readTopics = () => (dispatch, getState) => {
-  const { page, per_page } = getState().topics;
+export const readTopics = (page, per_page) => (dispatch) => {
   fetch(`/api/v1/topics?page=${page}&per_page=${per_page}`, {
     credentials: 'include',
     method: 'get',
@@ -47,9 +46,7 @@ export const readTopics = () => (dispatch, getState) => {
 export const topics = handleActions({
   READ_TOPICS_SUCCESS: (state, action) => ({
     ...state,
-    has_more: action.payload.has_more,
-    data: state.data.concat(action.payload.data),
-    page: state.page + 1
+    ...action.payload
   })
 }, {});
 

@@ -62,9 +62,10 @@ router.post('/api/v1/session', async ctx => {
 
       // 登录成功则将 uid, username, avator, smAvatar 写入session
       ctx.session.username  = user.username;
-      ctx.session.uid  = user._id;
+      ctx.session.uid       = user._id;
       ctx.session.avatar    = user.avatar;
       ctx.session.smAvatar  = user.smAvatar;
+      ctx.session.admin     = user.admin
 
       // 如果勾选“下次自动登录”，将 uid 写入到cookie中，生存时间1个月
       if (remember) {

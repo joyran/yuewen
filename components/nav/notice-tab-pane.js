@@ -1,3 +1,7 @@
+/**
+ * 查看通知消息 tabpane
+ */
+
 import { List, Avatar, Icon } from 'antd';
 import moment from 'moment';
 import {

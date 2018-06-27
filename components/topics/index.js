@@ -3,19 +3,23 @@
  */
 
 import { connect } from 'react-redux';
-import InfiniteScroll from 'react-infinite-scroller';
-import { Button, Card, Tag, Row, Col } from 'antd';
+import { Button, Card, Tag, Row, Col, Pagination } from 'antd';
 import { followTopic } from '../../reducers/topic';
 import { readTopics } from '../../reducers/topics';
 import stylesheet from './index.scss';
 
 const Topics = (props) => {
-  const { data, has_more, loading } = props.topics;
+  const { data, count } = props.topics;
   const { followed_topics } = props.session;
 
   const handleClick = (topic, has_followed) => {
     const method = has_followed ? 'delete' : 'put';
     props.dispatch(followTopic(topic, method));
+  };
+
+  // 点击分页按钮
+  const onChange = (page, pageSize) => {
+    props.dispatch(readTopics(page, pageSize));
   };
 
   return (
@@ -33,35 +37,33 @@ const Topics = (props) => {
         }
       </Card>
       <Card title="所有话题" className="all-topics">
-        <InfiniteScroll
-          initialLoad={false}
-          pageStart={0}
-          loadMore={() => { !loading && has_more && props.dispatch(readTopics()); }}
-          hasMore={!loading && has_more}
-          useWindow
-        >
-          <Row className="topic-row" gutter={0}>
-            {
-              data.map((topic) => {
-                // 如果话题在用户已关注话题列表中则 has_followed 为 true
-                const has_followed = followed_topics.indexOf(topic.topic) !== -1;
-                return (
-                  <Col span={12} key={topic.topic} className="topic-col">
-                    <a className="topic-row-title" href={`/topic/${topic.topic}`}>{topic.topic}</a>
-                    <p className="topic-row-description">{topic.description}</p>
-                    <Button
-                      type="primary"
-                      className={has_followed ? 'followed' : 'unfollowed'}
-                      onClick={() => { handleClick(topic.topic, has_followed); }}
-                    >{ has_followed ? '已关注' : '关注话题'}</Button>
-                    <span style={{ marginLeft: 24 }}>{`${topic.articles_count}篇文章，${topic.followers_count}人关注`}</span>
-                  </Col>
-                );
-              })
-            }
-          </Row>
-          { loading && has_more && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
-        </InfiniteScroll>
+        {
+          data.map((item) => {
+            // 如果话题在用户已关注话题列表中则 has_followed 为 true
+            const has_followed = followed_topics.indexOf(item.topic) !== -1;
+
+            return (
+              <Row key={item._id} className="topic-row" gutter={24}>
+                <Col span={2}>
+                  <img src={item.avatar_url} className="topic_avatar" alt={item.topic} />
+                </Col>
+                <Col span={18}>
+                  <a className="topic-title" href={`/topic/${item.topic}`}>{item.topic}</a>
+                  <span className="topic-description">{item.description}</span>
+                </Col>
+                <Col span={4}>
+                  <Button
+                    type="primary"
+                    className={has_followed ? 'followed' : 'unfollowed'}
+                    onClick={() => { handleClick(item.topic, has_followed); }}
+                  >{has_followed ? '已经关注' : '关注话题'}
+                  </Button>
+                </Col>
+              </Row>
+            );
+          })
+        }
+        <Pagination style={{ float: 'right', marginTop: 24 }} showSizeChanger onShowSizeChange={onChange} onChange={onChange} total={count} />
       </Card>
     </div>
   );

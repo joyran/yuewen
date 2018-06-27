@@ -2,15 +2,20 @@
  * 文章路由
  */
 
-var Router = require('koa-router');
-var router = new Router();
-var Article = require('../models/article');
-var Like = require('../models/like');
-var Topic = require('../models/topic');
-var User = require('../models/user');
-var Collection = require('../models/collection');
-var Comment = require('../models/comment');
-var Notice = require('../models/notice');
+const Router = require('koa-router');
+const router = new Router();
+const fs = require('fs');
+const Promise = require('bluebird');
+const send = require('koa-send');
+const moment = require('moment');
+const pdf = Promise.promisifyAll(require('html-pdf'));
+const Article = require('../models/article');
+const Like = require('../models/like');
+const Topic = require('../models/topic');
+const User = require('../models/user');
+const Collection = require('../models/collection');
+const Comment = require('../models/comment');
+const Notice = require('../models/notice');
 
 
 /**
@@ -698,6 +703,60 @@ router.post('/api/v1/articles/:aid/likes', async ctx => {
 
   ctx.status = 201;
   ctx.body = likes;
+});
+
+
+/**
+ * 下载文章，格式为 pdf
+ */
+router.get('/api/v1/articles/:aid/download', async ctx => {
+  const { aid } = ctx.params;
+  const { uid } = ctx.session;
+
+  if (!uid) {
+    ctx.status = 401;
+    ctx.body = { message: '需要登录' };
+    return;
+  }
+
+  if (aid.length !== 24) {
+    ctx.status = 404;
+    ctx.body = { message: 'Not Found' };
+    return;
+  }
+
+  const article = await Article.findOne({ _id: aid }).populate('author').lean();
+
+  // 图片 base 路径
+  const base = 'file:///' + __dirname.replace('routers', 'static\\uploads\\article\\').replace(/\\/g, '/');
+  // 文件名称
+  const filename = article.title + '.pdf';
+  // 文件路径
+  const filepath = './server/static/downloads/' + filename;
+  // 文章保存为 pdf 配置
+  const options = {
+    format: 'Letter',
+    base,
+    header: { height: '16mm' },
+    footer: { height: '16mm' },
+    filename: filepath
+  };
+
+  var css = fs.readFileSync('./styles/article.css', 'utf8');          // 读取文章 css
+  var hljs = fs.readFileSync('./styles/atom-one-dark.scss', 'utf8');  // 读取代码高亮 css
+  var html = article.html.replace(/\/uploads\/article\//g, '');       // 替换文章中所有图片的前缀为空
+  // 拼接 html，并插入 css
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>pdf</title>' +
+            '<style type="text/css">' + css + '</style>' +
+            '<style type="text/css">' + hljs + '</style>' +
+            '</head><body><div class="article"><p class="title">' + article.title + '</p>' +
+            '<p class="author">' + article.author.name + ' 发布于 ' + moment(article.created_at, 'X').format('YYYY-MM-DD') + '</p>' +
+            html + '</div></body></html>';
+
+  // 根据 html 生成 pdf
+  await pdf.createAsync(html, options);
+  ctx.attachment(filename);
+  await send(ctx, filepath);
 });
 
 

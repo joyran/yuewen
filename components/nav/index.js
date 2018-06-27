@@ -69,6 +69,7 @@ class Nav extends Component {
         <a href="/markdown" target="_blank"><Icon type="edit" />写新文章</a>
         <a href="/manage"><Icon type="profile" />文章管理</a>
         <a onClick={this.showModal}><Icon type="lock" />修改密码</a>
+        {this.props.session.admin ? <a href="/admin"><Icon type="setting" />后台管理</a> : ''}
         <a onClick={() => dispatch(deleteSession())}><Icon type="logout" />退出登录</a>
       </div>
     );

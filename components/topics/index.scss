@@ -13,7 +13,8 @@
 }
 
 .topic-row {
-  padding: 0;
+  padding: 16px 0;
+  border-bottom: 1px solid $grey-lighter;
 }
 
 .topic-col {
@@ -53,18 +54,16 @@
   display: block;
 }
 
-.topic-row-description {
-  font-size: 14px;
-  line-height: 2;
-  color: $grey-darker;
-  max-height: 80px;
-  min-height: 80px;
+.topic-description {
+  height: 22px;
   overflow: hidden;
+  display: inline-block;
+  font-size: rgba(0,0,0,0.55);
 }
 
 .all-topics {
   .ant-card-body {
-    padding: 0;
+    padding: 24px;
   }
 }
 
@@ -86,4 +85,15 @@
       color: $link-color;
     }
   }
+}
+
+.topic_avatar {
+  height: 48px;
+  width: 48px;
+  border-radius: 4px;
+}
+
+.topic-title {
+  display: block;
+  margin-bottom: 4px;
 }

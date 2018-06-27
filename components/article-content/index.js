@@ -74,11 +74,11 @@ const ArticleContent = (props) => {
           </div>
           <div className="button">
             <Icon type="message" />
-            <span>{ `${article.comments_count} 条评论` }</span>
+            <a href="#comment-list">{ `${article.comments_count} 条评论` }</a>
           </div>
           <div className="button">
-            <Icon type="file-pdf" />
-            <span>保存</span>
+            <Icon type="download" />
+            <span onClick={() => { window.open(`/api/v1/articles/${article._id}/download`, 'Iframe'); }}>下载</span>
           </div>
           <div className="button">
             <Icon type="clock-circle-o" />
