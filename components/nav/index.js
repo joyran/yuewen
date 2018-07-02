@@ -49,16 +49,25 @@ class Nav extends Component {
   }
 
   render() {
-    const { comments, likes } = this.props.notice;
+    const { unviewNotices } = this.props.notice;
+    const unviewCommentNotices = unviewNotices.filter((n) => {
+      if (n.type === 'comment') { return n; }
+      return false;
+    });
+    const unviewLikeNotices = unviewNotices.filter((n) => {
+      if (n.type === 'like') { return n; }
+      return false;
+    });
+
     const { dispatch } = this.props;
 
     const notice = (
       <Tabs defaultActiveKey="1">
-        <TabPane tab={comments.length === 0 ? '评论' : `评论 ${comments.length}`} key="1">
-          <NoticeTabPane type="评论" dataSource={comments} dispatch={dispatch} />
+        <TabPane tab={unviewCommentNotices.length === 0 ? '评论' : `评论 ${unviewCommentNotices.length}`} key="1">
+          <NoticeTabPane type="评论" dataSource={unviewCommentNotices} dispatch={dispatch} />
         </TabPane>
-        <TabPane tab={likes.length === 0 ? '点赞' : `点赞 ${likes.length}`} key="2">
-          <NoticeTabPane type="点赞" dataSource={likes} dispatch={dispatch} />
+        <TabPane tab={unviewLikeNotices.length === 0 ? '点赞' : `点赞 ${unviewLikeNotices.length}`} key="2">
+          <NoticeTabPane type="点赞" dataSource={unviewLikeNotices} dispatch={dispatch} />
         </TabPane>
       </Tabs>
     );
@@ -124,7 +133,7 @@ class Nav extends Component {
             placement="bottom"
             overlayClassName="popover-notification"
           >
-            <Badge count={comments.length + likes.length}>
+            <Badge count={unviewNotices.length}>
               <Icon type="bell" />
             </Badge>
           </Popover>

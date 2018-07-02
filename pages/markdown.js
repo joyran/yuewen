@@ -70,20 +70,21 @@ Index.getInitialProps = async ({ store, req, query }) => {
   var res;
   // 文章索引 aid
   const aid = query.aid;
+  // 服务端请求时不会带上主机地址，必须手动添加
+  const { host } = req.headers;
 
   // ----- 读取当前登录用户所有信息
-  res = await fetch(`http://${req.headers.host}/api/v1/user`, {
+  res = await fetch(`http://${host}/api/v1/user`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
-  res = await res.json();
-  store.dispatch(readSessionSuccess(res));
-  const { login } = store.getState().session;
+  const user = await res.json();
+  store.dispatch(readSessionSuccess(user));
+  const { login } = user;
 
   if (aid) {
     // ----- 读取文章内容，作者等
-    res = await fetch(`http://${req.headers.host}/api/v1/users/${login}/articles/${aid}`, {
+    res = await fetch(`http://${host}/api/v1/users/${login}/articles/${aid}`, {
       method: 'get',
       headers: { Cookie: req.headers.cookie }
     });
@@ -95,11 +96,10 @@ Index.getInitialProps = async ({ store, req, query }) => {
 
 
   // ----- 读取所有话题 topics
-  res = await fetch(`http://${req.headers.host}/api/v1/topics`, {
+  res = await fetch(`http://${host}/api/v1/topics`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
   const topics = await res.json();
   store.dispatch(readTopicsSuccess(topics));
 

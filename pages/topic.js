@@ -81,14 +81,13 @@ Index.getInitialProps = async ({ store, req, query }) => {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
-  res = await res.json();
-  store.dispatch(readSessionSuccess(res));
-  const { login } = store.getState().session;
+  const user = await res.json();
+  store.dispatch(readSessionSuccess(user));
+  const { login } = user;
 
 
   // ----- 读取话题基本信息
-  res = await fetch(`http://${host}/api/v1/topic/${topic}`, {
+  res = await fetch(`http://${host}/api/v1/topics/${topic}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
@@ -99,52 +98,33 @@ Index.getInitialProps = async ({ store, req, query }) => {
 
   // ----- 读取话题下的文章
   const articles = store.getState().topic.articles;
-  res = await fetch(`http://${host}/api/v1/topic/${topic}/articles?&page=${articles.page}&per_page=${articles.per_page}`, {
+  res = await fetch(`http://${host}/api/v1/topics/${topic}/articles?&page=${articles.page}&per_page=${articles.per_page}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
   res = await res.json();
   store.dispatch(readTopicArticlesSuccess(res));
 
 
   // ----- 读取话题下的关注者
   const followers = store.getState().topic.followers;
-  res = await fetch(`http://${host}/api/v1/topic/${topic}/followers?&page=${followers.page}&per_page=${followers.per_page}`, {
+  res = await fetch(`http://${host}/api/v1/topics/${topic}/followers?&page=${followers.page}&per_page=${followers.per_page}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
   res = await res.json();
   store.dispatch(readTopicFollowersSuccess(res));
 
 
-  // ----- 读取用户未读通知消息数组
+  // ----- 读取用户未读通知消息
   res = await fetch(`http://${host}/api/v1/users/${login}/received_notices?has_view=false`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
   const unviewNotices = await res.json();
+  store.dispatch(readUnviewNoticeSuccess(unviewNotices));
 
-  // 过滤 comments
-  const comments = unviewNotices.filter((notice) => {
-    if (notice.type === 'comment') {
-      return notice;
-    }
-    return false;
-  });
-
-  // 过滤 likes
-  const likes = unviewNotices.filter((notice) => {
-    if (notice.type === 'like') {
-      return notice;
-    }
-    return false;
-  });
-
-  store.dispatch(readUnviewNoticeSuccess({ comments, likes }));
-
+  // 默认返回 200 OK
   return { statusCode: 200 };
 };
 

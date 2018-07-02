@@ -61,6 +61,8 @@ const Index = (props) => {
 
 Index.getInitialProps = async ({ store, req, query }) => {
   var res;
+  // 服务端请求时不会带上主机地址，必须手动添加
+  const { host } = req.headers;
 
   // 文章索引 aid, 为空显示 404 页面
   const { aid } = query;
@@ -68,18 +70,17 @@ Index.getInitialProps = async ({ store, req, query }) => {
 
 
   // ----- 读取当前登录用户基本信息
-  res = await fetch(`http://${req.headers.host}/api/v1/user`, {
+  res = await fetch(`http://${host}/api/v1/user`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
   const user = await res.json();
   store.dispatch(readSessionSuccess(user));
-  const { login } = store.getState().session;
+  const { login } = user;
 
 
   // ----- 读取文章内容
-  res = await fetch(`http://${req.headers.host}/api/v1/articles/${aid}`, {
+  res = await fetch(`http://${host}/api/v1/articles/${aid}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
@@ -89,50 +90,32 @@ Index.getInitialProps = async ({ store, req, query }) => {
 
 
   // ----- 读取文章点赞用户数组
-  res = await fetch(`http://${req.headers.host}/api/v1/articles/${aid}/likes`, {
+  res = await fetch(`http://${host}/api/v1/articles/${aid}/likes`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
-  res = await res.json();
-  store.dispatch(readArticleLikesSuccess(res));
+  const likes = await res.json();
+  store.dispatch(readArticleLikesSuccess(likes));
 
 
   // ----- 读取文章评论数组
-  res = await fetch(`http://${req.headers.host}/api/v1/articles/${aid}/comments`, {
+  res = await fetch(`http://${host}/api/v1/articles/${aid}/comments`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
-  res = await res.json();
-  store.dispatch(readArticleCommentsSuccess(res));
+  const comments = await res.json();
+  store.dispatch(readArticleCommentsSuccess(comments));
 
 
-  // ----- 读取用户未读通知消息数组
-  res = await fetch(`http://${req.headers.host}/api/v1/users/${login}/received_notices?has_view=false`, {
+  // ----- 读取用户未读通知消息
+  res = await fetch(`http://${host}/api/v1/users/${login}/received_notices?has_view=false`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
   const unviewNotices = await res.json();
+  store.dispatch(readUnviewNoticeSuccess(unviewNotices));
 
-  // 过滤 comments
-  const comments = unviewNotices.filter((notice) => {
-    if (notice.type === 'comment') {
-      return notice;
-    }
-    return false;
-  });
-
-  // 过滤 likes
-  const likes = unviewNotices.filter((notice) => {
-    if (notice.type === 'like') {
-      return notice;
-    }
-    return false;
-  });
-
-  store.dispatch(readUnviewNoticeSuccess({ comments, likes }));
-
+  // 默认返回 200 OK
   return { statusCode: 200 };
 };
 

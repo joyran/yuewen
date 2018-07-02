@@ -68,10 +68,9 @@ Index.getInitialProps = async ({ store, req }) => {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
-  res = await res.json();
-  store.dispatch(readSessionSuccess(res));
-  const { login } = store.getState().session;
+  const user = await res.json();
+  store.dispatch(readSessionSuccess(user));
+  const { login } = user;
 
 
   // ----- 读取所有话题
@@ -79,37 +78,19 @@ Index.getInitialProps = async ({ store, req }) => {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
   res = await res.json();
   store.dispatch(readTopicsSuccess(res));
 
 
-  // ----- 读取用户未读通知消息数组
+  // ----- 读取用户未读通知消息
   res = await fetch(`http://${host}/api/v1/users/${login}/received_notices?has_view=false`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
   const unviewNotices = await res.json();
+  store.dispatch(readUnviewNoticeSuccess(unviewNotices));
 
-  // 过滤 comments
-  const comments = unviewNotices.filter((notice) => {
-    if (notice.type === 'comment') {
-      return notice;
-    }
-    return false;
-  });
-
-  // 过滤 likes
-  const likes = unviewNotices.filter((notice) => {
-    if (notice.type === 'like') {
-      return notice;
-    }
-    return false;
-  });
-
-  store.dispatch(readUnviewNoticeSuccess({ comments, likes }));
-
+  // 默认返回 200 OK
   return { statusCode: 200 };
 };
 

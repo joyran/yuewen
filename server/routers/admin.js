@@ -2,12 +2,13 @@
  * 后台管理
  */
 
-var Router = require('koa-router');
-var router = new Router();
-var Article = require('../models/article');
-var Like = require('../models/like');
-var User = require('../models/user');
-var Notice = require('../models/notice');
+const Router = require('koa-router');
+const router = new Router();
+const Article = require('../models/article');
+const Like = require('../models/like');
+const User = require('../models/user');
+const Notice = require('../models/notice');
+const jsonPretty = require('./json-pretty');
 
 
 /**
@@ -22,15 +23,8 @@ router.get('/api/v1/admin/users', async ctx => {
   const skip = (page - 1) * per_page;
   const { has_view } = ctx.query;
 
-  if (!ctx.session.uid) {
-    ctx.status = 401;
-    ctx.body = { message: '需要登录' };
-    return;
-  }
-
   if (!ctx.session.admin) {
-    ctx.status = 403;
-    ctx.body = { message: '没有权限' };
+    jsonPretty(ctx, 403, { message: '没有权限' });
     return;
   }
 
@@ -42,14 +36,9 @@ router.get('/api/v1/admin/users', async ctx => {
   });
 
   // 读取用户总数量
-  var count = await User.find({}).count();
+  var total = await User.find({}).count();
 
-  ctx.status = 200;
-  ctx.body = {
-    status: 200,
-    data: users,
-    count
-  }
+  jsonPretty(ctx, 200, { data: users, total });
 });
 
 
@@ -65,15 +54,8 @@ router.get('/api/v1/admin/articles', async ctx => {
   const skip = (page - 1) * per_page;
   const { has_view } = ctx.query;
 
-  if (!ctx.session.uid) {
-    ctx.status = 401;
-    ctx.body = { message: '需要登录' };
-    return;
-  }
-
   if (!ctx.session.admin) {
-    ctx.status = 403;
-    ctx.body = { message: '没有权限' };
+    jsonPretty(ctx, 403, { message: '没有权限' });
     return;
   }
 
@@ -86,14 +68,9 @@ router.get('/api/v1/admin/articles', async ctx => {
   });
 
   // 读取文章总数量
-  var count = await Article.find({}).count();
+  var total = await Article.find({}).count();
 
-  ctx.status = 200;
-  ctx.body = {
-    status: 200,
-    data: articles,
-    count
-  }
+  jsonPretty(ctx, 200, { data: articles, total });
 });
 
 module.exports = router;

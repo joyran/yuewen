@@ -58,53 +58,36 @@ const Index = (props) => {
 
 Index.getInitialProps = async ({ store, req }) => {
   var res;
+  // 服务端请求时不会带上主机地址，必须手动添加
+  const { host } = req.headers;
 
   // ----- 读取当前登录用户所有信息
-  res = await fetch(`http://${req.headers.host}/api/v1/user`, {
+  res = await fetch(`http://${host}/api/v1/user`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
-  res = await res.json();
-  store.dispatch(readSessionSuccess(res));
-  const { login } = store.getState().session;
+  const user = await res.json();
+  store.dispatch(readSessionSuccess(user));
+  const { login } = user;
 
 
   // ----- 读取用户发表的所有文章
-  res = await fetch(`http://${req.headers.host}/api/v1/users/${login}/articles`, {
+  res = await fetch(`http://${host}/api/v1/users/${login}/articles`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
   const articles = await res.json();
   store.dispatch(readArticlesSuccess(articles));
 
-  // ----- 读取用户未读通知消息数组
-  res = await fetch(`http://${req.headers.host}/api/v1/users/${login}/received_notices?has_view=false`, {
+  // ----- 读取用户未读通知消息
+  res = await fetch(`http://${host}/api/v1/users/${login}/received_notices?has_view=false`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
   const unviewNotices = await res.json();
+  store.dispatch(readUnviewNoticeSuccess(unviewNotices));
 
-  // 过滤 comments
-  const comments = unviewNotices.filter((notice) => {
-    if (notice.type === 'comment') {
-      return notice;
-    }
-    return false;
-  });
-
-  // 过滤 likes
-  const likes = unviewNotices.filter((notice) => {
-    if (notice.type === 'like') {
-      return notice;
-    }
-    return false;
-  });
-
-  store.dispatch(readUnviewNoticeSuccess({ comments, likes }));
-
+  // 默认返回 200 OK
   return { statusCode: 200 };
 };
 

@@ -31,13 +31,9 @@ export const updateAllNoticeToView = () => (dispatch, getState) => {
       'Content-Type': 'application/json'
     }
   })
-    .then((res) => {
-      if (res.status === 201) {
-        dispatch(updateAllNoticeToViewSuccess());
-        message.success('清空通知消息成功');
-      } else {
-        message.error('清空通知消息失败');
-      }
+    .then(() => {
+      message.success('清空通知消息成功');
+      dispatch(updateAllNoticeToViewSuccess());
     })
     .catch((err) => {
       console.error(err.message);
@@ -58,13 +54,7 @@ export const updateNoticeToView = (nid, link) => (dispatch, getState) => {
       'Content-Type': 'application/json'
     }
   })
-    .then((res) => {
-      if (res.status === 201) {
-        top.location = link;
-      } else {
-        message.error('更新通知消息状态为已读失败');
-      }
-    })
+    .then(() => { top.location = link; })
     .catch((err) => {
       console.error(err.message);
       message.error(networkErrorMsg, 5);
@@ -78,7 +68,7 @@ export const updateNoticeToView = (nid, link) => (dispatch, getState) => {
 export const notice = handleActions({
   READ_UNVIEW_NOTICE_SUCCESS: (state, action) => ({
     ...state,
-    ...action.payload
+    unviewNotices: action.payload
   }),
 
   READ_ALL_NOTICE_SUCCESS: (state, action) => ({
@@ -88,8 +78,7 @@ export const notice = handleActions({
 
   UPDATE_ALL_NOTICE_TO_VIEW_SUCCESS: state => ({
     ...state,
-    comments: [],
-    likes: []
+    unviewNotices: []
   })
 }, {});
 

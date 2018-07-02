@@ -6,6 +6,7 @@ const fetch = require('isomorphic-fetch');
 const Router = require('koa-router');
 const router = new Router();
 const Article = require('../models/article');
+const jsonPretty = require('./json-pretty');
 
 /**
  * 搜索
@@ -50,9 +51,7 @@ router.get('/api/v1/search/:keyword', async ctx => {
       }
     })
 
-  // 输出返回值
-  ctx.status = 200;
-  ctx.body = { data };
+  jsonPretty(ctx, status, data);
 });
 
 module.exports = router;

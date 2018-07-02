@@ -2,9 +2,10 @@
  * 登录相关路由，包括登录，退出，读取
  */
 
-var Router = require('koa-router');
-var router = new Router();
-var User = require('../models/user');
+const Router = require('koa-router');
+const router = new Router();
+const User = require('../models/user');
+const jsonPretty = require('./json-pretty');
 
 /**
  * 退出登录，删除 uid和 koa:sess cookie，删除所有session
@@ -21,8 +22,7 @@ router.del('/api/v1/session', async ctx => {
     maxAge: 0
   });
 
-  ctx.status = 204;
-  ctx.body = {};
+  jsonPretty(ctx, 204, {})
 });
 
 
@@ -83,8 +83,7 @@ router.post('/api/v1/session', async ctx => {
   }
 
   // 输出返回值
-  ctx.status = status;
-  ctx.body = { status, message };
+  jsonPretty(ctx, status, { message });
 });
 
 module.exports = router;

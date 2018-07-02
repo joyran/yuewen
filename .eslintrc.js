@@ -29,6 +29,7 @@ const eslintrc = {
     'consistent-return': 0,
     'no-redeclare': 0,
     'no-unused-expressions': ['error', { 'allowShortCircuit': true }],
+    'no-lonely-if': 0,
     'class-methods-use-this': 0,
     'react/require-extension': 0,
     'react/react-in-jsx-scope': 0,

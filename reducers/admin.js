@@ -72,15 +72,13 @@ export const readArticles = (page, per_page) => (dispatch) => {
 export const admin = handleActions({
   READ_USERS_SUCCESS: (state, action) => ({
     ...state,
-    data: action.payload.data,
-    count: action.payload.count,
+    ...action.payload,
     loading: !state.loading,
   }),
 
   READ_ARTICLES_SUCCESS: (state, action) => ({
     ...state,
-    data: action.payload.data,
-    count: action.payload.count,
+    ...action.payload,
     loading: !state.loading,
   }),
 

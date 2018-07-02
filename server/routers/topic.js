@@ -1,8 +1,8 @@
-var Router = require('koa-router');
-var router = new Router();
-var Topic = require('../models/topic');
-var Article = require('../models/article');
-var User = require('../models/user');
+const Router = require('koa-router');
+const router = new Router();
+const Topic = require('../models/topic');
+const Article = require('../models/article');
+const User = require('../models/user');
 
 /**
  * 读取所有话题
@@ -21,7 +21,7 @@ router.get('/api/v1/topics', async ctx => {
 
   var user = await User.findOne({ _id: uid }).lean();
 
-  // 读取所有话题, 按照文章数量降序排序
+  // 读取所有话题, 按照话题下文章数量降序排序
   var topics = await Topic.find({}).sort({ articles: -1 }).skip(skip).limit(per_page).lean();
 
   // 话题总数
@@ -36,7 +36,7 @@ router.get('/api/v1/topics', async ctx => {
 /**
  * 读取话题基本信息
  */
-router.get('/api/v1/topic/:topic', async ctx => {
+router.get('/api/v1/topics/:topic', async ctx => {
   const { topic } = ctx.params;
   const { uid } = ctx.session;
 
@@ -68,7 +68,7 @@ router.get('/api/v1/topic/:topic', async ctx => {
 /**
  * 读取话题文章
  */
-router.get('/api/v1/topic/:topic/articles', async ctx => {
+router.get('/api/v1/topics/:topic/articles', async ctx => {
   const { topic } = ctx.params;
   const { uid } = ctx.session;
   const page  = ctx.query.page ? parseInt(ctx.query.page) : 1;
@@ -133,7 +133,7 @@ router.get('/api/v1/topic/:topic/articles', async ctx => {
 /**
  * 读取话题关注者
  */
-router.get('/api/v1/topic/:topic/followers', async ctx => {
+router.get('/api/v1/topics/:topic/followers', async ctx => {
   const { topic } = ctx.params;
   const { uid } = ctx.session;
   const page  = ctx.query.page ? parseInt(ctx.query.page) : 1;
@@ -177,7 +177,7 @@ router.get('/api/v1/topic/:topic/followers', async ctx => {
 /**
  * 关注话题
  */
-router.put('/api/v1/topic/:topic/follow', async ctx => {
+router.put('/api/v1/topics/:topic/follow', async ctx => {
   const { topic } = ctx.params;
   const { uid } = ctx.session;
 
@@ -226,7 +226,7 @@ router.put('/api/v1/topic/:topic/follow', async ctx => {
 /**
  * 取消关注话题
  */
-router.delete('/api/v1/topic/:topic/follow', async ctx => {
+router.delete('/api/v1/topics/:topic/follow', async ctx => {
   const { topic } = ctx.params;
   const { uid } = ctx.session;
 

@@ -37,7 +37,7 @@ export const readTopicArticles = () => (dispatch, getState) => {
   const { topic, articles } = getState().topic;
   const { sort_by } = articles;
 
-  fetch(`/api/v1/topic/${topic}/articles?page=${articles.page}&per_page=${articles.per_page}&sort_by=${sort_by}`, {
+  fetch(`/api/v1/topics/${topic}/articles?page=${articles.page}&per_page=${articles.per_page}&sort_by=${sort_by}`, {
     credentials: 'include',
     method: 'get'
   })
@@ -56,7 +56,7 @@ export const readTopicArticles = () => (dispatch, getState) => {
 export const readTopicFollowers = () => (dispatch, getState) => {
   const { topic, followers } = getState().topic;
 
-  fetch(`/api/v1/topic/${topic}/followers?page=${followers.page}&per_page=${followers.per_page}`, {
+  fetch(`/api/v1/topics/${topic}/followers?page=${followers.page}&per_page=${followers.per_page}`, {
     credentials: 'include',
     method: 'get'
   })
@@ -78,7 +78,7 @@ export const readTopicFollowers = () => (dispatch, getState) => {
 export const followTopic = (topic, method) => (dispatch, getState) => {
   var followed_topics = getState().session.followed_topics;
 
-  fetch(`/api/v1/topic/${topic}/follow`, {
+  fetch(`/api/v1/topics/${topic}/follow`, {
     credentials: 'include',
     method,
     headers: {

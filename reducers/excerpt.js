@@ -13,10 +13,12 @@ const networkErrorMsg = '网络连接失败，请刷新重试！';
 // ------------------------
 export const {
   readExcerptsSuccess,
-  changeTag
+  changeTag,
+  showLoadingCard
 } = createActions(
   'READ_EXCERPTS_SUCCESS',
-  'CHANGE_TAG'
+  'CHANGE_TAG',
+  'SHOW_LOADING_CARD'
 );
 
 /**
@@ -25,8 +27,9 @@ export const {
  */
 export const readExcerptsByUser = login => (dispatch, getState) => {
   const { page, sortby, per_page } = getState().excerpt;
+  dispatch(showLoadingCard());
 
-  fetch(`/api/v1/users/${login}/excerpts/${sortby}?page=${page}&per_page=${per_page}`, {
+  return fetch(`/api/v1/users/${login}/excerpts/${sortby}?page=${page}&per_page=${per_page}`, {
     credentials: 'include',
     method: 'get'
   })
@@ -59,5 +62,10 @@ export const excerpt = handleActions({
     data: [],
     loading: true,
     has_more: true
+  }),
+
+  SHOW_LOADING_CARD: state => ({
+    ...state,
+    loading: true
   })
 }, {});

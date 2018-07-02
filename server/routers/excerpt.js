@@ -2,11 +2,12 @@
  * 文章摘要路由
  */
 
-var Router = require('koa-router');
-var router = new Router();
-var Article = require('../models/article');
-var Collection = require('../models/collection');
-var User = require('../models/user');
+const Router = require('koa-router');
+const router = new Router();
+const Article = require('../models/article');
+const Collection = require('../models/collection');
+const User = require('../models/user');
+const jsonPretty = require('./json-pretty');
 
 
 /**
@@ -19,16 +20,9 @@ router.get('/api/v1/users/:login/excerpts/follow', async ctx => {
   const per_page = ctx.query.per_page ? parseInt(ctx.query.per_page) : 10;
   const skip = (page - 1) * per_page;
 
-  if (!uid) {
-    ctx.status = 401;
-    ctx.body = { message: '需要登录' };
-    return;
-  }
-
-  var user = await User.findOne({ login }).lean();
+  const user = await User.findOne({ login }).lean();
   if (!user) {
-    ctx.status = 404;
-    ctx.body = { message: 'Not Found' };
+    jsonPretty(ctx, 404, { message: 'Not Found' });
     return;
   }
 
@@ -37,7 +31,7 @@ router.get('/api/v1/users/:login/excerpts/follow', async ctx => {
                               .skip(skip).limit(per_page).lean();
 
   // 读取文章总数
-  var total = await Article.find({ topics: { $in: user.followed_topics }}).count({});
+  const total = await Article.find({ topics: { $in: user.followed_topics }}).count({});
 
   // 删除一些敏感信息和冗余字段
   excerpts.map((excerpt) => {
@@ -50,11 +44,10 @@ router.get('/api/v1/users/:login/excerpts/follow', async ctx => {
   });
 
   // 检测是否还有更多，总数小于 skip + per_page 则没有更多了。
-  const has_more = skip + per_page >= total ? false : true;
+  const has_more = skip + per_page < total;
 
   // 输出返回值
-  ctx.status = 200;
-  ctx.body = { data: excerpts, has_more };
+  jsonPretty(ctx, 200, { data: excerpts, has_more, total });
 });
 
 
@@ -68,16 +61,9 @@ router.get('/api/v1/users/:login/excerpts/create', async ctx => {
   const per_page = ctx.query.per_page ? parseInt(ctx.query.per_page) : 10;
   const skip = (page - 1) * per_page;
 
-  if (!uid) {
-    ctx.status = 401;
-    ctx.body = { message: '需要登录' };
-    return;
-  }
-
   const user = await User.findOne({ login }).lean();
   if (!user) {
-    ctx.status = 404;
-    ctx.body = { message: 'Not Found' };
+    jsonPretty(ctx, 404, { message: 'Not Found' });
     return;
   }
 
@@ -99,8 +85,7 @@ router.get('/api/v1/users/:login/excerpts/create', async ctx => {
   const has_more = skip + per_page >= excerpts_created_count ? false : true;
 
   // 输出返回值
-  ctx.status = 200;
-  ctx.body = { data: excerpts, excerpts_created_count, excerpts_collected_count, has_more };
+  jsonPretty(ctx, 200, { data: excerpts, excerpts_created_count, excerpts_collected_count, has_more });
 });
 
 
@@ -114,16 +99,9 @@ router.get('/api/v1/users/:login/excerpts/collect', async ctx => {
   const per_page = ctx.query.per_page ? parseInt(ctx.query.per_page) : 10;
   const skip = (page - 1) * per_page;
 
-  if (!uid) {
-    ctx.status = 401;
-    ctx.body = { message: '需要登录' };
-    return;
-  }
-
   const user = await User.findOne({ login }).lean();
   if (!user) {
-    ctx.status = 404;
-    ctx.body = { message: 'Not Found' };
+    jsonPretty(ctx, 404, { message: 'Not Found' });
     return;
   }
 
@@ -151,8 +129,7 @@ router.get('/api/v1/users/:login/excerpts/collect', async ctx => {
   const has_more = skip + per_page >= excerpts_collected_count ? false : true;
 
   // 输出返回值
-  ctx.status = 200;
-  ctx.body = { data: excerpts, excerpts_collected_count, has_more };
+  jsonPretty(ctx, 200, { data: excerpts, excerpts_collected_count, has_more })
 });
 
 module.exports = router;

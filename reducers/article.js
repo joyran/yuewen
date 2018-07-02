@@ -19,8 +19,10 @@ export const {
   readConversationSuccess,
   toggleCommentReplyEditor,
   toggleConversationModal,
-  updateCommentLikesSuccess,
-  updateConversationLikesSuccess
+  createCommentLikesSuccess,
+  deleteCommentLikesSuccess,
+  createConversationLikesSuccess,
+  deleteConversationLikesSuccess
 } = createActions(
   'READ_ARTICLE_SUCCESS',
   'READ_ARTICLE_LIKES_SUCCESS',
@@ -30,8 +32,10 @@ export const {
   'READ_CONVERSATION_SUCCESS',
   'TOGGLE_COMMENT_REPLY_EDITOR',
   'TOGGLE_CONVERSATION_MODAL',
-  'UPDATE_COMMENT_LIKES_SUCCESS',
-  'UPDATE_CONVERSATION_LIKES_SUCCESS'
+  'CREATE_COMMENT_LIKES_SUCCESS',
+  'DELETE_COMMENT_LIKES_SUCCESS',
+  'CREATE_CONVERSATION_LIKES_SUCCESS',
+  'DELETE_CONVERSATION_LIKES_SUCCESS'
 );
 
 /**
@@ -80,11 +84,10 @@ export const updateArticleCollection = aid => (dispatch, getState) => {
     .then((res) => {
       if (res.status === 201) {
         message.success('收藏文章成功');
-        dispatch(updateArticleCollectionSuccess());
       } else if (res.status === 204) {
         message.success('取消收藏文章成功');
-        dispatch(updateArticleCollectionSuccess());
       }
+      dispatch(updateArticleCollectionSuccess());
     })
     .catch((err) => {
       console.error(err.message);
@@ -207,12 +210,19 @@ export const updateCommentLikes = (cid, has_liked, type) => (dispatch) => {
       'Content-Type': 'application/json'
     }
   })
-    .then(res => res.json())
-    .then((res) => {
+    .then(() => {
       if (type === 'comment') {
-        dispatch(updateCommentLikesSuccess(res));
+        if (has_liked) {
+          dispatch(deleteCommentLikesSuccess(cid));
+        } else {
+          dispatch(createCommentLikesSuccess(cid));
+        }
       } else {
-        dispatch(updateConversationLikesSuccess(res));
+        if (has_liked) {
+          dispatch(deleteConversationLikesSuccess(cid));
+        } else {
+          dispatch(createConversationLikesSuccess(cid));
+        }
       }
     })
     .catch((err) => {
@@ -278,30 +288,59 @@ export const article = handleActions({
     conversation_modal_visible: !state.conversation_modal_visible
   }),
 
-  UPDATE_COMMENT_LIKES_SUCCESS: (state, action) => ({
+  CREATE_COMMENT_LIKES_SUCCESS: (state, action) => ({
     ...state,
     comments: state.comments.map((comment) => {
-      if (comment._id === action.payload.cid) {
-        comment.likes_count = action.payload.likes_count;
-        comment.has_liked = !comment.has_liked;
+      if (comment._id === action.payload) {
+        comment.likes_count += 1;
+        comment.has_liked = true;
       }
       return comment;
     })
   }),
 
-  UPDATE_CONVERSATION_LIKES_SUCCESS: (state, action) => ({
+  DELETE_COMMENT_LIKES_SUCCESS: (state, action) => ({
+    ...state,
+    comments: state.comments.map((comment) => {
+      if (comment._id === action.payload) {
+        comment.likes_count -= 1;
+        comment.has_liked = false;
+      }
+      return comment;
+    })
+  }),
+
+  CREATE_CONVERSATION_LIKES_SUCCESS: (state, action) => ({
     ...state,
     conversation: state.conversation.map((comment) => {
-      if (comment._id === action.payload.cid) {
-        comment.likes_count = action.payload.likes_count;
-        comment.has_liked = !comment.has_liked;
+      if (comment._id === action.payload) {
+        comment.likes_count += 1;
+        comment.has_liked = true;
       }
       return comment;
     }),
     comments: state.comments.map((comment) => {
-      if (comment._id === action.payload.cid) {
-        comment.likes_count = action.payload.likes_count;
-        comment.has_liked = !comment.has_liked;
+      if (comment._id === action.payload) {
+        comment.likes_count += 1;
+        comment.has_liked = true;
+      }
+      return comment;
+    })
+  }),
+
+  DELETE_CONVERSATION_LIKES_SUCCESS: (state, action) => ({
+    ...state,
+    conversation: state.conversation.map((comment) => {
+      if (comment._id === action.payload) {
+        comment.likes_count -= 1;
+        comment.has_liked = false;
+      }
+      return comment;
+    }),
+    comments: state.comments.map((comment) => {
+      if (comment._id === action.payload) {
+        comment.likes_count -= 1;
+        comment.has_liked = false;
       }
       return comment;
     })

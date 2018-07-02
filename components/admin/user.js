@@ -41,7 +41,7 @@ class User extends Component {
 
     // 分页组件
     const pagination = {
-      total: this.props.admin.count,
+      total: this.props.admin.total,
       showSizeChanger: true,
       showTotal: total => `总数 ${total}`
     };

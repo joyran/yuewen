@@ -2,10 +2,11 @@
  * 用户
  */
 
-var Router = require('koa-router');
-var router = new Router();
-var User = require('../models/user');
-var Article = require('../models/article');
+const Router = require('koa-router');
+const router = new Router();
+const User = require('../models/user');
+const Article = require('../models/article');
+const jsonPretty = require('./json-pretty');
 
 /**
  * 读取当前登录用户基本信息
@@ -15,33 +16,20 @@ var Article = require('../models/article');
  */
 router.get('/api/v1/user', async ctx => {
   const { uid } = ctx.session;
-
-  if (!uid) {
-    ctx.status = 401;
-    ctx.body = { message: '需要登录' };
-    return;
-  }
-
   var user = await User.findOne({ _id: uid }).lean();
-
-  if (!user) {
-    ctx.status = 404;
-    ctx.body = { 'message': 'Not Found' };
-    return;
-  }
 
   // 删除用户密码
   delete user.password;
-
   // 用户接收的通知消息 url
-  user.received_notices_url = `/api/v1/users/${user.login}/received_notices`;
+  user.received_notices_url = `${ctx.origin}/api/v1/users/${user.login}/received_notices`;
+  // 用户发表的文章 url
+  user.articles_url = `${ctx.origin}/api/v1/users/${user.login}/articles`
 
   // 用户发表的文章总数量
-  const articles_count = await Article.find({ author: uid }).count({});
-  user.articles_count = articles_count;
+  const articles = await Article.find({ author: uid }).count({});
+  user.articles = articles;
 
-  ctx.status = 200;
-  ctx.body = user;
+  jsonPretty(ctx, 200, user);
 });
 
 /**
@@ -57,21 +45,15 @@ router.get('/api/v1/users', async ctx => {
   const skip = (page - 1) * per_page;
   const { uid } = ctx.session;
 
-  if (!uid) {
-    ctx.status = 401;
-    ctx.body = { message: '需要登录' };
-    return;
-  }
-
   var users = await User.find({}).sort({ created_at: -1 }).skip(skip).limit(per_page).lean();
   users.map((user) => {
     delete user.password;
-    user.received_notices_url = `/api/v1/users/${user.login}/received_notices`;
-    user.url = `/api/v1/users/${user.login}`;
+    user.received_notices_url = `${ctx.origin}/api/v1/users/${user.login}/received_notices`;
+    user.url = `${ctx.origin}/api/v1/users/${user.login}`;
+    user.articles_url = `${ctx.origin}/api/v1/users/${user.login}/articles`
   });
 
-  ctx.status = 200;
-  ctx.body = users;
+  jsonPretty(ctx, 200, users);
 });
 
 /**
@@ -84,25 +66,24 @@ router.get('/api/v1/users/:login', async ctx => {
   const { login } = ctx.params;
   const { uid } = ctx.session;
 
-  if (!uid) {
-    ctx.status = 401;
-    ctx.body = { message: '需要登录' };
-    return;
-  }
-
   var user = await User.findOne({ login }).lean();
   if (!user) {
-    ctx.status = 404;
-    ctx.body = { message: '未找到指定用户' };
+    jsonPretty(ctx, 404, { message: 'Not Found' });
     return;
   }
 
+  // 删除用户密码
   delete user.password;
-  user.received_notices_url = `/api/v1/users/${login}/received_notices`;
-  user.url = `/api/v1/users/${login}`;
+  // 用户接收的通知消息 url
+  user.received_notices_url = `${ctx.origin}/api/v1/users/${user.login}/received_notices`;
+  // 用户发表的文章 url
+  user.articles_url = `${ctx.origin}/api/v1/users/${user.login}/articles`
 
-  ctx.status = 200;
-  ctx.body = user;
+  // 用户发表的文章总数量
+  const articles = await Article.find({ author: uid }).count({});
+  user.articles = articles;
+
+  jsonPretty(ctx, 200, user);
 });
 
 
@@ -119,27 +100,24 @@ router.get('/api/v1/users/:login/articles', async ctx => {
   const per_page = ctx.query.per_page ? parseInt(ctx.query.per_page) : 10;
   const skip = (page - 1) * per_page;
 
-  if (!uid) {
-    ctx.status = 401;
-    ctx.body = { message: '需要登录' };
+  var user = await User.findOne({ login }).lean();
+  if (!user) {
+    jsonPretty(ctx, 404, { message: 'Not Found' });
     return;
   }
 
-  var user = await User.findOne({ login }).lean();
   var articles = await Article.find({ author: user._id }).sort({ created_at: -1 })
                               .skip(skip).limit(per_page).populate('author').lean();
   articles.map((article) => {
+    // 删除作者密码
     delete article.author.password;
-
     // 文章评论 url
-    article.comments_url = `/api/v1/articles/${article._id}/comments`;
-
+    article.comments_url = `${ctx.origin}/api/v1/articles/${article._id}/comments`;
     // 文章点赞用户 url
-    article.likes_url = `/api/v1/articles/${article._id}/likes`;
+    article.likes_url = `${ctx.origin}/api/v1/articles/${article._id}/likes`;
   })
 
-  ctx.status = 200;
-  ctx.body = articles;
+  jsonPretty(ctx, 200, articles);
 });
 
 
@@ -151,37 +129,31 @@ router.get('/api/v1/users/:login/articles/:aid', async ctx => {
   const { uid } = ctx.session;
   const { login, aid } = ctx.params;
 
-  if (!uid) {
-    ctx.status = 401;
-    ctx.body = { message: '需要登录' };
-    return;
-  }
-
   if (aid.length !== 24) {
-    ctx.status = 404;
-    ctx.body = { message: 'Not Found' };
+    jsonPretty(ctx, 404, { message: 'Not Found' });
     return;
   }
 
   var user = await User.findOne({ login }).lean();
-  var article = await Article.findOne({ author: user._id, _id: aid }).lean();
-
-  if (!article) {
-    ctx.status = 404;
-    ctx.body = { message: 'Not Found' };
+  if (!user) {
+    jsonPretty(ctx, 404, { message: 'Not Found' });
     return;
   }
 
+  var article = await Article.findOne({ author: user._id, _id: aid }).lean();
+  if (!article) {
+    jsonPretty(ctx, 404, { message: 'Not Found' });
+    return;
+  }
+
+  // 删除作者密码
   delete article.author.password;
-
   // 文章评论 url
-  article.comments_url = `/api/v1/articles/${article._id}/comments`;
-
+  article.comments_url = `${ctx.origin}/api/v1/articles/${article._id}/comments`;
   // 文章点赞用户 url
-  article.likes_url = `/api/v1/articles/${article._id}/likes`;
+  article.likes_url = `${ctx.origin}/api/v1/articles/${article._id}/likes`;
 
-  ctx.status = 200;
-  ctx.body = article;
+  jsonPretty(ctx, 200, article);
 });
 
 
@@ -196,27 +168,16 @@ router.put('/api/v1/user/password', async ctx => {
   const { oldpassword, newpassword } = ctx.request.body;
   const { uid } = ctx.session;
 
-  if (!uid) {
-    ctx.status = 401;
-    ctx.body = { message: '需要登录' };
-  }
-
   // 验证旧密码是否正确
   var result = await User.findOne({ _id: uid, password: oldpassword });
   if (!result) {
-    ctx.status = 401;
-    ctx.body = { message: '旧密码不正确' };
-  } else {
-    // 旧密码正确则修改密码
-    var result = await User.findByIdAndUpdate({ _id: uid }, { password: newpassword }).exec();
-    if (result) {
-      ctx.status = 201;
-      ctx.body = {};
-    } else {
-      ctx.status = 500;
-      ctx.body = { message: '服务器错误' };
-    }
+    jsonPretty(ctx, 401, { message: '旧密码不正确' });
+    return;
   }
+
+  // 旧密码正确则修改密码
+  await User.findByIdAndUpdate({ _id: uid }, { password: newpassword }).exec();
+  jsonPretty(ctx, 201, {});
 });
 
 module.exports = router;
