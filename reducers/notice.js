@@ -19,6 +19,29 @@ export const {
   'UPDATE_ALL_NOTICE_TO_VIEW_SUCCESS'
 );
 
+
+/**
+ * 读取所有通知消息
+ */
+export const readAllNotices = page => (dispatch, getState) => {
+  const { login } = getState().session;
+  return fetch(`/api/v1/users/${login}/received_notices?page=${page}`, {
+    credentials: 'include',
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(res => res.json())
+    .then((res) => {
+      dispatch(readAllNoticeSuccess(res));
+    })
+    .catch((err) => {
+      console.error(err.message);
+      message.error(networkErrorMsg, 5);
+    });
+};
+
 /**
  * 更新所有通知消息状态为已读
  */
@@ -68,17 +91,20 @@ export const updateNoticeToView = (nid, link) => (dispatch, getState) => {
 export const notice = handleActions({
   READ_UNVIEW_NOTICE_SUCCESS: (state, action) => ({
     ...state,
-    unviewNotices: action.payload
+    unview_notices: action.payload.data,
+    unview_notices_total: action.payload.total
   }),
 
   READ_ALL_NOTICE_SUCCESS: (state, action) => ({
     ...state,
-    notices: action.payload
+    notices: action.payload.data,
+    notices_total: action.payload.total
   }),
 
   UPDATE_ALL_NOTICE_TO_VIEW_SUCCESS: state => ({
     ...state,
-    unviewNotices: []
+    unview_notices: [],
+    unview_notices_total: 0
   })
 }, {});
 

@@ -49,12 +49,12 @@ class Nav extends Component {
   }
 
   render() {
-    const { unviewNotices } = this.props.notice;
-    const unviewCommentNotices = unviewNotices.filter((n) => {
+    const { unview_notices } = this.props.notice;
+    const unviewCommentNotices = unview_notices.filter((n) => {
       if (n.type === 'comment') { return n; }
       return false;
     });
-    const unviewLikeNotices = unviewNotices.filter((n) => {
+    const unviewLikeNotices = unview_notices.filter((n) => {
       if (n.type === 'like') { return n; }
       return false;
     });
@@ -133,7 +133,7 @@ class Nav extends Component {
             placement="bottom"
             overlayClassName="popover-notification"
           >
-            <Badge count={unviewNotices.length}>
+            <Badge count={this.props.notice.unview_notices_total}>
               <Icon type="bell" />
             </Badge>
           </Popover>

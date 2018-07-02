@@ -22,7 +22,7 @@ router.get('/api/v1/users/:login/received_notices', async ctx => {
   const { uid } = ctx.session;
   const { login } = ctx.params;
   const page  = ctx.query.page ? parseInt(ctx.query.page) : 1;
-  const per_page = ctx.query.per_page ? parseInt(ctx.query.per_page) : 100;
+  const per_page = ctx.query.per_page ? parseInt(ctx.query.per_page) : 10;
   const skip = (page - 1) * per_page;
   const { has_view } = ctx.query;
 
@@ -32,13 +32,16 @@ router.get('/api/v1/users/:login/received_notices', async ctx => {
     return;
   }
 
-  if (has_view === 'true' || has_view === 'false') {
+  if (has_view === 'false') {
+    // 未读通知
     var notices = await Notice.find({ atuser: user._id, has_view }).sort({ created_at: -1 })
-                              .skip(skip).limit(per_page).populate('initiator').lean();
+                              .populate('initiator').lean();
+    var total = await Notice.find({ atuser: user._id, has_view }).count();
   } else {
-    // 读取所有通知消息
+    // 所有通知
     var notices = await Notice.find({ atuser: user._id }).sort({ created_at: -1 })
                               .skip(skip).limit(per_page).populate('initiator').lean();
+    var total = await Notice.find({ atuser: user._id }).count();
   }
 
   notices.map((notice) => {
@@ -46,7 +49,7 @@ router.get('/api/v1/users/:login/received_notices', async ctx => {
     delete notice.initiator.password;
   });
 
-  jsonPretty(ctx, 200, notices);
+  jsonPretty(ctx, 200, { data: notices, total });
 });
 
 

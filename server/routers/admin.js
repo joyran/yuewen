@@ -30,6 +30,7 @@ router.get('/api/v1/admin/users', async ctx => {
 
   // 读取用户
   var users = await User.find({}).skip(skip).limit(per_page).lean();
+
   // 删除用户密码
   users.map((user) => {
     delete user.password;
@@ -61,6 +62,7 @@ router.get('/api/v1/admin/articles', async ctx => {
 
   // 读取文章
   var articles = await Article.find({}).sort({ created_at: -1 }).skip(skip).limit(per_page).populate('author').lean();
+
   // 删除用户密码
   articles.map((article) => {
     article.author_login = article.author.login;

@@ -2,10 +2,10 @@
  * 消息通知
  */
 
-import { List, Avatar, Badge } from 'antd';
+import { List, Avatar, Badge, Pagination } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { updateNoticeToView } from '../../reducers/notice';
+import { updateNoticeToView, readAllNotices } from '../../reducers/notice';
 import stylesheet from './index.scss';
 
 // 时间汉化
@@ -40,6 +40,15 @@ const Notice = (props) => {
           <img src="/imgs/notice.svg" alt="空空而已" />
           <p>还没有收到新通知哦</p>
         </div>
+      }
+      { props.notice.notices_total > 10 ?
+        <Pagination
+          defaultCurrent={1}
+          total={props.notice.notices_total}
+          className="comment-pagination"
+          style={{ marginTop: 24, textAlign: 'center' }}
+          onChange={(page) => { props.dispatch(readAllNotices(page)); }}
+        /> : ''
       }
     </div>
   );
