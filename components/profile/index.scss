@@ -1,5 +1,9 @@
 @import "././styles/variable";
 
+.ant-tabs-nav .ant-tabs-tab {
+  margin-left: 20px !important;
+}
+
 // profile-header
 .profile-header {
   width: $layout-width;

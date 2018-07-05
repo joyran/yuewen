@@ -13,6 +13,8 @@ var schema = new Schema({
   avatar_url: String,
   small_avatar_url: String,
   followed_topics: Array,
+  following: Array,
+  followers: Array,
   prestige: Number,
   banner_url: String,
   bio: String,

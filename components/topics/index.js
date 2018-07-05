@@ -47,11 +47,11 @@ const Topics = (props) => {
                 <Col span={2}>
                   <img src={item.avatar_url} className="topic_avatar" alt={item.topic} />
                 </Col>
-                <Col span={18}>
+                <Col span={19}>
                   <a className="topic-title" href={`/topic/${item.topic}`}>{item.topic}</a>
                   <span className="topic-description">{item.description}</span>
                 </Col>
-                <Col span={4}>
+                <Col span={3}>
                   <Button
                     type="primary"
                     className={has_followed ? 'followed' : 'unfollowed'}
@@ -63,7 +63,7 @@ const Topics = (props) => {
             );
           })
         }
-        <Pagination style={{ float: 'right', marginTop: 24 }} showSizeChanger onShowSizeChange={onChange} onChange={onChange} total={count} />
+        <Pagination style={{ textAlign: 'center', marginTop: 24 }} showSizeChanger onShowSizeChange={onChange} onChange={onChange} total={count} />
       </Card>
     </div>
   );

@@ -3,7 +3,7 @@
  */
 
 import React, { Component } from 'react';
-import { Icon, Badge, Popover, Tabs, Row, Col, Avatar, Dropdown, Menu } from 'antd';
+import { Icon, Badge, Popover, Tabs, Row, Col, Avatar, Dropdown } from 'antd';
 import { connect } from 'react-redux';
 import fetch from 'isomorphic-fetch';
 import { deleteSession } from '../../reducers/session';
@@ -17,22 +17,40 @@ class Nav extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchResult: [],
-      visible: false
+      searchResult: {
+        data: {
+          articles: [],
+          users: []
+        },
+        total: 0
+      },
+      visible: false,
+      query: null
     };
   }
 
   onSearch = (e) => {
-    const keyword = e.target.value;
-    if (!keyword) return false;
+    const query = e.target.value;
+    if (!query) {
+      this.setState({
+        searchResult: {
+          data: {
+            articles: [],
+            users: []
+          },
+          total: 0
+        }
+      });
+      return false;
+    }
 
-    fetch(`/api/v1/search/${keyword}`, {
+    fetch(`/api/v1/search/all?q=${query}`, {
       credentials: 'include',
       method: 'get'
     })
       .then(res => res.json())
       .then((res) => {
-        this.setState({ searchResult: res.data });
+        this.setState({ searchResult: res, query });
       });
   }
 
@@ -50,17 +68,21 @@ class Nav extends Component {
 
   render() {
     const { unview_notices } = this.props.notice;
+    const { dispatch } = this.props;
+
+    // 过滤出 type 为 comment 的评论通知
     const unviewCommentNotices = unview_notices.filter((n) => {
       if (n.type === 'comment') { return n; }
       return false;
     });
+
+    // 过滤出 type 为 like 的点赞通知
     const unviewLikeNotices = unview_notices.filter((n) => {
       if (n.type === 'like') { return n; }
       return false;
     });
 
-    const { dispatch } = this.props;
-
+    // 消息通知卡片组件，包括评论和点赞通知消息
     const notice = (
       <Tabs defaultActiveKey="1">
         <TabPane tab={unviewCommentNotices.length === 0 ? '评论' : `评论 ${unviewCommentNotices.length}`} key="1">
@@ -72,6 +94,7 @@ class Nav extends Component {
       </Tabs>
     );
 
+    // 点击个人头像弹出的 Popover
     const profile = (
       <div>
         <a href={`/user/${this.props.session.login}`} ><Icon type="user" />个人主页</a>
@@ -83,26 +106,39 @@ class Nav extends Component {
       </div>
     );
 
+    // 搜索结果下拉展示组件
     const search = (
-      <Menu>
-        { this.state.searchResult.map((item, index) => {
-          // 文章标题默认从 highlight 中读取，如果 highlight 中没有则从 _source 中读取
-          const title = item.highlight.title ? item.highlight.title[0] : item._source.title;
-
-          // markdown默认从 highlight 中读取，如果 highlight 中没有则从 _source 中读取摘要
-          const markdown = item.highlight.markdown ? item.highlight.markdown[0] : item._source.excerpt;
-          // replace 删除摘要中 # 和空格
-          const excerpt = markdown.replace(/[#\s]/g, '');
-          return (
-            <Menu.Item key={index}>
-              <a href={`/article/${item._id}`} target="_blank">
-                <p className="title" dangerouslySetInnerHTML={{ __html: title }} />
-                <p className="excerpt" dangerouslySetInnerHTML={{ __html: excerpt }} />
-              </a>
-            </Menu.Item>
-          );
-        }) }
-      </Menu>
+      <div>
+        { this.state.searchResult.data.articles.length > 0 ? <p className="search-header">文章</p> : '' }
+        <ul>
+          { this.state.searchResult.data.articles.map((item, index) => {
+            // 文章标题默认从 highlight 中读取，如果 highlight 中没有则从 _source 中读取
+            const title = item.highlight.title ? item.highlight.title[0] : item._source.title;
+            return (
+              <li key={index} className="link">
+                <a href={`/article/${item._id}`} target="_blank">
+                  <span dangerouslySetInnerHTML={{ __html: title }} />
+                </a>
+              </li>
+            );
+          }) }
+        </ul>
+        { this.state.searchResult.data.users.length > 0 ? <p className="search-header">用户</p> : '' }
+        <ul>
+          { this.state.searchResult.data.users.map((item, index) => {
+            const name = item.highlight.name[0];
+            return (
+              <li key={index} className="link">
+                <a href={`/user/${item._source.login}`} target="_blank">
+                  <span dangerouslySetInnerHTML={{ __html: name }} />
+                </a>
+              </li>
+            );
+          }) }
+        </ul>
+        { this.state.searchResult.total > 0 ?
+          <a href={`/search?q=${this.state.query}`} className="search-hint">{`查看${this.state.searchResult.total}条搜索结果`}</a> : '' }
+      </div>
     );
 
     return (

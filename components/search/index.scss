@@ -1,0 +1,106 @@
+@import "././styles/variable";
+
+.wrapper {
+  background: #fff;
+  margin-top: 12px;
+}
+
+// 修改 tabs 默认样式
+.ant-tabs-bar {
+  margin: 0;
+}
+
+.ant-tabs-nav .ant-tabs-tab {
+  margin-left: 20px !important;
+}
+
+.search-not-found {
+  text-align: center;
+  color: $grey;
+  background: #fff;
+  padding-top: 100px;
+  height: 400px;
+}
+
+// 文章
+.article-item {
+  border-bottom: 1px solid $grey-lighter;
+  margin: 16px 20px 0;
+  padding-bottom: 16px;
+
+  a {
+    width: 100%;
+    display: inline-block;
+  }
+
+  em {
+    color: #f1403c;
+    font-style: normal;
+  }
+}
+
+.article-title {
+  color: $grey-darker;
+  display: inline-block;
+  width: 100%;
+  font-size: 16px;
+  line-height: 1.5;
+  vertical-align: middle;
+  text-overflow: ellipsis;
+  margin-bottom: 8px;
+  font-weight: 600;
+
+  &:hover {
+    color: $link-color;
+  }
+
+  &:hover em {
+    color: $link-color;
+  }
+}
+
+.article-excerpt {
+  margin-bottom: 0;
+  color: $grey-darker;
+  line-height: 2;
+}
+
+// 用户
+.user-item {
+  display: flex;
+  padding: 16px 20px;
+  border-bottom: 1px solid $grey-lighter;
+}
+
+.user-item-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 4px;
+}
+
+.user-item-content {
+  flex: 1;
+  margin-left: 24px;
+}
+
+.user-item-content-username {
+  font-size: 16px;
+  color: $grey-darker;
+  font-weight: 600;
+
+  em {
+    color: #f1403c;
+    font-style: normal;
+  }
+}
+
+.user-item-content-bio {
+  padding-top: 8px;
+  margin-bottom: 0;
+  color: $grey-darker;
+}
+
+.user-item-button {
+  margin-top: 16px;
+  width: 100px;
+}

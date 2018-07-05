@@ -13,7 +13,7 @@
 4. 打开浏览器访问 http://localhost:9200/ 查看是否启动成功
 5. 新建索引 yue, 并设置 type 为 articles，设置字段 markdown 和 title 分词器为 ik_max_word
 ```
-$ curl -X PUT 'localhost:9200/accounts' -d '
+PUT /yue
 {
   "mappings": {
     "articles": {
@@ -29,9 +29,18 @@ $ curl -X PUT 'localhost:9200/accounts' -d '
           "search_analyzer": "ik_max_word"
         }
       }
+    },
+    "users": {
+      "properties": {
+        "name": {
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "search_analyzer": "ik_max_word"
+        }
+      }
     }
   }
-}'
+}
 ```
 
 ### mongo-connector
@@ -48,9 +57,9 @@ $ curl -X PUT 'localhost:9200/accounts' -d '
 mongod --dbpath f:/mongodb/data/db --replSet rs0 --auth
 ```
 
-### 同步 MongoDB 数据到 elasticsearch
+### 同步 MongoDB 数据库 yue 下所有表格到 elasticsearch
 ```
-mongo-connector -m localhost:27017 -t localhost:9200 -d elastic2_doc_manager -n yue.articles
+mongo-connector -m localhost:27017 -t localhost:9200 -d elastic2_doc_manager -n yue.*
 ```
 
 ### 安装依赖

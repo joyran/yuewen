@@ -1,8 +1,7 @@
 /**
- * 用户个人主页
+ * 搜索展示页面
  */
 
-import { connect } from 'react-redux';
 import withRedux from 'next-redux-wrapper';
 import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
@@ -11,12 +10,12 @@ import fetch from 'isomorphic-fetch';
 import { Layout, BackTop, LocaleProvider } from 'antd';
 import Head from 'next/head';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
-import { reducers, readProfileSuccess } from '../reducers/profile';
-import { readExcerptsSuccess } from '../reducers/excerpt';
-import { readSessionSuccess } from '../reducers/session';
+import { parse } from 'url';
 import { readUnviewNoticeSuccess } from '../reducers/notice';
-import Profile from '../components/profile/index';
+import { readSessionSuccess } from '../reducers/session';
+import { reducers, searchArticleSuccess, initSearch } from '../reducers/search';
 import Nav from '../components/nav/index';
+import Search from '../components/search/index';
 import Error from '../components/error/index';
 import stylesheet from '../styles/index.scss';
 
@@ -24,15 +23,8 @@ const { Header, Content, Footer } = Layout;
 
 // 初始默认 state
 const initialState = {
-  profile: {},
-  excerpt: {
-    data: [],
-    page: 1,
-    per_page: 10,
-    sortby: 'create',
-  },
   session: {},
-  notice: {}
+  search: {}
 };
 
 const initStore = (state = initialState) => {
@@ -48,7 +40,7 @@ const Index = (props) => {
     <LocaleProvider locale={zhCN}>
       <Layout style={{ background: '#f6f6f6' }}>
         <Head>
-          <title>{`${props.profile.name} - 悦文`}</title>
+          <title>搜索结果 - 悦文</title>
           <link rel="stylesheet" href="/css/antd.css" />
           <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         </Head>
@@ -56,7 +48,7 @@ const Index = (props) => {
           <Nav />
         </Header>
         <Content>
-          <Profile />
+          <Search />
         </Content>
         <Footer />
         <BackTop />
@@ -65,40 +57,32 @@ const Index = (props) => {
   );
 };
 
-Index.getInitialProps = async ({ store, req, query }) => {
+Index.getInitialProps = async ({ store, req }) => {
   var res;
   // 服务端请求时不会带上主机地址，必须手动添加
   const { host } = req.headers;
-  const { user } = query;
-  const excerpt = store.getState().excerpt;
+  // 解析url，得到搜索关键字 query
+  const parsedUrl = parse(req.url, true);
+  // encodeURI对汉字转义
+  const q = encodeURI(parsedUrl.query.q);
+  store.dispatch(initSearch(q));
 
   // ----- 读取当前登录用户所有信息
   res = await fetch(`http://${host}/api/v1/user`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  res = await res.json();
-  store.dispatch(readSessionSuccess(res));
-  const { login } = res;
+  const user = await res.json();
+  store.dispatch(readSessionSuccess(user));
+  const { login } = user;
 
-
-  // ----- 读取用户个人基本信息
-  res = await fetch(`http://${host}/api/v1/users/${user}`, {
+  // ----- 读取搜索文章结果
+  res = await fetch(`http://${host}/api/v1/search/articles?q=${q}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  if (res.status !== 200) return { statusCode: res.status };
-  const profile = await res.json();
-  store.dispatch(readProfileSuccess(profile));
-
-
-  // ----- 读取当前用户所有发表的文章摘录
-  res = await fetch(`http://${host}/api/v1/users/${user}/excerpts/create?page=${excerpt.page}&per_page=${excerpt.per_page}`, {
-    method: 'get',
-    headers: { Cookie: req.headers.cookie }
-  });
-  const excerpts = await res.json();
-  store.dispatch(readExcerptsSuccess(excerpts));
+  const articles = await res.json();
+  store.dispatch(searchArticleSuccess(articles));
 
   // ----- 读取用户未读通知消息
   res = await fetch(`http://${host}/api/v1/users/${login}/received_notices?has_view=false`, {
@@ -113,4 +97,4 @@ Index.getInitialProps = async ({ store, req, query }) => {
 };
 
 
-export default withRedux(initStore, null)(connect(state => state)(Index));
+export default withRedux(initStore, null)(Index);

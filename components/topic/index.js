@@ -77,7 +77,7 @@ const Topic = (props) => {
                       >{follower.name}</a>
                       <p className="topic-follower-content-bio">{follower.bio}</p>
                     </div>
-                    <Button type="primary" className="topic-follower-button">关注</Button>
+                    <Button type="primary" icon="plus" className="topic-follower-button">关注</Button>
                   </div>
                 );
               })

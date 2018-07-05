@@ -87,7 +87,9 @@
 }
 
 .topic-follower-content-username {
-  font-size: 18px;
+  font-size: 16px;
+  color: $grey-darker;
+  font-weight: 600;
 }
 
 .topic-follower-content-bio {
@@ -98,4 +100,5 @@
 
 .topic-follower-button {
   margin-top: 16px;
+  width: 100px;
 }

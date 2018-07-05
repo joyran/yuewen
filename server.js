@@ -103,6 +103,12 @@ app.prepare().then(() => {
     ctx.respond = false;
   })
 
+  // 搜索结果展示页面
+  router.get('/search', async ctx => {
+    await app.render(ctx.req, ctx.res, '/search', ctx.params);
+    ctx.respond = false;
+  })
+
   // 主页路由
   router.get('/', async ctx => {
     await app.render(ctx.req, ctx.res, '/index', ctx.params);
