@@ -26,12 +26,19 @@ router.get('/api/v1/users/:login/excerpts/follow', async ctx => {
     return;
   }
 
-  var excerpts = await Article.find({ topics: { $in: user.followed_topics }})
+  // 包括关注的话题和关注的用户发表的文章
+  var excerpts = await Article.find({ $or: [
+                                      { topics: { $in: user.followed_topics }},
+                                      { author: { $in: user.following }}
+                                    ]})
                               .sort({ created_at: -1 }).populate('author')
                               .skip(skip).limit(per_page).lean();
 
   // 读取文章总数
-  const total = await Article.find({ topics: { $in: user.followed_topics }}).count({});
+  const total = await Article.find({ $or: [
+                                      { topics: { $in: user.followed_topics }},
+                                      { author: { $in: user.following }}
+                                    ]}).count({});
 
   // 删除一些敏感信息和冗余字段
   excerpts.map((excerpt) => {
@@ -69,8 +76,7 @@ router.get('/api/v1/users/:login/excerpts/create', async ctx => {
 
   var excerpts = await Article.find({ author: user._id }).sort({ created_at: -1 })
                               .populate('author').skip(skip).limit(per_page).lean();
-  var excerpts_created_count = await Article.find({ author: user._id }).count({});
-  var excerpts_collected_count = await Collection.find({ user: user._id }).count({});
+  var excerpts_count = await Article.find({ author: user._id }).count({});
 
   excerpts.map((excerpt) => {
     // 删除用户密码
@@ -82,10 +88,10 @@ router.get('/api/v1/users/:login/excerpts/create', async ctx => {
   });
 
   // 检测是否还有更多，总数小于 skip + per_page 则没有更多了。
-  const has_more = skip + per_page >= excerpts_created_count ? false : true;
+  const has_more = skip + per_page < excerpts_count;
 
   // 输出返回值
-  jsonPretty(ctx, 200, { data: excerpts, excerpts_created_count, excerpts_collected_count, has_more });
+  jsonPretty(ctx, 200, { data: excerpts, has_more });
 });
 
 
@@ -114,7 +120,7 @@ router.get('/api/v1/users/:login/excerpts/collect', async ctx => {
 
   // 读取摘要
   var excerpts = await Article.find({ _id: { $in: collections }}).populate('author').lean();
-  var excerpts_collected_count = await Collection.find({ user: user._id }).count({});
+  var excerpts_count = await Collection.find({ user: user._id }).count({});
 
   excerpts.map((excerpt) => {
     // 删除用户密码
@@ -126,10 +132,10 @@ router.get('/api/v1/users/:login/excerpts/collect', async ctx => {
   });
 
   // 检测是否还有更多，总数小于 skip + per_page 则没有更多了。
-  const has_more = skip + per_page >= excerpts_collected_count ? false : true;
+  const has_more = skip + per_page < excerpts_count;
 
   // 输出返回值
-  jsonPretty(ctx, 200, { data: excerpts, excerpts_collected_count, has_more })
+  jsonPretty(ctx, 200, { data: excerpts, has_more });
 });
 
 module.exports = router;

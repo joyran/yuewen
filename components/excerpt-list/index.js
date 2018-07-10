@@ -10,7 +10,7 @@ import stylesheet from './index.scss';
 moment.locale('zh-cn');
 
 const ExcerptList = (props) => {
-  const { data, loading } = props;
+  const { data, loading, info } = props;
 
   return (
     <ul className="excerpt-list">
@@ -70,8 +70,8 @@ const ExcerptList = (props) => {
       }
       { data.length === 0 && !loading ?
         <div className="excerpt-not-found">
-          <img src="/imgs/article.svg" alt="空空而已" />
-          <p>空空而已</p>
+          <img src="/imgs/article.svg" alt={info} />
+          <p>{info}</p>
         </div> : ''
       }
     </ul>

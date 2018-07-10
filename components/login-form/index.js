@@ -27,7 +27,7 @@ const LoginFormUI = (props) => {
   };
 
   return (
-    <Form onSubmit={e => handleSubmit(e)} style={{ margin: '100px auto' }}>
+    <Form onSubmit={e => handleSubmit(e)} style={{ margin: '0 auto', paddingTop: 100 }}>
       <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
       <h1>悦文 · 登录</h1>
       <FormItem>

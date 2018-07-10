@@ -1,0 +1,44 @@
+@import "././styles/variable";
+
+.user-item {
+  display: flex;
+  padding: 16px 20px;
+  border-bottom: 1px solid $grey-lighter;
+  background: #fff;
+}
+
+.user-item-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+}
+
+.user-item-content {
+  flex: 1;
+  margin-left: 20px;
+}
+
+.user-item-content-username {
+  font-size: 16px;
+  color: $grey-darker;
+  font-weight: 600;
+}
+
+.user-item-content-bio {
+  padding-top: 8px;
+  margin-bottom: 0;
+  color: $grey-darker;
+}
+
+.user-item-button {
+  margin-top: 16px;
+  width: 100px;
+}
+
+.empty {
+  text-align: center;
+  color: $grey;
+  background: #fff;
+  padding-top: 100px;
+  height: 400px;
+}

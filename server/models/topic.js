@@ -9,7 +9,8 @@ var schema = new Schema({
   topic: String,
   followers_count: Number,
   articles_count: Number,
-  description: String
+  description: String,
+  avatar_url: String
 }, { versionKey: false });
 
 var Topic = mongoose.model('Topic', schema);

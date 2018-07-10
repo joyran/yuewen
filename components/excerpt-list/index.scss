@@ -6,7 +6,7 @@
 
 .excerpt-item {
   position: relative;
-  padding: 24px;
+  padding: 20px;
   background: #fff;
   margin-top: 12px;
   box-shadow: 0 1px 3px rgba(26,26,26,.1);
@@ -15,7 +15,7 @@
 .excerpt-footer {
   font-size: 12px;
   color: $grey-light;
-  margin-right: 24px;
+  margin-right: 20px;
 }
 
 .excerpt-date {
@@ -112,7 +112,6 @@
   text-align: center;
   color: $grey;
   background: #fff;
-  padding-top: 24px;
-  margin-top: 12px;
-  height: 225px;
+  padding-top: 100px;
+  height: 400px;
 }

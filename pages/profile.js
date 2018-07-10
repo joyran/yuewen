@@ -11,8 +11,7 @@ import fetch from 'isomorphic-fetch';
 import { Layout, BackTop, LocaleProvider } from 'antd';
 import Head from 'next/head';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
-import { reducers, readProfileSuccess } from '../reducers/profile';
-import { readExcerptsSuccess } from '../reducers/excerpt';
+import { reducers, readProfileSuccess, readArticlesSuccess } from '../reducers/profile';
 import { readSessionSuccess } from '../reducers/session';
 import { readUnviewNoticeSuccess } from '../reducers/notice';
 import Profile from '../components/profile/index';
@@ -24,12 +23,33 @@ const { Header, Content, Footer } = Layout;
 
 // 初始默认 state
 const initialState = {
-  profile: {},
-  excerpt: {
-    data: [],
-    page: 1,
-    per_page: 10,
-    sortby: 'create',
+  profile: {
+    followers: {
+      data: [],
+      page: 1,
+      per_page: 20,
+      has_more: true
+    },
+    following: {
+      data: [],
+      page: 1,
+      per_page: 20,
+      has_more: true
+    },
+    articles: {
+      data: [],
+      page: 1,
+      per_page: 20,
+      has_more: true,
+      loading: false
+    },
+    collects: {
+      data: [],
+      page: 1,
+      per_page: 20,
+      has_more: true,
+      loading: false
+    }
   },
   session: {},
   notice: {}
@@ -70,7 +90,7 @@ Index.getInitialProps = async ({ store, req, query }) => {
   // 服务端请求时不会带上主机地址，必须手动添加
   const { host } = req.headers;
   const { user } = query;
-  const excerpt = store.getState().excerpt;
+  const { page, per_page } = store.getState().profile.articles;
 
   // ----- 读取当前登录用户所有信息
   res = await fetch(`http://${host}/api/v1/user`, {
@@ -93,12 +113,13 @@ Index.getInitialProps = async ({ store, req, query }) => {
 
 
   // ----- 读取当前用户所有发表的文章摘录
-  res = await fetch(`http://${host}/api/v1/users/${user}/excerpts/create?page=${excerpt.page}&per_page=${excerpt.per_page}`, {
+  res = await fetch(`http://${host}/api/v1/users/${user}/excerpts/create?page=${page}&per_page=${per_page}`, {
     method: 'get',
     headers: { Cookie: req.headers.cookie }
   });
-  const excerpts = await res.json();
-  store.dispatch(readExcerptsSuccess(excerpts));
+  const articles = await res.json();
+  store.dispatch(readArticlesSuccess(articles));
+
 
   // ----- 读取用户未读通知消息
   res = await fetch(`http://${host}/api/v1/users/${login}/received_notices?has_view=false`, {

@@ -30,14 +30,13 @@ export const signin = (username, password, remember) => (dispatch) => {
       remember
     })
   })
-    .then(res => res.json())
     .then((res) => {
       if (res.status === 201) {
         // 验证成功跳转到主页
         location.href = '/';
       } else {
         // 验证失败提示用户错误消息
-        message.error(res.message, 5);
+        message.error('登录失败，请检查用户名和密码', 5);
         dispatch(loginFailed());
       }
     })

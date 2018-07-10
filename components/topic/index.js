@@ -3,6 +3,7 @@ import InfiniteScroll from 'react-infinite-scroller';
 import { Tabs, Button, Card, Icon } from 'antd';
 import { readTopicArticles, readTopicFollowers, followTopic, swapSortby, resetTopicArticles } from '../../reducers/topic';
 import ExcerptList from '../excerpt-list/index';
+import UserList from '../user-list/index';
 import stylesheet from './index.scss';
 
 const TabPane = Tabs.TabPane;
@@ -56,32 +57,7 @@ const Topic = (props) => {
             hasMore={!followers.loading && followers.has_more}
             useWindow
           >
-            {
-              followers.data.map((follower) => {
-                return (
-                  <div className="topic-follower" key={follower.login}>
-                    <a
-                      href={`/user/${follower.login}`}
-                      className="topic-follower-avatar-link"
-                    >
-                      <img
-                        alt={follower.name}
-                        src={follower.avatar_url}
-                        className="topic-follower-avatar"
-                      />
-                    </a>
-                    <div className="topic-follower-content">
-                      <a
-                        className="topic-follower-content-username"
-                        href={`/user/${follower.login}`}
-                      >{follower.name}</a>
-                      <p className="topic-follower-content-bio">{follower.bio}</p>
-                    </div>
-                    <Button type="primary" icon="plus" className="topic-follower-button">关注</Button>
-                  </div>
-                );
-              })
-            }
+            <UserList data={followers.data} loading={followers.loading} info="还没有关注的用户" />
             { followers.loading && followers.has_more && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
           </InfiniteScroll>
         </TabPane>

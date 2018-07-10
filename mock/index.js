@@ -24,6 +24,8 @@ async function main() {
   var tags = {};
   var articles = {};
   var comments = {};
+  var markdown = '';
+  var html = '';
   // 连接 mysql 数据库
   const connection =  await mysql.createConnection({
     host     : '10.68.100.51',
@@ -50,6 +52,8 @@ async function main() {
       bio: null,
       state : true,
       admin : false,
+      followers: [],
+      following: [],
       created_at : parseInt(new Date().getTime()/1000),
     };
     let u = new User(user);
@@ -90,6 +94,27 @@ async function main() {
     let a = new Article(article);
     let res = await a.save();
     articles[row['bid']] = res._id;
+  }
+
+  // 更新文章中文章链接
+  var rows = await Article.find({}).lean();
+  for (var i = 0; i < rows.length; i++) {
+    let row = rows[i];
+    let arr = row.markdown.match(/\/yuewen\/article\/\d+/g);
+    console.log(arr);
+    if (!arr) continue;
+    markdown = row.markdown;
+    html = row.html;
+    for (var j = 0; j < arr.length; j++) {
+      let id = arr[j].split('/')[3];
+      let _id = articles[id];
+      markdown = markdown.replace(`/yuewen/article/${id}`, `/article/${_id}`);
+      markdown = markdown.replace('http://10.68.100.51', '');
+      html = html.replace(`/yuewen/article/${id}`, `/article/${_id}`);
+      html = html.replace('http://10.68.100.51', '');
+    }
+    var res = await Article.findByIdAndUpdate({ _id: row._id }, { markdown, html }, { new: true }).exec();
+    console.log(res);
   }
 
   // 读取文章点赞

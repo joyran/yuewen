@@ -16,7 +16,6 @@ const excerpt = require('./server/routers/excerpt');
 const article = require('./server/routers/article');
 const notice = require('./server/routers/notice');
 const topic = require('./server/routers/topic');
-const profile = require('./server/routers/profile');
 const search = require('./server/routers/search');
 const upload = require('./server/routers/upload');
 const admin = require('./server/routers/admin');
@@ -138,7 +137,6 @@ app.prepare().then(() => {
   koa.use(article.routes()).use(article.allowedMethods());
   koa.use(notice.routes()).use(notice.allowedMethods());
   koa.use(topic.routes()).use(topic.allowedMethods());
-  koa.use(profile.routes()).use(profile.allowedMethods());
   koa.use(search.routes()).use(search.allowedMethods());
   koa.use(upload.routes()).use(upload.allowedMethods());
   koa.use(admin.routes()).use(admin.allowedMethods());

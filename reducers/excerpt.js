@@ -13,11 +13,11 @@ const networkErrorMsg = '网络连接失败，请刷新重试！';
 // ------------------------
 export const {
   readExcerptsSuccess,
-  changeTag,
+  changeTab,
   showLoadingCard
 } = createActions(
   'READ_EXCERPTS_SUCCESS',
-  'CHANGE_TAG',
+  'CHANGE_TAB',
   'SHOW_LOADING_CARD'
 );
 
@@ -55,7 +55,7 @@ export const excerpt = handleActions({
   }),
 
   // 点击 tag 标签，page 和 data 重置，loading 置为 true 是想显示 loading card
-  CHANGE_TAG: (state, action) => ({
+  CHANGE_TAB: (state, action) => ({
     ...state,
     sortby: action.payload,
     page: 1,
