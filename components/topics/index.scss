@@ -12,48 +12,53 @@
   border: none;
 }
 
-.topic-row {
+.all-topics {
+  .ant-card-body {
+    padding: 0 20px 20px;
+  }
+}
+
+.ant-card-head {
+  margin-bottom: 0;
+}
+
+.topic-list {
+  padding: 0;
+}
+
+.topic-item {
+  display: flex;
   padding: 16px 0;
   border-bottom: 1px solid $grey-lighter;
+  background: #fff;
 }
 
-.topic-col {
-  border-bottom: 1px solid $grey-lighter;
-  padding: 24px;
+.topic-item-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
 }
 
-.followed {
-  margin-top: 8px;
-  background: #87d068;
-  border-color: #87d068;
-  color: #fff;
-  float: right;
-
-  &:hover {
-    background: #9adc7d;
-    border-color: #9adc7d;
-  }
+.topic-item-content {
+  flex: 1;
+  margin-left: 20px;
 }
 
-.unfollowed {
-  margin-top: 8px;
-  background: #1890ff;
-  border-color: #1890ff;
-  color: #fff;
-  float: right;
-
-  &:hover {
-    background: #40a9ff;
-    border-color: #40a9ff;
-  }
+.topic-item-content-topic {
+  font-size: 18px;
+  color: $grey-darker;
+  font-weight: 600;
 }
 
-.topic-row-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: $title-color;
-  margin-bottom: 12px;
-  display: block;
+.topic-item-content-bio {
+  padding-top: 8px;
+  margin-bottom: 0;
+  color: $grey-darker;
+}
+
+.topic-item-button {
+  margin-top: 16px;
+  width: 100px;
 }
 
 .topic-description {
@@ -61,12 +66,6 @@
   overflow: hidden;
   display: inline-block;
   font-size: rgba(0,0,0,0.55);
-}
-
-.all-topics {
-  .ant-card-body {
-    padding: 24px;
-  }
 }
 
 .topic-tag {
@@ -87,15 +86,4 @@
       color: $link-color;
     }
   }
-}
-
-.topic_avatar {
-  height: 48px;
-  width: 48px;
-  border-radius: 4px;
-}
-
-.topic-title {
-  display: block;
-  margin-bottom: 4px;
 }

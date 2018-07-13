@@ -11,6 +11,31 @@
   }
 }
 
+// 图片预览对话框居中显示
+.vertical-center-modal {
+  text-align: center;
+  white-space: nowrap;
+
+  .ant-modal-body {
+    padding: 0;
+  }
+}
+
+.vertical-center-modal:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  width: 0;
+}
+
+.vertical-center-modal .ant-modal {
+  display: inline-block;
+  vertical-align: middle;
+  top: 0;
+  text-align: left;
+}
+
 .ant-layout-header {
   background: $background-color;
   padding: 0;
@@ -33,10 +58,10 @@ body {
 
 .logo {
   height: 64px;
-  color: #fff;
   line-height: 64px;
 
-  span {
+  a {
+    color: #fff;
     font-size: 34px;
     font-weight: bold;
     padding-left: 24px;
@@ -46,5 +71,12 @@ body {
 .avatar {
   height: 32px;
   width: 32px;
-  border-radius: 50%;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.avatar-big {
+  height: 100%;
+  width: 100%;
+  cursor: zoom-out;
 }

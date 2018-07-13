@@ -4,32 +4,46 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-// import { Spin } from 'antd';
-import ReactMarkdown from 'react-markdown';
 import CodeMirror from 'react-codemirror';
-import CodeBlock from './code-block';
+import marked from 'marked';
+import highlight from 'highlight.js';
 import Toolbar from './toolbar';
 import { updateMarkdown, updateCursorRange } from '../../reducers/markdown-editor';
 import stylesheet from './index.scss';
+
+marked.setOptions({
+  highlight: code => highlight.highlightAuto(code).value
+});
 
 // 加载 markdown 格式
 require('codemirror/mode/markdown/markdown');
 
 class Markdown extends Component {
+  constructor() {
+    super();
+
+    this.state = {
+      html: ''
+    };
+  }
+
   componentDidMount() {
     // 写新文章时才从 localStorage 中读取 markdown，编辑文章不读取
     if (!this.props.meditor.markdown) {
       this.props.dispatch(updateMarkdown(localStorage.markdown));
+      this.setState({ html: marked(localStorage.markdown) });
       this.codemirror.setValue(localStorage.markdown);
     } else {
       // 初始化设置 codemirror value
       this.codemirror.setValue(this.props.meditor.markdown);
+      this.setState({ html: marked(this.props.meditor.markdown) });
     }
   }
 
   // CodeMirror 发生变化时更新 store 中 markdown并同步更新 localStorage
   onChangeMarkdown = (value) => {
     this.props.dispatch(updateMarkdown(value));
+    this.setState({ html: marked(value) });
     localStorage.markdown = value;
   }
 
@@ -78,12 +92,7 @@ class Markdown extends Component {
             }}
             autoFocus
           />
-          <ReactMarkdown
-            source={this.props.meditor.markdown}
-            className={this.props.meditor.previewClassName}
-            renderers={{ code: CodeBlock }}
-            escapeHtml={false}
-          />
+          <div className="markdown-preview" dangerouslySetInnerHTML={{ __html: this.state.html }} />
         </div>
       </div>
     );

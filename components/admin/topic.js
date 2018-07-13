@@ -1,12 +1,12 @@
 /**
- * 文章管理
+ * 话题管理
  */
 
 import React, { Component } from 'react';
 import { Table, Modal } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { readArticles, deleteArticle } from '../../reducers/admin';
+import { readTopics, deleteTopic } from '../../reducers/admin';
 
 // 时间汉化
 moment.locale('zh-cn');
@@ -14,17 +14,17 @@ const confirm = Modal.confirm;
 
 class Article extends Component {
   componentDidMount() {
-    this.props.dispatch(readArticles(1, 10));
+    this.props.dispatch(readTopics(1, 10));
   }
 
   render() {
     // 删除文章
-    const onClickDelete = (aid) => {
+    const onClickDelete = (topic) => {
       confirm({
-        title: '确定要删除文章吗',
-        content: '文章被删除不可恢复',
+        title: '确定要删除话题吗',
+        content: '话题被删除不可恢复',
         onOk() {
-          this.props.dispatch(deleteArticle(aid));
+          this.props.dispatch(deleteTopic(topic));
         },
         onCancel() {},
       });

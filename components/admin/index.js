@@ -24,7 +24,7 @@ const Admin = () => {
             </Head>
             <Sider>
               <div className="logo">
-                <span>悦文</span>
+                <a href="/">悦文</a>
               </div>
               <Menu
                 defaultSelectedKeys={['dashboard']}

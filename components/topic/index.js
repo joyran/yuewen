@@ -29,8 +29,15 @@ const Topic = (props) => {
     <div className="topic">
       <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
       <div className="topic-header">
-        <p className="title">{props.topic.topic}</p>
-        <p className="description">{props.topic.description}</p>
+        <div className="info">
+          <div className="avatar">
+            <img src={props.topic.avatar_url} alt={props.topic.topic} />
+          </div>
+          <div className="content">
+            <p className="title">{props.topic.topic}</p>
+            <p className="description">{props.topic.description}</p>
+          </div>
+        </div>
         <Button
           className={props.topic.has_followed ? 'followed' : 'unfollowed'}
           onClick={handleClick}

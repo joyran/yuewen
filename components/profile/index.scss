@@ -99,7 +99,7 @@
 
 .profile-header-bio {
   margin-left: 12px;
-  font-size: 18px;
+  font-size: 16px;
   white-space: nowrap;
 }
 
@@ -167,4 +167,50 @@
     margin-top: 0;
     border-bottom: 1px solid $grey-lighter;
   }
+}
+
+// 关注的话题
+.topic-list {
+  .ant-card-body {
+    padding: 0 20px 20px;
+  }
+
+  .ant-card-head {
+    margin-bottom: 0;
+  }
+}
+
+.topic-item {
+  display: flex;
+  padding: 16px 0;
+  border-bottom: 1px solid $grey-lighter;
+  background: #fff;
+}
+
+.topic-item-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+}
+
+.topic-item-content {
+  flex: 1;
+  margin-left: 20px;
+}
+
+.topic-item-content-topic {
+  font-size: 18px;
+  color: $grey-darker;
+  font-weight: 600;
+}
+
+.topic-item-content-bio {
+  padding-top: 8px;
+  margin-bottom: 0;
+  color: $grey-darker;
+}
+
+.topic-item-button {
+  margin-top: 16px;
+  width: 100px;
 }

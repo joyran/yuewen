@@ -37,6 +37,7 @@
     "koa-session2": "^2.2.4",
     "koa-static": "^4.0.1",
     "markdown-it": "^8.4.1",
+    "marked": "^0.4.0",
     "mocha": "^4.0.1",
     "mongoose": "^4.11.9",
     "mysql": "^2.15.0",

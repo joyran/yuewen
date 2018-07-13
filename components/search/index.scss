@@ -23,6 +23,11 @@
 }
 
 // 文章
+.article-list {
+  margin: 0;
+  padding: 0;
+}
+
 .article-item {
   border-bottom: 1px solid $grey-lighter;
   margin: 16px 20px 0;
@@ -66,25 +71,30 @@
 }
 
 // 用户
+.user-list {
+  padding: 0 20px;
+  background: #fff;
+}
+
 .user-item {
   display: flex;
-  padding: 16px 20px;
+  padding: 16px 0;
   border-bottom: 1px solid $grey-lighter;
 }
 
 .user-item-avatar {
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   border-radius: 4px;
 }
 
 .user-item-content {
   flex: 1;
-  margin-left: 24px;
+  margin-left: 20px;
 }
 
 .user-item-content-username {
-  font-size: 16px;
+  font-size: 18px;
   color: $grey-darker;
   font-weight: 600;
 

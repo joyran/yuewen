@@ -551,7 +551,7 @@ router.post('/api/v1/articles/:aid/likes', async ctx => {
       atuser: article.author,
       content: '',
       link_url: `/article/${aid}`,
-      title: `${user.name} 点赞了文章 《${article.title}》`,
+      title: `${user.name} 点赞了你的文章 《${article.title}》`,
       initiator: uid,
       has_view: false,
       type: 'like',

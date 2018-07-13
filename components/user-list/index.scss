@@ -1,8 +1,13 @@
 @import "././styles/variable";
 
+.user-list {
+  padding: 0 20px;
+  background: #fff;
+}
+
 .user-item {
   display: flex;
-  padding: 16px 20px;
+  padding: 16px 0;
   border-bottom: 1px solid $grey-lighter;
   background: #fff;
 }
@@ -19,7 +24,7 @@
 }
 
 .user-item-content-username {
-  font-size: 16px;
+  font-size: 18px;
   color: $grey-darker;
   font-weight: 600;
 }

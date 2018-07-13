@@ -2,11 +2,13 @@
 
 .excerpt-list {
   width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .excerpt-item {
   position: relative;
-  padding: 20px;
+  padding: 16px 20px;
   background: #fff;
   margin-top: 12px;
   box-shadow: 0 1px 3px rgba(26,26,26,.1);
@@ -69,7 +71,7 @@
 .excerpt-title {
   display: inline-block;
   width: 100%;
-  font-size: 20px;
+  font-size: 18px;
   color: $title-color;
   line-height: 1.5;
   vertical-align: middle;
@@ -86,7 +88,7 @@
   font-size: 14px;
   margin: 0 0 12px;
   max-height: 84px;
-  color: $grey-darker;
+  color: $title-color;
   line-height: 28px;
   word-break: break-all;
   overflow: hidden;

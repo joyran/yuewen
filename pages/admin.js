@@ -52,8 +52,8 @@ Index.getInitialProps = async ({ store, req }) => {
   const user = await res.json();
 
   // 如果用户 admin 为 false 则没有权限，显示403页面
-  if (!res.admin) return { statusCode: 403 };
-  store.dispatch(readSessionSuccess(res));
+  if (!user.admin) return { statusCode: 403 };
+  store.dispatch(readSessionSuccess(user));
 
   // 默认返回 200 OK
   return { statusCode: 200 };

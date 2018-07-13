@@ -15,7 +15,7 @@ const UserList = (props) => {
   const { data, info, loading } = props;
 
   return (
-    <ul className="excerpt-list">
+    <ul className="user-list">
       <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
       {
         data.map((item) => {

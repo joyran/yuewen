@@ -5,6 +5,17 @@
   padding: 20px;
   margin-top: 12px;
 
+  .info {
+    display: flex;
+  }
+
+  .avatar img {
+    width: 100px;
+    height: 100px;
+    border-radius: 4px;
+    margin-right: 20px;
+  }
+
   .title {
     font-size: 24px;
     font-weight: bold;
@@ -19,6 +30,7 @@
     background: #87d068;
     border-color: #87d068;
     color: #fff;
+    width: 100px;
 
     &:hover {
       background: #9adc7d;
@@ -30,6 +42,7 @@
     background: #1890ff;
     border-color: #1890ff;
     color: #fff;
+    width: 100px;
 
     &:hover {
       background: #40a9ff;

@@ -6,6 +6,7 @@ import { Tabs, Card, Button } from 'antd';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
 import { changeTab, searchArticle, searchUser } from '../../reducers/search';
+import { followUser, unfollowUser } from '../../reducers/session';
 import stylesheet from './index.scss';
 
 const TabPane = Tabs.TabPane;
@@ -42,7 +43,7 @@ const Index = (props) => {
             hasMore={!props.search.loading && props.search.articles.has_more}
             useWindow
           >
-            <ul>
+            <ul className="article-list">
               { props.search.articles.data.map((item, index) => {
                 // 文章标题默认从 highlight 中读取，如果 highlight 中没有则从 _source 中读取
                 const title = item.highlight.title ? item.highlight.title[0] : item._source.title;
@@ -78,8 +79,10 @@ const Index = (props) => {
             hasMore={!props.search.loading && props.search.users.has_more}
             useWindow
           >
-            <ul>
+            <ul className="user-list">
               { props.search.users.data.map((item, index) => {
+                const has_followed = props.session.following.indexOf(item._id) !== -1;
+
                 return (
                   <li className="user-item" key={index}>
                     <a
@@ -100,7 +103,10 @@ const Index = (props) => {
                       />
                       <p className="user-item-content-bio">{item._source.bio}</p>
                     </div>
-                    <Button type="primary" icon="plus" className="user-item-button">关注</Button>
+                    { has_followed ?
+                      <Button className="user-item-button" onClick={() => props.dispatch(unfollowUser(item._source.login))}>已关注</Button> :
+                      <Button type="primary" icon="plus" className="user-item-button" onClick={() => props.dispatch(followUser(item._source.login))}>关注</Button>
+                    }
                   </li>
                 );
               }) }

@@ -2,11 +2,36 @@
 @import "././styles/atom-one-dark";     // highlight atom-one-dark主题风格
 @import "preview";
 
-// 文章头部，包括标题，作者和创作时间
-.article-header {
+// 图片预览对话框居中显示
+.vertical-center-modal {
+  text-align: center;
+  white-space: nowrap;
 
+  .ant-modal-body {
+    padding: 0;
+
+    img {
+      cursor: zoom-out;
+    }
+  }
 }
 
+.vertical-center-modal:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  width: 0;
+}
+
+.vertical-center-modal .ant-modal {
+  display: inline-block;
+  vertical-align: middle;
+  top: 0;
+  text-align: left;
+}
+
+// 文章头部，包括标题，作者和创作时间
 .article-title {
   margin: 32px 0;
   font-size: 32px;
@@ -23,7 +48,7 @@
   width: 40px;
   height: 40px;
   vertical-align: middle;
-  border-radius: 50%;
+  border-radius: 4px;
 }
 
 .article-author-info-avatar-link {
@@ -102,6 +127,7 @@
 
 .article-likes {
   margin-top: 24px !important;
+  padding: 0;
 
   li {
     float: left;

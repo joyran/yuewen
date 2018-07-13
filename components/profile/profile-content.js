@@ -49,7 +49,7 @@ const ProfileContent = (props) => {
             hasMore={!props.profile.articles.loading && props.profile.articles.has_more}
             useWindow
           >
-            <ExcerptList data={props.profile.articles.data} loading={props.profile.articles.loading} info="还没有文章" />
+            <ExcerptList data={props.profile.articles.data} loading={props.profile.articles.loading} info="还没有发表过文章" />
             { props.profile.articles.loading && props.profile.articles.has_more && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
           </InfiniteScroll>
         </TabPane>
@@ -61,7 +61,7 @@ const ProfileContent = (props) => {
             hasMore={!props.profile.collects.loading && props.profile.collects.has_more}
             useWindow
           >
-            <ExcerptList data={props.profile.collects.data} loading={props.profile.collects.loading} info="还没有收藏" />
+            <ExcerptList data={props.profile.collects.data} loading={props.profile.collects.loading} info="还没有收藏的文章" />
             { props.profile.collects.loading && props.profile.collects.has_more && <Card loading bordered={false} style={{ width: '100%' }}>BL</Card> }
           </InfiniteScroll>
         </TabPane>

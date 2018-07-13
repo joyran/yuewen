@@ -124,7 +124,7 @@ export const readFollowers = login => (dispatch, getState) => {
  * 读取当前登录用户关注的用户
  */
 export const readFollowing = login => (dispatch, getState) => {
-  const { page, per_page } = getState().profile.followers;
+  const { page, per_page } = getState().profile.following;
 
   return fetch(`/api/v1/users/${login}/following?page=${page}&per_page=${per_page}`, {
     credentials: 'include',
