@@ -6,8 +6,11 @@ const koaSession = require("koa-session2");
 const mongoose = require('./server/utils/mongoose');
 const SessionStore = require("./server/utils/session-store");
 const server = require('koa-static');
-const User = require('./server/models/user');
 const jsonPretty = require('./server/routers/json-pretty');
+
+// 导入model
+const User = require('./server/models/user');
+const Article = require('./server/models/article');
 
 // 导入路由
 const user = require('./server/routers/user');
@@ -26,7 +29,6 @@ const port = parseInt(process.env.PORT, 10) || 80;
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
-
 
 app.prepare().then(() => {
   const koa = new Koa();

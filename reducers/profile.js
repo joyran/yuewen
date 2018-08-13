@@ -4,7 +4,6 @@ import { message } from 'antd';
 import fetch from 'isomorphic-fetch';
 import { session } from './session';
 import { notice } from './notice';
-import { excerpt } from './excerpt';
 
 const networkErrorMsg = '网络连接失败，请刷新重试！';
 
@@ -254,4 +253,4 @@ export const profile = handleActions({
   })
 }, {});
 
-export const reducers = combineReducers({ session, profile, notice, excerpt });
+export const reducers = combineReducers({ session, profile, notice });

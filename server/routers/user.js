@@ -62,6 +62,7 @@ router.get('/api/v1/users', async ctx => {
   jsonPretty(ctx, 200, users);
 });
 
+
 /**
  * 读取指定用户
  * 方法: GET
@@ -82,7 +83,7 @@ router.get('/api/v1/users/:login', async ctx => {
   delete user.password;
 
   // 用户发表的文章总数量
-  const articles_count = await Article.find({ author: uid }).count({});
+  const articles_count = await Article.find({ author: user._id }).count({});
   user.articles_count = articles_count;
 
   // 用户收藏的文章总数量

@@ -68,15 +68,31 @@ body {
   }
 }
 
-.avatar {
+.user-avatar {
   height: 32px;
   width: 32px;
   border-radius: 4px;
   cursor: pointer;
 }
 
+.topic-avatar {
+  height: 48px;
+  width: 48px;
+  border-radius: 4px;
+}
+
 .avatar-big {
   height: 100%;
   width: 100%;
   cursor: zoom-out;
+}
+
+.ant-upload-select-picture-card i {
+  font-size: 32px;
+  color: #999;
+}
+
+.ant-upload-select-picture-card .ant-upload-text {
+  margin-top: 8px;
+  color: #666;
 }

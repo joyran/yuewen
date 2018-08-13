@@ -18,6 +18,7 @@ const User = require('../server/models/user');
 const Article = require('../server/models/article');
 const Like = require('../server/models/like');
 const Comment = require('../server/models/comment');
+const config = require('config');
 
 async function main() {
   var users = {};
@@ -77,6 +78,12 @@ async function main() {
   var [rows, fields] = await connection.execute('SELECT * FROM mooc_article');
   for (var i = 0; i < rows.length; i++) {
     let row = rows[i];
+    // 文章热度权重
+    const view = config.get('heat.view');
+    const like = config.get('heat.like');
+    const comment = config.get('heat.comment');
+    const collect = config.get('heat.collect');
+    let heat = parseInt(row['viewnum']) * view + parseInt(row['likenum']) * like + parseInt(row['commnum']) * comment;
     let article = {
       author: users[row['uid']],
       title: row['title'],
@@ -89,7 +96,7 @@ async function main() {
       updated_at: parseInt(new Date(row['update_datetime']).getTime()/1000),
       markdown: row['markdown'].replace(/\/yuewen\/storage\/uploads\/img/g, '/uploads'),
       html: md.render(row['markdown']).replace(/\/yuewen\/storage\/uploads\/img/g, '/uploads'),
-      heat: 0
+      heat
     };
     let a = new Article(article);
     let res = await a.save();
@@ -114,7 +121,6 @@ async function main() {
       html = html.replace('http://10.68.100.51', '');
     }
     var res = await Article.findByIdAndUpdate({ _id: row._id }, { markdown, html }, { new: true }).exec();
-    console.log(res);
   }
 
   // 读取文章点赞

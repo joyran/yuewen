@@ -17,6 +17,13 @@ const Collection = require('../models/collection');
 const Comment = require('../models/comment');
 const Notice = require('../models/notice');
 const jsonPretty = require('./json-pretty');
+const config = require('config');
+
+// 文章热度权重
+const view = config.get('heat.view');
+const like = config.get('heat.like');
+const comment = config.get('heat.comment');
+const collect = config.get('heat.collect');
 
 // 递归查找回复的评论，即这条评论是回复谁的，逆向向上查找
 const findUpConversation = async comment => {
@@ -92,8 +99,8 @@ router.get('/api/v1/articles/:aid', async ctx => {
     return;
   }
 
-  // 每访问一次文章阅读数加 1，热度加 1
-  await Article.findByIdAndUpdate({ _id: aid }, { views_count: article.views_count + 1, heat: article.heat + 1 }).exec();
+  // 每访问一次文章阅读数加 1
+  await Article.findByIdAndUpdate({ _id: aid }, { $inc: { views_count: 1, heat: view } }).exec();
 
   // 查找该篇文章是否已经被当前登录用户收藏
   var collection = await Collection.findOne({ user: uid, article: aid });
@@ -140,7 +147,7 @@ router.post('/api/v1/articles', async ctx => {
  * 方法: PUT
  * 参数: title      标题
  * 参数: excerpt    摘要
- * 参数: topics     标签
+ * 参数: topics     话题
  * 参数: markdown   markdown 原始格式
  * 参数: html     markdown 解析后的 html 格式
  */
@@ -217,6 +224,7 @@ router.post('/api/v1/articles/:aid/collect', async ctx => {
     // 添加收藏
     let created_at = parseInt(Date.now()/1000);
     await Collection.create({ article: aid, user: uid, created_at });
+    await Article.findByIdAndUpdate({ _id: aid }, { $inc: { heat: collect } }).exec();
     ctx.status = 201;
     jsonPretty(ctx, 201, {});
   }
@@ -243,6 +251,8 @@ router.delete('/api/v1/articles/:aid/collect', async ctx => {
   // 如果已经收藏过则取消收藏
   if (result) {
     await Collection.findByIdAndRemove(result._id).exec();
+    let article = await Article.findOne({ _id: aid }).lean();
+    await Article.findByIdAndUpdate({ _id: aid }, { heat: article.heat - collect }).exec();
     jsonPretty(ctx, 204, {});
     return;
   } else {
@@ -431,16 +441,16 @@ router.post('/api/v1/articles/:aid/comments', async ctx => {
   const created_at = parseInt(Date.now()/1000);
 
   // 写入评论
-  const comment = await Comment.create({ author: uid, atuser, rid, reply_to_author, article: aid, content, created_at, likes_count: 0 });
+  const ret = await Comment.create({ author: uid, atuser, rid, reply_to_author, article: aid, content, created_at, likes_count: 0 });
 
-  // 评论写入成功后文章评论数量 comments_count +1, 热度加 10
-  await Article.findByIdAndUpdate({ _id: aid }, { comments_count: article.comments_count + 1, heat: article.heat + 10 }).exec();
+  // 评论写入成功后文章评论数量 comments_count +1
+  await Article.findByIdAndUpdate({ _id: aid }, { $inc: { comments_count: 1, heat: comment } }).exec();
 
   // 生成新的评论通知消息
   await Notice.create({
     atuser,
     content,
-    link_url: `/article/${aid}#comment-${comment._id}`,
+    link_url: `/article/${aid}#comment-${ret._id}`,
     title: `${user.name} 评论了你的文章 《${article.title}》`,
     initiator: uid,
     has_view: false,
@@ -448,7 +458,7 @@ router.post('/api/v1/articles/:aid/comments', async ctx => {
     created_at
   });
 
-  jsonPretty(ctx, 201, comment);
+  jsonPretty(ctx, 201, ret);
 });
 
 
@@ -476,16 +486,16 @@ router.post('/api/v1/articles/:aid/comments/:cid/replys', async ctx => {
   const created_at = parseInt(Date.now()/1000);
 
   // 写入评论的回复
-  var comment = await Comment.create({ author: uid, atuser, reply_to_author: atuser, rid: cid, article: aid, content, created_at, likes_count: 0 });
+  var ret = await Comment.create({ author: uid, atuser, reply_to_author: atuser, rid: cid, article: aid, content, created_at, likes_count: 0 });
 
   // 评论写入成功后文章评论数量 comments_count + 1
-  await Article.findByIdAndUpdate({ _id: aid }, { comments_count: article.comments_count + 1 }).exec();
+  await Article.findByIdAndUpdate({ _id: aid }, { $inc: { comments_count: 1, heat: comment } }).exec();
 
   // 生成新的评论回复通知消息
   await Notice.create({
     atuser,
     content,
-    link_url: `/article/${aid}#comment-${comment._id}`,
+    link_url: `/article/${aid}#comment-${ret._id}`,
     title: `${user.name} 回复了你在文章 《${article.title}》 中的评论`,
     initiator: uid,
     has_view: false,
@@ -493,7 +503,7 @@ router.post('/api/v1/articles/:aid/comments/:cid/replys', async ctx => {
     created_at
   });
 
-  jsonPretty(ctx, 404, comment);
+  jsonPretty(ctx, 404, ret);
 });
 
 
@@ -536,15 +546,15 @@ router.post('/api/v1/articles/:aid/likes', async ctx => {
   const user = await User.findOne({ _id: uid }).lean();
 
   // 查找该篇文章是否被当前登录用户点过赞
-  var like = await Like.findOne({ article: aid, user: uid });
+  var ret = await Like.findOne({ article: aid, user: uid });
 
   // 未点赞添加点赞记录
-  if (!like) {
+  if (!ret) {
     var created_at = parseInt(Date.now()/1000);
     await Like.create({ article: aid, user: uid, created_at });
 
     // 文章点赞数加 1
-    await Article.findByIdAndUpdate({ _id: aid }, { likes_count: article.likes_count + 1 }).exec();
+    await Article.findByIdAndUpdate({ _id: aid }, { $inc: { likes_count: 1, heat: like } }).exec();
 
     // 生成点赞通知消息
     await Notice.create({
@@ -561,9 +571,9 @@ router.post('/api/v1/articles/:aid/likes', async ctx => {
 
   var likes = await Like.find({ article: aid }).populate('user').lean();
 
-  likes.map((like) => {
+  likes.map((i) => {
     // 删除用户密码
-    delete like.user.password;
+    delete i.user.password;
   })
 
   jsonPretty(ctx, 200, likes);

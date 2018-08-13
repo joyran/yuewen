@@ -69,7 +69,7 @@ const ExcerptList = (props) => {
         })
       }
       { data.length === 0 && !loading ?
-        <div className="excerpt-not-found">
+        <div className="empty">
           <img src="/imgs/article.svg" alt={info} />
           <p>{info}</p>
         </div> : ''

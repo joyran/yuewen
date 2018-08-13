@@ -35,10 +35,17 @@ router.get('/api/v1/users/:login/excerpts/follow', async ctx => {
                               .skip(skip).limit(per_page).lean();
 
   // 读取文章总数
-  const total = await Article.find({ $or: [
+  var total = await Article.find({ $or: [
                                       { topics: { $in: user.followed_topics }},
                                       { author: { $in: user.following }}
                                     ]}).count({});
+
+  // 如果用户没有关注话题和文章，则展示热门文章
+  if (total === 0) {
+    var excerpts = await Article.find({}).sort({ heat: -1 }).populate('author').skip(skip).limit(per_page).lean();
+    var total = await Article.find({}).count({});
+  }
+
 
   // 删除一些敏感信息和冗余字段
   excerpts.map((excerpt) => {

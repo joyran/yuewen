@@ -8,7 +8,7 @@ import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunkMiddleware from 'redux-thunk';
 import fetch from 'isomorphic-fetch';
-import { Layout, BackTop, LocaleProvider, Card } from 'antd';
+import { Layout, BackTop, LocaleProvider, Card, Alert } from 'antd';
 import InfiniteScroll from 'react-infinite-scroller';
 import Head from 'next/head';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
@@ -56,6 +56,14 @@ const Index = (props) => {
           <Nav active="index" />
         </Header>
         <Content>
+          { props.session.followed_topics.length + props.session.following_count === 0 ?
+            <Alert
+              message="你还没有关注话题和用户，以下为你展示的是热门文章，快进入话题广场挑选喜欢的话题关注吧"
+              type="info"
+              closable
+              className="alert-info"
+            /> : ''
+          }
           <InfiniteScroll
             initialLoad={false}
             pageStart={0}

@@ -8,6 +8,7 @@ import AvatarEditor from 'react-avatar-editor';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { cropAvatar, cropBanner, deleteBanner } from '../../reducers/profile';
+import { followUser, unfollowUser } from '../../reducers/session';
 
 // 时间汉化
 moment.locale('zh-cn');
@@ -43,7 +44,6 @@ class ProfileHeader extends Component {
         bannerEditorModalVisible: !this.state.bannerEditorModalVisible,
         bannerEditorUrl: info.file.response.filepath
       });
-      // this.props.dispatch(updateProfileBanner(info.file.response.filepath));
     }
   }
 
@@ -258,6 +258,12 @@ class ProfileHeader extends Component {
             </div>
             { this.props.session._id === this.props.profile._id ?
               <Button type="primary" className="profile-header-edit">编辑个人资料</Button> : ''
+            }
+            { this.props.session.following.indexOf(this.props.profile._id) !== -1 && this.props.session._id !== this.props.profile._id ?
+              <Button className="profile-header-edit" onClick={() => this.props.dispatch(unfollowUser(this.props.profile.login))}>已关注</Button> : ''
+            }
+            { this.props.session.following.indexOf(this.props.profile._id) === -1 && this.props.session._id !== this.props.profile._id ?
+              <Button type="primary" icon="plus" className="profile-header-edit" onClick={() => this.props.dispatch(followUser(this.props.profile.login))}>关注</Button> : ''
             }
           </div>
         </div>

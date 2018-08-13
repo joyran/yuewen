@@ -9,6 +9,41 @@ const fs = require('fs');
 const router = new Router();
 const User = require('../models/user');
 
+
+// ------------------------------------
+// 上传话题缩略图路由
+// ------------------------------------
+
+// 设置文件存储路径和存储文件名
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'server/static/uploads/topic')
+  },
+  filename: function (req, file, cb) {
+    const filename = file.originalname;
+
+    // 文件后缀
+    const arr = filename.split('.');
+    const suffix = arr[arr.length - 1];
+    cb(null,  Date.now() + '.' + suffix);
+  }
+});
+
+// 设置 storage
+var upload = multer({ storage: storage });
+
+router.post('/api/v1/upload/topic', upload.single('file'), async ctx => {
+  const { originalname, filename } = ctx.req.file;
+
+  // 文件相对路径
+  const filepath = `/uploads/topic/${filename}`;
+  const status = 200;
+  const body = { status, filepath };
+  ctx.status = status;
+  ctx.body = body;
+});
+
+
 // ------------------------------------
 // 上传文章图片路由配置
 // ------------------------------------

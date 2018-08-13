@@ -1,6 +1,8 @@
 # 悦文
 一个能说会道的博客，支持 Markdown 写文章，还可以评论收藏。为了追求新技术，踩了不少坑，还好没放弃，差点就放弃了。前端采用 React + React-Router + React-Redux，后端抛弃 php，采用 Node.js，框架选用 Koa2 + Next.js，数据库采用 Mongodb，全文检索采用 Elasticsearch，API 完全符合 RESTful 设计风格。
 
+![](/images/yuewen.png)
+
 ## 环境准备
 - MongoDB   v3.4.5
 - Node.js   v8.1.0
@@ -112,7 +114,6 @@ http 状态码有以下几种
 ```
 
 ## TODO
-1. [已解决] 个人主页切换到【文章】tab，向下滚动不加载用户发表的文章，而是加载用户收藏的文章
-2. [已解决] 火狐和 Edge 浏览器打不开写文章页面
-3. [已解决] 标签管理
-4. 编辑个人资料
+1. 编辑个人资料
+2. 后台管理-标签管理
+3. 后台管理-仪表盘

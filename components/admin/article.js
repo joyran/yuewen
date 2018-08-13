@@ -20,11 +20,12 @@ class Article extends Component {
   render() {
     // 删除文章
     const onClickDelete = (aid) => {
+      const _this = this;
       confirm({
         title: '确定要删除文章吗',
         content: '文章被删除不可恢复',
         onOk() {
-          this.props.dispatch(deleteArticle(aid));
+          _this.props.dispatch(deleteArticle(aid));
         },
         onCancel() {},
       });

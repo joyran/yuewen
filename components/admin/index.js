@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import Dashboard from './dashboard';
 import User from './user';
 import Article from './article';
+import Topic from './topic';
 import stylesheet from './index.scss';
 
 const { Header, Content, Sider } = Layout;
@@ -43,6 +44,10 @@ const Admin = () => {
                   <Icon type="profile" />
                   <Link to="/article" style={{ display: 'inline-block' }}>文章管理</Link>
                 </Menu.Item>
+                <Menu.Item key="topic">
+                  <Icon type="profile" />
+                  <Link to="/topic" style={{ display: 'inline-block' }}>话题管理</Link>
+                </Menu.Item>
               </Menu>
             </Sider>
             <Layout>
@@ -54,6 +59,7 @@ const Admin = () => {
                   <Route path="/dashboard" component={Dashboard} />
                   <Route path="/user" component={User} />
                   <Route path="/article" component={Article} />
+                  <Route path="/topic" component={Topic} />
                   <Route exact path="/" component={Dashboard} />
                 </Switch>
               </Content>

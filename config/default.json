@@ -5,5 +5,11 @@
     "database": "yue",
     "username": "yue",
     "password": "123456"
+  },
+  "heat": {
+    "view": 1,
+    "like": 10,
+    "comment": 10,
+    "collect": 20
   }
 }
