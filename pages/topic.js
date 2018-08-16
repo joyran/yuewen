@@ -54,7 +54,7 @@ const Index = (props) => {
       <Layout style={{ background: '#f6f6f6' }}>
         <Head>
           <title>{`${props.topic.topic} - 悦文`}</title>
-          <link rel="stylesheet" href="/css/antd.css" />
+          <link rel="stylesheet" href="/css/antd.min.css" />
           <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         </Head>
         <Header>

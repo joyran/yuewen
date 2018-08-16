@@ -20,7 +20,7 @@ const Admin = () => {
           <Layout style={{ background: '#f6f6f6', minHeight: '100vh' }} >
             <Head>
               <title>悦文 · 后台管理</title>
-              <link rel="stylesheet" href="/css/antd.css" />
+              <link rel="stylesheet" href="/css/antd.min.css" />
               <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
             </Head>
             <Sider>

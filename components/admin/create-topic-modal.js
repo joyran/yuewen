@@ -5,13 +5,11 @@
 import { Modal, Form, Input, Upload, message, Icon } from 'antd';
 
 const FormItem = Form.Item;
-// const Dragger = Upload.Dragger;
 const { TextArea } = Input;
 
 const CreateTopicModal = Form.create()(
   (props) => {
-    const {
-      visible, onCancel, onOk, form, onChange, avatar } = props;
+    const { visible, onCancel, onOk, form, onChange, avatar, loading } = props;
     const { getFieldDecorator, resetFields } = form;
 
     const beforeUpload = (file) => {
@@ -25,8 +23,8 @@ const CreateTopicModal = Form.create()(
 
     const uploadButton = (
       <div>
-        <Icon type={this.state.loading ? 'loading' : 'plus'} />
-        <div className="ant-upload-text">Upload</div>
+        <Icon type={loading ? 'loading' : 'plus'} />
+        <div className="ant-upload-text">上传封面</div>
       </div>
     );
 
@@ -40,7 +38,7 @@ const CreateTopicModal = Form.create()(
           afterClose={resetFields}
         >
           <Upload
-            name="avatar"
+            name="file"
             action="/api/v1/upload/topic"
             listType="picture-card"
             onChange={onChange}
@@ -51,13 +49,6 @@ const CreateTopicModal = Form.create()(
             {avatar ? <img src={avatar} alt="avatar" /> : uploadButton}
           </Upload>
           <Form layout="vertical" style={{ marginTop: 24 }}>
-            <FormItem label="封面" >
-              { getFieldDecorator('avatar_url', {
-                rules: [{ required: true, message: '请上传封面' }],
-              })(
-                <Input />
-              )}
-            </FormItem>
             <FormItem label="话题" >
               { getFieldDecorator('topic', {
                 rules: [{ required: true, message: '请输入话题' }],

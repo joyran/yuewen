@@ -1,5 +1,5 @@
 # 悦文
-一个能说会道的博客，支持 Markdown 写文章，还可以评论收藏。为了追求新技术，踩了不少坑，还好没放弃，差点就放弃了。前端采用 React + React-Router + React-Redux，后端抛弃 php，采用 Node.js，框架选用 Koa2 + Next.js，数据库采用 Mongodb，全文检索采用 Elasticsearch，API 完全符合 RESTful 设计风格。
+一个能说会道的多人博客，支持 Markdown 写文章，还可以评论收藏。为了追求新技术，踩了不少坑，还好没放弃，差点就放弃了。前端采用 React + React-Router + React-Redux，后端抛弃 php，采用 Node.js，框架选用 Koa2 + Next.js，数据库采用 Mongodb，全文检索采用 Elasticsearch，API 完全符合 RESTful 设计风格。
 
 ![](/images/yuewen.png)
 
@@ -56,7 +56,7 @@ PUT /yue
 ### 启动 MongoDB 服务器
 创建 MongoDB 数据存储目录 `f:/mongodb/data/db`
 ```
-mongod --dbpath f:/mongodb/data/db --replSet rs0 --auth
+mongod --dbpath f:/mongodb/data/db --replSet rs0
 ```
 
 ### 同步 MongoDB 数据库 yue 下所有表格到 elasticsearch

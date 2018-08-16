@@ -28,7 +28,7 @@ const Index = () => {
     <div>
       <Head>
         <title>悦文 · 登录</title>
-        <link rel="stylesheet" href="/css/antd.css" />
+        <link rel="stylesheet" href="/css/antd.min.css" />
       </Head>
       <LoginForm />
     </div>

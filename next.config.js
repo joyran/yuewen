@@ -3,7 +3,7 @@ const glob = require('glob')
 
 module.exports = {
   webpack: (config, { dev }) => {
-    if (dev) {
+    if (true) {
       config.module.rules.push(
         {
           test: /\.js$/,

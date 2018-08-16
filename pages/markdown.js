@@ -57,7 +57,7 @@ const Index = (props) => {
       <Layout>
         <Head>
           <title>写新文章 - 悦文</title>
-          <link rel="stylesheet" href="/css/antd.css" />
+          <link rel="stylesheet" href="/css/antd.min.css" />
           <style dangerouslySetInnerHTML={{ __html: stylesheet }} />
         </Head>
         <Markdown />

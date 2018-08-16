@@ -189,7 +189,7 @@ router.put('/api/v1/admin/topics', async ctx => {
     articles_count: 0
   })
 
-  jsonPretty(ctx, 200, topic);
+  jsonPretty(ctx, 200, ret);
 });
 
 

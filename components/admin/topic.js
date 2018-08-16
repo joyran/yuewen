@@ -12,14 +12,13 @@ class Topic extends Component {
   constructor(props) {
     super(props);
     this.onOk = this.onOk.bind(this);
+    this.handleChange = this.handleChange.bind(this);
 
     this.state = {
       avatar: '',
       visible: false,
       width: 520,
-      previewVisible: false,
-      previewImage: '',
-      fileList: [{}],
+      loading: false,
     };
   }
 
@@ -28,10 +27,21 @@ class Topic extends Component {
     const _this = this;
     this.form.validateFields((err, values) => {
       if (!err) {
-        _this.props.dispatch(createTopic(values));
+        _this.props.dispatch(createTopic({ ...values, avatar_url: _this.state.avatar }));
         _this.setState({ visible: false });
       }
     });
+  }
+
+  handleChange({ file }) {
+    if (file.status === 'uploading') {
+      this.setState({ loading: true });
+      return;
+    }
+
+    if (file.status === 'done') {
+      this.setState({ avatar: file.response.filepath, loading: false });
+    }
   }
 
   componentDidMount() {
@@ -39,12 +49,6 @@ class Topic extends Component {
   }
 
   render() {
-    // 编辑话题
-    const editTopic = (record) => {
-      this.setState({ visible: true });
-      console.log(record);
-    };
-
     const columns = [{
       title: '头像',
       dataIndex: 'avatar_url',
@@ -70,42 +74,15 @@ class Topic extends Component {
     }, {
       title: '操作',
       key: 'action',
-      render: (text, record) => (
+      render: () => (
         <span>
           <a onClick={() => this.setState({ visible: true })}>新增</a>
           <Divider type="vertical" />
-          <a onClick={() => editTopic(record)}>编辑</a>
+          <a>删除</a>
         </span>
       ),
       width: '10%'
     }];
-
-    // 上传图片成功后回调
-    // const onChangeDragger = (info) => {
-    //   const status = info.file.status;
-    //   if (status === 'done') {
-    //     // 上传完成后修改 avatar_url 表单
-    //     this.form.setFieldsValue({ avatar_url: info.file.response.filepath });
-    //     message.success('图片上传成功');
-    //   } else if (status === 'error') {
-    //     message.error('图片上传失败');
-    //   }
-    // };
-
-    const handleChange = ({ file }) => {
-      if (file.status === 'done') {
-        this.setState({ avatar: file.response.filepath });
-      }
-    };
-
-    const handlePreview = (file) => {
-      this.setState({
-        previewImage: file.url || file.thumbUrl,
-        previewVisible: true,
-      });
-    };
-
-    const handleCancel = () => this.setState({ previewVisible: false });
 
     // 点击分页按钮
     const onChange = (pagination) => {
@@ -119,6 +96,8 @@ class Topic extends Component {
       showSizeChanger: true,
       showTotal: total => `总数 ${total}`
     };
+
+    console.log(this.state);
 
     return (
       <div>
@@ -135,12 +114,9 @@ class Topic extends Component {
           visible={this.state.visible}
           onOk={e => this.onOk(e)}
           onCancel={() => this.setState({ visible: false })}
-          onChange={handleChange}
-          onPreview={handlePreview}
-          handleCancel={handleCancel}
+          onChange={this.handleChange}
           avatar={this.state.avatar}
-          previewVisible={this.state.previewVisible}
-          previewImage={this.state.previewImage}
+          loading={this.state.loading}
         />
       </div>
     );
